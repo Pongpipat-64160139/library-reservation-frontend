@@ -5,10 +5,14 @@
       <v-row>
         <!-- Dropdown สำหรับเลือกประเภทห้อง -->
         <v-col>
-          
-        </v-col>
-        <v-col>
-          
+          <v-select
+            class="width-dd v-selectcolor"
+            label="Select room type"
+            :items="typeroom"
+            v-model="selectedPage"
+            @update:modelValue="onSelectChange"
+          >
+          </v-select>
         </v-col>
       </v-row>
     </v-container>
@@ -99,55 +103,69 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
-export default defineComponent({
-  data() {
-    return {
-      timeSlots: [
-        "08:00",
-        "08:30",
-        "09:00",
-        "09:30",
-        "10:00",
-        "10:30",
-        "11:00",
-        "11:30",
-        "12:00",
-        "12:30",
-        "13:00",
-        "13:30",
-        "14:00",
-        "14:30",
-        "15:00",
-        "15:30",
-        "16:00",
-        "16:30",
-      ],
-      typeroom: [
-        {
-          title: "Group Study Room",
-          icon: "mdi-account-group",
-          to: "/table_study",
-        },
-        {
-          title: "Entertain Room",
-          icon: "mdi-movie-roll",
-          link: "/table_entertain",
-        },
-        {
-          title: "Meeting Room",
-          icon: "mdi-laptop-account",
-          link: "/table_meeting",
-        },
-      ],
-      rooms3: ["ห้อง 1", "ห้อง 2", "ห้อง 3", "ห้อง 4", "ห้อง 5", "ห้อง 6"],
-      rooms4: ["ห้อง 1", "ห้อง 2", "ห้อง 3", "ห้อง 4", "ห้อง 5"], // ชั้น 4 มีแค่ 5 ห้อง
-      rooms5: ["ห้อง 1", "ห้อง 2", "ห้อง 3", "ห้อง 4", "ห้อง 5"], // ชั้น 5 มีแค่ 5 ห้อง
-    };
+const router = useRouter();
+const selectedPage = ref("Group Study Room");
+
+const timeSlots = [
+  "08:00",
+  "08:30",
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11:30",
+  "12:00",
+  "12:30",
+  "13:00",
+  "13:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+  "16:00",
+  "16:30",
+];
+
+const typeroom = [
+  {
+    title: "Group Study Room",
+    icon: "mdi-account-group",
+    to: "/table_study",
   },
-});
+  {
+    title: "Entertain Room",
+    icon: "mdi-movie-roll",
+    link: "/table_entertain",
+  },
+  {
+    title: "Meeting Room",
+    icon: "mdi-laptop-account",
+    link: "/table_meeting",
+  },
+];
+
+const rooms3 = ["ห้อง 1", "ห้อง 2", "ห้อง 3", "ห้อง 4", "ห้อง 5", "ห้อง 6"];
+const rooms4 = ["ห้อง 1", "ห้อง 2", "ห้อง 3", "ห้อง 4", "ห้อง 5"];
+const rooms5 = ["ห้อง 1", "ห้อง 2", "ห้อง 3", "ห้อง 4", "ห้อง 5"];
+
+const onSelectChange = (value: string) => {
+  console.log("Selected value:", value);
+  if (value === "Group Study Room") {
+    console.log("Navigating to HelloWorld");
+    router.push("/table_study");
+  } else if (value === "Entertain Room") {
+    console.log("Navigating to page2");
+    router.push("/table_entertain");
+  } else if (value === "Meeting Room") {
+    console.log("Navigating to page2");
+    router.push("/table_meeting");
+  }
+};
 </script>
 
 <style scoped>

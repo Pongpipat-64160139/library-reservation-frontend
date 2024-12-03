@@ -45,7 +45,10 @@
     >
       <span class="d-flex">
         <h1 class="ps-16 pt-5 head1-title">Entertain Room</h1>
-        <router-link to="/table_entertain" class="ps-16 pt-4 regularstu-title regularstu-line">
+        <router-link
+          to="/table_entertain"
+          class="ps-16 pt-4 regularstu-title regularstu-line"
+        >
           จองห้อง <v-icon right>mdi-arrow-right</v-icon>
         </router-link>
       </span>
@@ -76,7 +79,10 @@
     >
       <span class="d-flex">
         <h1 class="ps-16 pt-5 head1-title">Meeting Room</h1>
-        <router-link to="/table_meeting" class="ps-16 pt-4 regularmeet-title regularstu-line">
+        <router-link
+          to="/table_meeting"
+          class="ps-16 pt-4 regularmeet-title regularstu-line"
+        >
           จองห้อง <v-icon right>mdi-arrow-right</v-icon>
         </router-link>
       </span>
