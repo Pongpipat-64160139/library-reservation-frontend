@@ -6,18 +6,16 @@
       class="head-font"
       style="background-color: #eae2d6; height: 80px"
     >
-      <div class="d-flex align-items-center ms-10">
-        <v-img
-          src="https://media.discordapp.net/attachments/1311938195914625025/1311973048882303056/logo-informatics.png?ex=674acd9e&is=67497c1e&hm=bf1b7252b42cdfdaec4df9bc4698c42697369e88434a07df25f9e0cf9f4e6aa6&=&format=webp&quality=lossless&width=312&height=312"
-          width="60"
-          height="60"
-          class="mr-3 mt-2"
-        ></v-img>
-        <div class="mt-4">
+      <router-link
+        to="/home_page"
+        class="d-flex align-items-center ms-10 custom-router-link"
+      >
+        <v-img :src="logobuu" width="57" height="57" class="mr-3 mt-2"></v-img>
+        <div class="mt-3">
           <div>BUU Library</div>
           <div>ระบบจองการใช้พื้นที่บริการ</div>
         </div>
-      </div>
+      </router-link>
 
       <div class="d-flex mt-11 ms-136">
         <div>
@@ -35,6 +33,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import logobuu from "@/assets/logobuu.png";
 
 interface BreadcrumbItem {
   title: string;
@@ -45,6 +44,7 @@ interface BreadcrumbItem {
 export default defineComponent({
   data() {
     return {
+      logobuu,
       items: [
         {
           title: "สถานะการจอง",
@@ -83,8 +83,8 @@ export default defineComponent({
 }
 
 .head-font {
-  font-weight: 400; 
-  font-size: 16px; 
+  font-weight: 400;
+  font-size: 16px;
 }
 
 .left-al {
@@ -101,5 +101,14 @@ export default defineComponent({
 
 .text-center {
   text-align: center;
+}
+
+.custom-router-link {
+  text-decoration: none; /* เอาเส้นใต้ออก */
+  color: inherit;
+}
+
+.custom-router-link:hover {
+  text-decoration: none; /* ไม่มีเส้นใต้ตอนโฮเวอร์ */
 }
 </style>

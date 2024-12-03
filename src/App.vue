@@ -1,19 +1,11 @@
 <template>
-  <div id="app">
-    <HomePage />
-  </div>
+  <v-app>
+    <v-main>
+      <router-view />
+    </v-main>
+  </v-app>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-import HomePage from "./components/home/home_page.vue";
-
-export default defineComponent({
-  name: "App",
-  components: {
-    HomePage,
-  },
-});
+<script lang="ts" setup>
+  //
 </script>
-
-<style></style>

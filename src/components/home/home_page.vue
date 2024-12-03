@@ -1,8 +1,6 @@
 <template class="back-ground">
-  <v-container fluid class="back-ground">
-    <!-- เรียกใช้ HeaderStudent ข้างบน -->
-    <Header_page />
-  </v-container>
+  <!-- เรียกใช้ HeaderStudent ข้างบน -->
+  <Header_page />
 
   <v-container fluid class="back-ground ms-kob">
     <h1 class="pt-5 head-title text-center pb-10">ประเภทห้อง</h1>
@@ -16,9 +14,12 @@
     >
       <span class="d-flex">
         <h1 class="ps-16 pt-5 head1-title">Group Study Room</h1>
-          <h1 class="ps-16 pt-4 regularstu-title">
-            จองห้อง <v-icon right>mdi-arrow-right</v-icon>
-          </h1>
+        <router-link
+          to="/table_study"
+          class="ps-16 pt-4 regularstu-title regularstu-line"
+        >
+          จองห้อง <v-icon right>mdi-arrow-right</v-icon>
+        </router-link>
       </span>
 
       <v-slide-group show-arrows class="ps-13">
@@ -43,10 +44,10 @@
       style="background-color: #ead8c0; border-radius: 16px"
     >
       <span class="d-flex">
-        <h1 class="ps-16 pt-5 head1-title">Group Study Room</h1>
-        <h1 class="ps-16 pt-4 regularstu-title">
+        <h1 class="ps-16 pt-5 head1-title">Entertain Room</h1>
+        <router-link to="/table_entertain" class="ps-16 pt-4 regularstu-title regularstu-line">
           จองห้อง <v-icon right>mdi-arrow-right</v-icon>
-        </h1>
+        </router-link>
       </span>
 
       <v-slide-group show-arrows class="ps-13">
@@ -75,9 +76,9 @@
     >
       <span class="d-flex">
         <h1 class="ps-16 pt-5 head1-title">Meeting Room</h1>
-        <h1 class="ps-16 pt-4 regularmeet-title">
+        <router-link to="/table_meeting" class="ps-16 pt-4 regularmeet-title regularstu-line">
           จองห้อง <v-icon right>mdi-arrow-right</v-icon>
-        </h1>
+        </router-link>
       </span>
 
       <v-slide-group show-arrows class="">
@@ -233,7 +234,7 @@ export default defineComponent({
 .regularmeet-title {
   font-weight: 400;
   font-size: 16px;
-  margin-left: 385px;
+  margin-left: 386px;
   margin-top: 10px;
 }
 
@@ -266,6 +267,18 @@ export default defineComponent({
 }
 
 .ms-kob {
-  margin-top: -750px;
+  margin-top: -700px;
+}
+
+.regularstu-line {
+  /* ปรับให้เหมาะสมกับ layout */
+  cursor: pointer; /* เพิ่มเพื่อให้ผู้ใช้รู้ว่าสามารถคลิกได้ */
+  text-decoration: none; /* ไม่มีเส้นใต้ในสถานะปกติ */
+  color: #493628; /* สีข้อความ */
+  transition: text-decoration 0.2s ease-in-out; /* เพิ่มความนุ่มนวล */
+}
+
+.regularstu-line:hover {
+  text-decoration: underline; /* เพิ่มเส้นใต้เมื่อ hover */
 }
 </style>
