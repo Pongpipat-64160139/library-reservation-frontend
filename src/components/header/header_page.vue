@@ -25,7 +25,9 @@
 
       <div class="ms-020 mt-4 text-center">
         <div>64160136</div>
-        <div>ออกจากระบบ</div>
+        <router-link to="/login_page" class="custom-router-link"
+          >ออกจากระบบ</router-link
+        >
       </div>
     </v-app-bar>
   </v-app>

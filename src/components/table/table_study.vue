@@ -2,9 +2,13 @@
   <Header_page />
   <v-container fluid class="back-ground ms-kob">
     <v-container>
-      <v-row>
+      <v-row justify="center" align="center">
         <!-- Dropdown สำหรับเลือกประเภทห้อง -->
-        <v-col>
+        <v-col
+          class="d-flex justify-center"
+          cols="auto"
+          style="margin-right: 100px"
+        >
           <v-select
             class="width-dd v-selectcolor"
             label="Select room type"
@@ -13,6 +17,20 @@
             @update:modelValue="onSelectChange"
           >
           </v-select>
+        </v-col>
+
+        <!-- ช่องสำหรับปุ่มแสดงวันที่ -->
+        <v-col class="d-flex justify-center" cols="auto">
+          <v-btn class="btn-date" @click="showDatePicker = !showDatePicker">
+            {{ currentDate }}
+            <v-icon class="calendar-icon">mdi-calendar</v-icon>
+          </v-btn>
+
+          <!-- v-date-picker แสดงเมื่อ showDatePicker เป็น true -->
+          <v-date-picker
+            v-if="showDatePicker"
+            class="date-picker-position v-date-picker"
+          ></v-date-picker>
         </v-col>
       </v-row>
     </v-container>
@@ -106,6 +124,26 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+const showDatePicker = ref(false);
+const currentDate = ref("");
+
+const getCurrentDate = () => {
+  const date = new Date();
+
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long", // แสดงชื่อวัน
+    day: "numeric", // แสดงวันที่
+    month: "long", // แสดงเดือน
+    year: "numeric", // แสดงปี
+  };
+
+  // ใช้ Intl.DateTimeFormat เพื่อแสดงวันที่ในรูปแบบที่ต้องการ
+  const formatter = new Intl.DateTimeFormat("th-TH", options);
+  currentDate.value = formatter.format(date);
+};
+
+// เรียกใช้ฟังก์ชั่นเพื่อให้ได้วันที่ปัจจุบันเมื่อโหลดหน้า
+getCurrentDate();
 
 const router = useRouter();
 const selectedPage = ref("Group Study Room");
@@ -256,7 +294,42 @@ const onSelectChange = (value: string) => {
   border-radius: 5px;
 }
 
-.v-menu .v-text-field {
+.date-picker-position {
+  position: absolute; /* ทำให้มันลอย */
+  top: 170px; /* เลือกตำแหน่งที่ต้องการให้แสดง */
+  left: 500;
+  z-index: 1000; /* ควบคุมลำดับชั้นไม่ให้ทับส่วนอื่น */
+  background-color: #f5eded;
+  box-shadow: 0px 10px 8px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
+  border: 1px solid #493628;
+  width: 300px;
+  height: 440px;
+  color: #493628;
+}
+
+.btn-date {
+  width: 300px;
+  background-color: #f5eded;
+  border: 1px solid #493628;
   height: 57px;
+  border-radius: 5px;
+}
+
+.calendar-icon {
+  margin-left: 100px;
+  font-size: 20px;
+}
+
+.v-date-picker :deep(.v-btn) {
+  font-size: 10px !important; /* ปรับขนาดฟอนต์ */
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 100% !important; /* หากต้องการให้ปุ่มเป็นวงกลม */
+}
+
+/* ขนาดฟอนต์สำหรับ "Select date" */
+.v-date-picker :deep(.v-picker-title) {
+  font-size: 15px !important;
+  margin-top: 10px;
 }
 </style>
