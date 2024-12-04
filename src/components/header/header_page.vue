@@ -36,6 +36,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import logobuu from "@/assets/logobuu.png";
+import router from "@/router";
 
 interface BreadcrumbItem {
   title: string;
@@ -51,12 +52,12 @@ export default defineComponent({
         {
           title: "สถานะการจอง",
           disabled: false,
-          href: "breadcrumbs_dashboard",
+          href: "/status_page",
         },
         {
           title: "คู่มือใช้งาน",
           disabled: false,
-          href: "breadcrumbs_link_1",
+          href: "/form_study",
         },
         {
           title: "Floor-Room",

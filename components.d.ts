@@ -7,6 +7,13 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Booking_meeting: typeof import('./src/components/booking/booking_meeting.vue')['default']
+    Booking_study: typeof import('./src/components/booking/booking_study.vue')['default']
+    Form_: typeof import('./src/components/form/form_.vue')['default']
+    Form_equipment: typeof import('./src/components/form/form_equipment.vue')['default']
+    Form_meeting: typeof import('./src/components/form/form_meeting.vue')['default']
+    Form_restaurant: typeof import('./src/components/form/form_restaurant.vue')['default']
+    Form_study: typeof import('./src/components/form/form_study.vue')['default']
     Header_page: typeof import('./src/components/header/header_page.vue')['default']
     Hello: typeof import('./src/components/hello.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
@@ -14,6 +21,7 @@ declare module 'vue' {
     Login_page: typeof import('./src/components/home/login_page.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Status_page: typeof import('./src/components/status/status_page.vue')['default']
     Table_entertain: typeof import('./src/components/table/table_entertain.vue')['default']
     Table_meeting: typeof import('./src/components/table/table_meeting.vue')['default']
     Table_study: typeof import('./src/components/table/table_study.vue')['default']

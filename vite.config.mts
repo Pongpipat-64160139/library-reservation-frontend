@@ -19,6 +19,9 @@ export default defineConfig({
         'src/components',
         'src/components/table',
         'src/components/home',
+        'src/components/status',
+        'src/components/form',
+        'src/components/booking',
         
       ],
     }),

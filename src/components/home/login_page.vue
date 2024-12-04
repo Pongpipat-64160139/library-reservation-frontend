@@ -125,5 +125,6 @@ export default defineComponent({
 .font-bold {
   font-weight: bold !important;
   font-size: 18px !important;
+  
 }
 </style>

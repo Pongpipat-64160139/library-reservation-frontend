@@ -55,6 +55,7 @@
             v-for="(time, index) in timeSlots"
             :key="time"
             :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormStudy"
           >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room6-column" v-for="room in rooms3" :key="room">
@@ -82,6 +83,7 @@
             v-for="(time, index) in timeSlots"
             :key="time"
             :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormStudy"
           >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room5-column" v-for="room in rooms4" :key="room">
@@ -109,6 +111,7 @@
             v-for="(time, index) in timeSlots"
             :key="time"
             :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormStudy"
           >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room5-column" v-for="room in rooms5" :key="room">
@@ -122,7 +125,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 const showDatePicker = ref(false);
 const currentDate = ref("");
@@ -204,6 +207,10 @@ const onSelectChange = (value: string) => {
     router.push("/table_meeting");
   }
 };
+
+const goToFormStudy = () => {
+  router.push("/booking_meeting");
+};
 </script>
 
 <style scoped>
@@ -255,12 +262,23 @@ const onSelectChange = (value: string) => {
   font-weight: bold;
 }
 
+.table-bordered td {
+  position: relative; /* เพื่อให้มั่นใจว่า td จะอยู่ในตำแหน่งที่คลิกได้ */
+  z-index: 1;
+}
+
+
 .row-even {
   background-color: #f5eded;
 }
 
 .row-odd {
   background-color: #e2dad6;
+}
+
+.row-even,
+.row-odd {
+  cursor: pointer;
 }
 
 .ms-kob {
@@ -318,6 +336,7 @@ const onSelectChange = (value: string) => {
 .calendar-icon {
   margin-left: 100px;
   font-size: 20px;
+  color: #493628;
 }
 
 .v-date-picker :deep(.v-btn) {
