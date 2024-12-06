@@ -10,14 +10,14 @@
         to="/home_page"
         class="d-flex align-items-center ms-10 custom-router-link"
       >
-        <v-img :src="logobuu" width="57" height="57" class="mr-3 mt-2"></v-img>
-        <div class="mt-3">
-          <div>BUU Library</div>
-          <div>ระบบจองการใช้พื้นที่บริการ</div>
+        <v-img :src="logobuu" width="54" height="54" class="mr-3 mt-3"></v-img>
+        <div class="mt-5">
+          <div class="buu-font">BUU Library</div>
+          <div class="buu-font">ระบบจองห้องสมุด</div>
         </div>
       </router-link>
 
-      <div class="d-flex mt-11 ms-136">
+      <div class="d-flex mt-11 ms-136 buu-font">
         <div>
           <v-breadcrumbs :items="items" divider="|"></v-breadcrumbs>
         </div>
@@ -25,7 +25,7 @@
 
       <div class="ms-020 mt-4 text-center">
         <div>64160136</div>
-        <router-link to="/login_page" class="custom-router-link"
+        <router-link to="/login_page" class="custom-router-link buu-font"
           >ออกจากระบบ</router-link
         >
       </div>
@@ -90,12 +90,17 @@ export default defineComponent({
   font-size: 16px;
 }
 
+.buu-font {
+  font-weight: 400;
+  font-size: 14px;
+}
+
 .left-al {
   text-align: left;
 }
 
 .ms-136 {
-  margin-left: 700px;
+  margin-left: 650px;
 }
 
 .ms-020 {

@@ -392,7 +392,7 @@ const onSelectChange = (value: string) => {
 }
 
 .ms-kob {
-  margin-top: -700px;
+  margin-top: -600px;
 }
 
 .ms-minustop {
@@ -448,7 +448,7 @@ const onSelectChange = (value: string) => {
 }
 
 .calendar-icon {
-  margin-left: 100px;
+  margin-left: 50px;
   font-size: 20px;
 }
 

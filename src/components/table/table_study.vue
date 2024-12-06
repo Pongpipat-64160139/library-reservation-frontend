@@ -282,7 +282,7 @@ const goToFormStudy = () => {
 }
 
 .ms-kob {
-  margin-top: -700px;
+  margin-top: -600px;
 }
 
 .ms-minustop {
@@ -334,7 +334,7 @@ const goToFormStudy = () => {
 }
 
 .calendar-icon {
-  margin-left: 100px;
+  margin-left: 50px;
   font-size: 20px;
   color: #493628;
 }

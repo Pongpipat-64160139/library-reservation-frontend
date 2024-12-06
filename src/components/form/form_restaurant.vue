@@ -5,11 +5,14 @@
       class="me-7 head-inmore ps-1 mb-5"
       title="ต้องการอาหารว่าง/กลางวัน (กรุณาแจ้งล่วงหน้า 2 วันทำการ)"
     >
-      <template  v-slot:text>
+      <template v-slot:text>
         <div class="cl-div">
           <!-- อาหารว่าง -->
           <h4 class="ms-10">อาหารว่าง</h4>
-          <v-checkbox class="d-flex flex-wrap ms-8 mg-break" label="Break เช้า" />
+          <v-checkbox
+            class="d-flex flex-wrap ms-8 mg-break"
+            label="Break เช้า"
+          />
           <div class="d-flex flex-wrap">
             <v-select
               label="เวลา"
@@ -32,7 +35,10 @@
             ></v-text-field>
           </div>
 
-          <v-checkbox class="d-flex flex-wrap ms-8 mg-break" label="Break กลางวัน" />
+          <v-checkbox
+            class="d-flex flex-wrap ms-8 mg-break"
+            label="Break กลางวัน"
+          />
           <div class="d-flex flex-wrap">
             <v-select
               label="เวลา"
@@ -55,7 +61,10 @@
             ></v-text-field>
           </div>
 
-          <v-checkbox class="d-flex flex-wrap ms-8 mg-break" label="Break บ่าย" />
+          <v-checkbox
+            class="d-flex flex-wrap ms-8 mg-break"
+            label="Break บ่าย"
+          />
           <div class="d-flex flex-wrap">
             <v-select
               label="เวลา"
@@ -159,7 +168,7 @@ export default defineComponent({
 
 .head-more {
   font-weight: 600;
-  font-size: 20px;
+  font-size: 18px;
   color: #493628;
   margin-top: 10px;
 }
@@ -173,7 +182,7 @@ export default defineComponent({
 
 .head-inmore {
   font-weight: 500;
-  font-size: 18px;
+  font-size: 17px;
   color: #493628;
   margin-top: 10px;
   background-color: #f5eded;

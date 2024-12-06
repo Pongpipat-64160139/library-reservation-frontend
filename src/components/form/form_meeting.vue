@@ -11,7 +11,7 @@
 
       <!-- span1 -->
       <span class="d-flex">
-        <h1 class="ms-16 pt-5 head1-title">ชื่อ</h1>
+        <h1 class="mg-name pt-5 head1-title">ชื่อ</h1>
         <v-text-field
           class="width-formname text-field-rounded"
           single-line
@@ -40,7 +40,7 @@
 
       <!-- span2 -->
       <span class="d-flex">
-        <h1 class="ps-7 pt-5 head1-title">วันที่เริ่ม</h1>
+        <h1 class="mg-date pt-5 head1-title">วันที่เริ่ม</h1>
         <v-text-field
           class="width-formdate text-field-rounded"
           single-line
@@ -74,12 +74,12 @@
 
       <!-- span3 -->
       <span class="d-flex">
-        <h1 class="ps-16 pt-5 head1-title">ชั้น</h1>
+        <h1 class="mg-floor pt-5 head1-title">ชั้น</h1>
         <v-select
           v-model="floor"
           :items="[2, 3, 4, 5, 6, 7]"
           outlined
-          label="เลือกชั้น"
+          label=""
           class="width-formfloor text-field-rounded"
         />
         <h1 class="ps-15 pt-5 head1-title">ห้อง</h1>
@@ -87,7 +87,7 @@
           v-model="room"
           :items="availableRooms"
           outlined
-          label="เลือกห้อง"
+          label=""
           class="width-formroom text-field-rounded"
         />
         <h1 class="ps-15 pt-5 head1-title">ชื่อป้ายเวที</h1>
@@ -101,7 +101,7 @@
 
       <!-- span4 -->
       <span class="d-flex">
-        <h1 class="ps-12 pt-5 head1-title">ทำซ้ำ</h1>
+        <h1 class="mg-repeat pt-5 head1-title">ทำซ้ำ</h1>
         <v-select
           v-model="repeatOption"
           :items="['ไม่', 'ทำซ้ำ']"
@@ -123,7 +123,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watch } from "vue";
 
 export default defineComponent({
   data() {
@@ -133,9 +133,9 @@ export default defineComponent({
       startDate: "",
       startTime: "08:00",
       endDate: "",
-      endTime: "-",
+      endTime: "08:30",
       floor: 2,
-      room: 201,
+      room: "201",
       repeatOption: "ไม่",
       timeOptions: [
         "08:00",
@@ -177,8 +177,29 @@ export default defineComponent({
           "ศึกษากลุ่ม 4",
           "ศึกษากลุ่ม 5",
         ],
-        5: ["Lecturer's Room 1", "Lecturer's Room 2", "Lecturer's Room 3"],
+        5: [
+          "ศึกษากลุ่ม 1",
+          "ศึกษากลุ่ม 2",
+          "ศึกษากลุ่ม 3",
+          "ศึกษากลุ่ม 4",
+          "ศึกษากลุ่ม 5",
+          "Lecturer's Room 1",
+          "Lecturer's Room 2",
+          "Lecturer's Room 3",
+        ],
         6: [
+          "STV 1",
+          "STV 2",
+          "STV 3",
+          "STV 4",
+          "STV 5",
+          "STV 6",
+          "STV 7",
+          "STV 8",
+          "STV 9",
+          "LIBRA OKE 1",
+          "LIBRA OKE 2",
+          "MINI THEATER",
           "604 Smart Board",
           "Mini Studio",
           "Cyber Zone 1",
@@ -193,6 +214,7 @@ export default defineComponent({
       currentEndDate: "",
     };
   },
+
   computed: {
     filteredEndTimes() {
       if (this.startTime === "08:00") {
@@ -259,13 +281,27 @@ export default defineComponent({
         return ["18:30"];
       }
 
-      return this.timeOptions.filter((time) => time !== "-");
+      return this.timeOptions.filter((time) => time !== "08:30");
     },
     availableRooms() {
-      // Ensure that this.floor is valid before accessing floorRooms
-      return this.floor !== null && this.floor !== undefined
-        ? this.floorRooms[this.floor]
-        : [];
+      if (this.floor in this.floorRooms) {
+        return this.floorRooms[this.floor as keyof typeof this.floorRooms];
+      } else {
+        return [];
+      }
+    },
+  },
+
+  watch: {
+    startTime(newStartTime) {
+      const availableTimes = this.filteredEndTimes;
+      this.endTime = availableTimes[0] || "08:30";
+    },
+    floor(newFloor: keyof typeof this.floorRooms) {
+      const firstRoom = this.floorRooms[newFloor]
+        ? this.floorRooms[newFloor][0]
+        : "";
+      this.room = firstRoom;
     },
   },
 
@@ -290,14 +326,14 @@ export default defineComponent({
 
 .head-title {
   font-weight: 600;
-  font-size: 24px;
+  font-size: 20px;
 }
 
 .head1-title {
   font-weight: 400;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
-  margin-top: -4px;
+  margin-top: -1px;
 }
 
 .text-center {
@@ -306,6 +342,22 @@ export default defineComponent({
 
 .mt-2 {
   margin-top: 10px;
+}
+
+.mg-name {
+  margin-left: 54px;
+}
+
+.mg-date {
+  margin-left: 25px;
+}
+
+.mg-floor {
+  margin-left: 56px;
+}
+
+.mg-repeat {
+  margin-left: 43px;
 }
 
 .back-ground {
@@ -325,7 +377,6 @@ export default defineComponent({
 }
 
 .width-formamount {
-  font-size: 50px;
   margin-left: 20px;
   color: #493628;
   width: 65px;
@@ -340,14 +391,12 @@ export default defineComponent({
 }
 
 .width-formtime {
-  font-size: 20px;
   margin-left: 20px;
   color: #493628;
   width: 135px;
 }
 
 .width-formtime1 {
-  font-size: 20px;
   margin-left: 20px;
   color: #493628;
   width: 135px;
@@ -362,34 +411,30 @@ export default defineComponent({
 
 .width-formfloor {
   width: 10px;
-  font-size: 50px;
   margin-left: 20px;
   color: #493628;
 }
 
 .width-formroom {
   width: 100px;
-  font-size: 50px;
   margin-left: 20px;
   color: #493628;
 }
 
 .width-formtag {
   width: 130px;
-  font-size: 50px;
   margin-left: 20px;
   color: #493628;
 }
 
 .width-formblank1 {
-  width: 465px;
-  font-size: 50px;
+  width: 460px;
   margin-left: 20px;
   color: #493628;
 }
 
 .text-field-rounded ::v-deep(.v-input__control) {
-  background-color: #f5eded; /* ตั้งค่าสีพื้นหลัง */
+  background-color: #f5eded;
   border-radius: 5px;
   border: 2px solid #493628;
 }

@@ -70,16 +70,14 @@
         <Form_restaurant />
       </span>
       <span class="d-flex">
-        <h1 class="head-more ms-10 mt-5">เอกสารเพิ่มเติม</h1>
+        <h1 class="head-more ms-10 mt-5">ไฟล์เอกสารเพิ่มเติม</h1>
         <v-file-input
           class="text-field-rounded width-file"
           label="เพิ่มไฟล์"
           single-line
           outlined
         >
-          <!-- ใส่ไอคอนและข้อความใน slot -->
-</v-file-input
-        >
+        </v-file-input>
       </span>
     </v-sheet>
   </v-container>
@@ -91,7 +89,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   data() {
     return {
-      selected: ["John"] as string[], // ใช้ `as` เพื่อกำหนดชนิดข้อมูล
+      selected: [""] as string[],
     };
   },
 });
@@ -109,21 +107,21 @@ export default defineComponent({
 
 .head-equipment {
   font-weight: 600;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .head-plsselect {
   font-weight: 100;
-  font-size: 18px;
+  font-size: 15px;
 }
 
 .head-selectequipment {
-  font-size: 20px;
+  font-size: 18px;
   color: #493628;
 }
 
 .head-selectequipment ::v-deep(.v-label) {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 500;
   color: #493628;
 }
@@ -136,13 +134,6 @@ export default defineComponent({
 
 .head-more {
   font-weight: 600;
-  font-size: 20px;
-  color: #493628;
-  margin-top: 10px;
-}
-
-.head-inmore {
-  font-weight: 500;
   font-size: 18px;
   color: #493628;
   margin-top: 10px;
@@ -184,7 +175,6 @@ export default defineComponent({
 
 .width-formblank1 {
   width: 465px;
-  font-size: 50px;
   margin-left: 20px;
   color: #493628;
 }

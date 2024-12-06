@@ -55,9 +55,7 @@
             :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
           >
             <td class="time-column font-table">{{ time }}</td>
-            <td class="room9-column" v-for="room in stv" :key="room">
-              <!-- เพิ่มเนื้อหาหรือปุ่มในช่องนี้ได้ -->
-            </td>
+            <td class="room9-column" v-for="room in stv" :key="room"></td>
           </tr>
         </tbody>
       </v-simple-table>
@@ -82,16 +80,14 @@
             :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
           >
             <td class="time-column font-table">{{ time }}</td>
-            <td class="room2-column" v-for="room in oke" :key="room">
-              <!-- เพิ่มเนื้อหาหรือปุ่มในช่องนี้ได้ -->
-            </td>
+            <td class="room2-column" v-for="room in oke" :key="room"></td>
           </tr>
         </tbody>
       </v-simple-table>
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง Mini Theater -->
-    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง Mini Theater</h1>
+    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง MINI THEATER</h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
@@ -109,9 +105,11 @@
             :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
           >
             <td class="time-column font-table">{{ time }}</td>
-            <td class="room1-column" v-for="room in minitheater" :key="room">
-              <!-- เพิ่มเนื้อหาหรือปุ่มในช่องนี้ได้ -->
-            </td>
+            <td
+              class="room1-column"
+              v-for="room in minitheater"
+              :key="room"
+            ></td>
           </tr>
         </tbody>
       </v-simple-table>
@@ -197,7 +195,7 @@ const stv = [
   "STV 9",
 ];
 const oke = ["ห้อง LIBRA OKE 1", "ห้อง LIBRA OKE 2"];
-const minitheater = ["ห้อง Mini Theater"];
+const minitheater = ["ห้อง MINI THEATER"];
 
 const onSelectChange = (value: string) => {
   console.log("Selected value:", value);
@@ -284,7 +282,7 @@ const onSelectChange = (value: string) => {
 }
 
 .ms-kob {
-  margin-top: -700px;
+  margin-top: -600px;
 }
 
 .ms-minustop {
@@ -340,7 +338,7 @@ const onSelectChange = (value: string) => {
 }
 
 .calendar-icon {
-  margin-left: 100px;
+  margin-left: 50px;
   font-size: 20px;
 }
 
