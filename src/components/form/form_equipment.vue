@@ -66,30 +66,25 @@
           class="ms-13 text-field-rounded me-7 mt-2"
         ></v-textarea>
       </span>
-      <span
-        ><h1 class="head-more ms-10 mt-5">ตัวเลือกเพิ่มเติม</h1>
-        <v-expansion-panels class="pd-more ms-16 me-1">
-          <v-expansion-panel
-            v-for="i in 1"
-            class="me-7 head-inmore ps-1 mb-5"
-            :key="i"
-            text="halo"
-            title="ต้องการอาหารว่าง/กลางวัน (กรุณาแจ้งล่วงหน้า 2 วันทำการ)"
-          ></v-expansion-panel></v-expansion-panels
-      ></span>
+      <span>
+        <Form_restaurant />
+      </span>
       <span class="d-flex">
         <h1 class="head-more ms-10 mt-5">เอกสารเพิ่มเติม</h1>
         <v-file-input
           class="text-field-rounded width-file"
           label=""
           variant="outlined"
-        > <!-- ใส่ไอคอนและข้อความใน slot -->
+        >
+          <!-- ใส่ไอคอนและข้อความใน slot -->
 
           <template #label>
-            <v-icon>mdi-file-plus</v-icon> <!-- เปลี่ยนเป็นไอคอนที่ต้องการ -->
+            <v-icon>mdi-file-plus</v-icon>
+            <!-- เปลี่ยนเป็นไอคอนที่ต้องการ -->
 
             เพิ่มไฟล์
-          </template></v-file-input>
+          </template></v-file-input
+        >
       </span>
     </v-sheet>
   </v-container>
