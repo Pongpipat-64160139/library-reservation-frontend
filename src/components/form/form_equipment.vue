@@ -73,17 +73,12 @@
         <h1 class="head-more ms-10 mt-5">เอกสารเพิ่มเติม</h1>
         <v-file-input
           class="text-field-rounded width-file"
-          label=""
-          variant="outlined"
+          label="เพิ่มไฟล์"
+          single-line
+          outlined
         >
           <!-- ใส่ไอคอนและข้อความใน slot -->
-
-          <template #label>
-            <v-icon>mdi-file-plus</v-icon>
-            <!-- เปลี่ยนเป็นไอคอนที่ต้องการ -->
-
-            เพิ่มไฟล์
-          </template></v-file-input
+</v-file-input
         >
       </span>
     </v-sheet>
