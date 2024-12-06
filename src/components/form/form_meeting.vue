@@ -41,12 +41,31 @@
       <!-- span2 -->
       <span class="d-flex">
         <h1 class="mg-date pt-5 head1-title">วันที่เริ่ม</h1>
-        <v-text-field
+
+        <v-menu
           class="width-formdate text-field-rounded"
-          single-line
-          outlined
-          label=""
-        />
+          v-model="menu"
+          :close-on-content-click="false"
+          :return-value.sync="date"
+          transition="scale-transition"
+          offset-y
+        >
+          <template
+            #activator="{ props }"
+            class="width-formdate text-field-rounded"
+          >
+            <!-- ปุ่มหรือฟิลด์ที่ใช้เปิด dropdown -->
+            <v-text-field
+              class="width-formdate text-field-rounded"
+              v-bind="props"
+              v-model="date"
+              label="เลือกวันที่"
+              readonly
+            />
+          </template>
+          <v-date-picker v-model="date" @input="menu = false" />
+        </v-menu>
+
         <h1 class="ps-5 pt-5 head1-title">เวลา</h1>
         <v-select
           v-model="startTime"
@@ -130,6 +149,8 @@ export default defineComponent({
     return {
       numPeople: "",
       phoneNumber: "",
+      menu: false, // สำหรับควบคุมการเปิดปิดของ dropdown
+      date: null,
       startDate: "",
       startTime: "08:00",
       endDate: "",
@@ -208,6 +229,8 @@ export default defineComponent({
         ],
         7: ["706", "707"],
       },
+      currentDate: this.formatDate(new Date("Tue Dec 03 2024 00:00:00 GMT+0700")),
+
       showStartDatePicker: false,
       showEndDatePicker: false,
       currentStartDate: "",
@@ -310,6 +333,20 @@ export default defineComponent({
       // กรองเฉพาะตัวเลข
       this.numPeople = this.numPeople.replace(/\D/g, "");
     },
+
+    formatDate(date: Date) {
+    // แปลงวันที่เป็นภาษาไทยในรูปแบบที่ต้องการ
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long', // วันในสัปดาห์
+      day: 'numeric', // วันที่
+      month: 'long', // เดือน
+      year: 'numeric', // ปี
+    };
+
+    const thaiDate = new Intl.DateTimeFormat('th-TH', options).format(date);
+
+    return thaiDate;
+  },
   },
 });
 </script>

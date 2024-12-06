@@ -428,7 +428,7 @@ const onSelectChange = (value: string) => {
 
 .date-picker-position {
   position: absolute; /* ทำให้มันลอย */
-  top: 170px; /* เลือกตำแหน่งที่ต้องการให้แสดง */
+  top: 190px; /* เลือกตำแหน่งที่ต้องการให้แสดง */
   left: 500;
   z-index: 1000; /* ควบคุมลำดับชั้นไม่ให้ทับส่วนอื่น */
   background-color: #f5eded;
