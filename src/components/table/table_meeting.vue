@@ -21,16 +21,24 @@
 
         <!-- ช่องสำหรับปุ่มแสดงวันที่ -->
         <v-col class="d-flex justify-center" cols="auto">
-          <v-btn class="btn-date" @click="showDatePicker = !showDatePicker">
-            {{ currentDate }}
+          <v-btn class="btn-date" @click="showDatePicker = !showDatePicker" >
+            {{ selectedDate ? new Date(selectedDate).toLocaleDateString('th-TH', {
+          weekday: 'long', year: 'numeric', month: 'long', day:
+            'numeric'
+        }) : new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+        }}
             <v-icon class="calendar-icon">mdi-calendar</v-icon>
           </v-btn>
 
           <!-- v-date-picker แสดงเมื่อ showDatePicker เป็น true -->
           <v-date-picker
             v-if="showDatePicker"
-            class="date-picker-position v-date-picker"
-          ></v-date-picker>
+            class="date-picker-position"
+            v-model="selectedDate"
+            @update:model-value="handleDateSelect"
+            @click:clear="selectedDate = null"
+          >
+          </v-date-picker>
         </v-col>
       </v-row>
     </v-container>
@@ -55,6 +63,7 @@
             v-for="(time, index) in timeSlots"
             :key="time"
             :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormMeeting"
           >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room1-column" v-for="room in twozo" :key="room"></td>
@@ -80,6 +89,7 @@
             v-for="(time, index) in timeSlots"
             :key="time"
             :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormMeeting"
           >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room3-column" v-for="room in lecture" :key="room"></td>
@@ -105,6 +115,7 @@
             v-for="(time, index) in timeSlots"
             :key="time"
             :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormMeeting"
           >
             <td class="time-column font-table">{{ time }}</td>
             <td
@@ -134,6 +145,7 @@
             v-for="(time, index) in timeSlots"
             :key="time"
             :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormMeeting"
           >
             <td class="time-column font-table">{{ time }}</td>
             <td
@@ -163,6 +175,7 @@
             v-for="(time, index) in timeSlots"
             :key="time"
             :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormMeeting"
           >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room2-column" v-for="room in cyberzone" :key="room"></td>
@@ -188,6 +201,7 @@
             v-for="(time, index) in timeSlots"
             :key="time"
             :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormMeeting"
           >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room1-column" v-for="room in liveforlife" :key="room">
@@ -217,6 +231,7 @@
             v-for="(time, index) in timeSlots"
             :key="time"
             :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormMeeting"
           >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room2-column" v-for="room in sevenfloor" :key="room">
@@ -234,6 +249,12 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 const showDatePicker = ref(false);
 const currentDate = ref("");
+const selectedDate = ref<string | null>(null);
+
+const handleDateSelect = (date: string | null) => {
+  selectedDate.value = date;
+  showDatePicker.value = false;
+}
 
 const getCurrentDate = () => {
   const date = new Date();
@@ -252,6 +273,7 @@ const getCurrentDate = () => {
 
 // เรียกใช้ฟังก์ชั่นเพื่อให้ได้วันที่ปัจจุบันเมื่อโหลดหน้า
 getCurrentDate();
+
 
 const router = useRouter();
 const selectedPage = ref("Meeting Room");
@@ -316,6 +338,11 @@ const onSelectChange = (value: string) => {
     router.push("/table_meeting");
   }
 };
+
+
+const goToFormMeeting = () => {
+  router.push("/booking_meeting");
+};
 </script>
 
 <style scoped>
@@ -347,6 +374,11 @@ const onSelectChange = (value: string) => {
   border: 1px solid #493628;
   text-align: center;
   padding: 0px;
+}
+
+.table-bordered td {
+  position: relative;
+  z-index: 1;
 }
 
 .time-column {
@@ -389,6 +421,11 @@ const onSelectChange = (value: string) => {
 
 .row-odd {
   background-color: #e2dad6;
+}
+
+.row-even,
+.row-odd {
+  cursor: pointer;
 }
 
 .ms-kob {

@@ -3,7 +3,7 @@
     <!-- Col แรกอยู่ฝั่งซ้าย -->
     <v-col cols="12" md="5" class="ms-15">
       <div>
-        <v-img :src="buulib" width="400" height="100" class="mt-15"></v-img>
+        <v-img :src="buulib" width="350" height="100" class="mt-10"></v-img>
         <p class="font-text mt-3 ms-9">Welcome to our online</p>
         <p class="font-text ms-9">library reservation system!</p>
 
@@ -46,7 +46,7 @@
 
     <!-- Col ที่สองอยู่ฝั่งขวา -->
     <v-col cols="12" md="6">
-      <v-img :src="lib" width="900" height="750" class="mt-2"></v-img>
+      <v-img :src="lib" width="700" height="700" class="mt-1"></v-img>
     </v-col>
   </v-row>
 </template>

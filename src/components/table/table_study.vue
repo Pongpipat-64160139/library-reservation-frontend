@@ -21,16 +21,24 @@
 
         <!-- ช่องสำหรับปุ่มแสดงวันที่ -->
         <v-col class="d-flex justify-center" cols="auto">
-          <v-btn class="btn-date" @click="showDatePicker = !showDatePicker">
-            {{ currentDate }}
+          <v-btn class="btn-date" @click="showDatePicker = !showDatePicker" >
+            {{ selectedDate ? new Date(selectedDate).toLocaleDateString('th-TH', {
+          weekday: 'long', year: 'numeric', month: 'long', day:
+            'numeric'
+        }) : new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+        }}
             <v-icon class="calendar-icon">mdi-calendar</v-icon>
           </v-btn>
 
           <!-- v-date-picker แสดงเมื่อ showDatePicker เป็น true -->
           <v-date-picker
             v-if="showDatePicker"
-            class="date-picker-position v-date-picker"
-          ></v-date-picker>
+            class="date-picker-position"
+            v-model="selectedDate"
+            @update:model-value="handleDateSelect"
+            @click:clear="selectedDate = null"
+          >
+          </v-date-picker>
         </v-col>
       </v-row>
     </v-container>
@@ -59,7 +67,6 @@
           >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room6-column" v-for="room in rooms3" :key="room">
-              <!-- เพิ่มเนื้อหาหรือปุ่มในช่องนี้ได้ -->
             </td>
           </tr>
         </tbody>
@@ -87,7 +94,6 @@
           >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room5-column" v-for="room in rooms4" :key="room">
-              <!-- เพิ่มเนื้อหาหรือปุ่มในช่องนี้ได้ -->
             </td>
           </tr>
         </tbody>
@@ -115,7 +121,6 @@
           >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room5-column" v-for="room in rooms5" :key="room">
-              <!-- เพิ่มเนื้อหาหรือปุ่มในช่องนี้ได้ -->
             </td>
           </tr>
         </tbody>
@@ -125,10 +130,16 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 const showDatePicker = ref(false);
 const currentDate = ref("");
+const selectedDate = ref<string | null>(null);
+
+const handleDateSelect = (date: string | null) => {
+  selectedDate.value = date;
+  showDatePicker.value = false;
+}
 
 const getCurrentDate = () => {
   const date = new Date();
@@ -150,6 +161,7 @@ getCurrentDate();
 
 const router = useRouter();
 const selectedPage = ref("Group Study Room");
+
 
 const timeSlots = [
   "08:00",
@@ -209,7 +221,7 @@ const onSelectChange = (value: string) => {
 };
 
 const goToFormStudy = () => {
-  router.push("/booking_meeting");
+  router.push("/booking_study");
 };
 </script>
 
@@ -263,7 +275,7 @@ const goToFormStudy = () => {
 }
 
 .table-bordered td {
-  position: relative; /* เพื่อให้มั่นใจว่า td จะอยู่ในตำแหน่งที่คลิกได้ */
+  position: relative;
   z-index: 1;
 }
 
@@ -313,12 +325,12 @@ const goToFormStudy = () => {
 }
 
 .date-picker-position {
-  position: absolute; /* ทำให้มันลอย */
-  top: 190px; /* เลือกตำแหน่งที่ต้องการให้แสดง */
+  position: absolute; 
+  top: 190px;
   left: 500;
-  z-index: 1000; /* ควบคุมลำดับชั้นไม่ให้ทับส่วนอื่น */
+  z-index: 1000; 
   background-color: #f5eded;
-  box-shadow: 0px 10px 8px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
+  box-shadow: 0px 10px 8px rgba(0, 0, 0, 0.1); 
   border: 1px solid #493628;
   width: 300px;
   height: 440px;
