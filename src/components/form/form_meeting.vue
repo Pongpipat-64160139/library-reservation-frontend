@@ -243,6 +243,7 @@
 </template>
 
 <script lang="ts">
+import router from "@/router";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -652,6 +653,7 @@ export default defineComponent({
   },
 
   methods: {
+    
     validateNumber() {
       // กรองเฉพาะตัวเลข
       this.numPeople = this.numPeople.replace(/\D/g, "");
@@ -674,8 +676,11 @@ export default defineComponent({
       if (this.repeatOption === "ไม่") {
         this.endRepeatDate = null; // ล้างค่าที่เลือกในวันที่สิ้นสุด
       }
+   
     },
+    
   },
+  
 });
 </script>
 

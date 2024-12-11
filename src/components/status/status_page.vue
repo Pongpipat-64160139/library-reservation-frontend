@@ -1,36 +1,45 @@
-<template>
-    <v-container>
-      <!-- ใช้ v-menu เพื่อให้ date picker เปิดในรูปแบบ dropdown -->
-      <v-menu
-        v-model="menu"
-        :close-on-content-click="false"
-        :return-value.sync="date"
-        transition="scale-transition"
-        offset-y
-      >
-        <template #activator="{ props }">
-          <!-- ปุ่มหรือฟิลด์ที่ใช้เปิด dropdown -->
-          <v-text-field
-            v-bind="props"
-            v-model="date"
-            label="เลือกวันที่"
-            readonly
-            append-icon="mdi-calendar"
-          />
-        </template>
-        <v-date-picker v-model="date" @input="menu = false" />
-      </v-menu>
-    </v-container>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        menu: false, // สำหรับควบคุมการเปิดปิดของ dropdown
-        date: null, // เก็บวันที่ที่เลือก
-      };
-    },
-  };
-  </script>
-  
+<template class="back-ground">
+  <!-- เรียกใช้ HeaderStudent ข้างบน -->
+  <Header_page />
+
+  <v-container fluid class="back-ground ms-kob">
+    <h1 class="pt-5 head-title text-center pb-10">สถานะการจอง</h1>
+
+    
+  </v-container>
+</template>
+
+<script lang="ts">
+
+</script>
+
+<style scoped>
+/* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
+
+/* ใช้ฟอนต์ Kanit ทั่วทั้งโปรเจ็กต์ */
+* {
+  font-family: "Kanit", sans-serif;
+  color: #493628;
+}
+
+.head-title {
+  font-weight: 600;
+  font-size: 24px;
+}
+
+.head1-title {
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.back-ground {
+  background-color: #f9f3ea;
+}
+
+.ms-kob {
+  margin-top: -600px;
+}
+
+
+</style>

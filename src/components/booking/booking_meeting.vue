@@ -3,6 +3,10 @@
   <v-container fluid class="back-ground ms-kob">
     <Form_meeting />
     <Form_equipment class="mt-1" />
+    <v-btn to="/table_meeting" type="submit" class="save-btn custom-btn">
+      <v-icon left>mdi-content-save</v-icon>
+      จองห้อง
+    </v-btn>
   </v-container>
 </template>
 
@@ -17,11 +21,36 @@
 
 .head-title {
   font-weight: 600;
-  font-size: 20px;
+  font-size: 16px;
 }
+
+.save-btn {
+  margin-left: 100px;
+  margin-top: 20px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* กำหนดสีพื้นหลังและสีข้อความของปุ่ม */
+.custom-btn {
+  background-color: #f5eded !important; /* ใช้ !important เพื่อให้แน่ใจว่าการตั้งค่านี้จะถูกใช้ */
+  color: #493628 !important;
+  margin-left: 1190px;
+  width: 150px;
+  height: 40px;
+  border: 2px solid #493628;
+}
+
+/* ถ้าต้องการเปลี่ยนสีไอคอน */
+.custom-btn .v-icon {
+  color: #493628 !important;
+  margin-right: 10px;
+}
+
 .back-ground {
   background-color: #f9f3ea;
 }
+
 .ms-kob {
   margin-top: -300px;
 }

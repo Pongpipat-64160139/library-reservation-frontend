@@ -8,7 +8,7 @@
       <template v-slot:text>
         <div class="cl-div">
           <!-- อาหารว่าง -->
-          <h4 class="ms-10">อาหารว่าง</h4>
+          <h4 class="ms-10 head-more">อาหารว่าง</h4>
           <v-checkbox
             class="d-flex flex-wrap ms-8 mg-break"
             label="Break เช้า"
@@ -88,7 +88,7 @@
           </div>
 
           <!-- อาหารกลางวัน -->
-          <h4 class="ms-10 mg-lunch">อาหารกลางวัน</h4>
+          <h4 class="ms-10 head-more mg-lunch">อาหารกลางวัน</h4>
           <div class="d-flex flex-wrap">
             <v-select
               label="เวลา"
@@ -168,7 +168,7 @@ export default defineComponent({
 
 .head-more {
   font-weight: 600;
-  font-size: 18px;
+  font-size: 16px;
   color: #493628;
   margin-top: 10px;
 }

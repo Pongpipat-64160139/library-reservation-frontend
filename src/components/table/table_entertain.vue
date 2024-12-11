@@ -143,8 +143,8 @@ const fetchHolidays = async (year: string) => {
   }
 };
 
-const allowedDates = (date: Date) => {
-  if (!date) return false;
+const allowedDates = (date: unknown) => {
+  if (!(date instanceof Date)) return false; 
 
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");

@@ -107,7 +107,7 @@ export default defineComponent({
 
 .head-equipment {
   font-weight: 600;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .head-plsselect {
@@ -127,14 +127,14 @@ export default defineComponent({
 }
 
 .head-another {
-  font-size: 18px;
+  font-size: 16px;
   color: #493628;
   margin-top: -15px;
 }
 
 .head-more {
   font-weight: 600;
-  font-size: 18px;
+  font-size: 16px;
   color: #493628;
   margin-top: 10px;
 }
