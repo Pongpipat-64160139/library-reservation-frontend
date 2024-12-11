@@ -25,7 +25,6 @@
       <span class="d-flex">
         <h1 class="mg-date1 head1-title">วันที่เริ่ม</h1>
 
-
         <v-menu
           v-model="startMenu"
           :close-on-content-click="false"
@@ -72,9 +71,6 @@
             "
           />
         </v-menu>
-
-
-
 
         <h1 class="mg-time1 head1-title">เวลา</h1>
         <v-select
@@ -235,6 +231,82 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 
+const numPeople = ref("");
+const phoneNumber = ref("");
+const menu = ref(false); // สำหรับควบคุมการเปิดปิดของ dropdown
+const startMenu = ref(false);
+const endMenu = ref(false);
+const startDate = ref(null);
+const endDate = ref(null);
+const endRepeatMenu = ref(false);
+const endRepeatDate = ref(null);
+const startTime = ref("08:00");
+const endTime = ref("08:30");
+const floor = ref(3);
+const room = ref("ศึกษากลุ่ม 1");
+const repeatOption = ref("ไม่");
+const timeOptions = ref([
+  "08:00",
+  "08:30",
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11.30",
+  "12:00",
+  "12:30",
+  "13:00",
+  "13:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+  "16:00",
+  "16:30",
+  "17:00",
+  "17:30",
+  "18:00",
+]);
+
+const floorRooms = ref({
+  3: [
+    "ศึกษากลุ่ม 1",
+    "ศึกษากลุ่ม 2",
+    "ศึกษากลุ่ม 3",
+    "ศึกษากลุ่ม 4",
+    "ศึกษากลุ่ม 5",
+    "ศึกษากลุ่ม 6",
+  ],
+  4: [
+    "ศึกษากลุ่ม 1",
+    "ศึกษากลุ่ม 2",
+    "ศึกษากลุ่ม 3",
+    "ศึกษากลุ่ม 4",
+    "ศึกษากลุ่ม 5",
+  ],
+  5: [
+    "ศึกษากลุ่ม 1",
+    "ศึกษากลุ่ม 2",
+    "ศึกษากลุ่ม 3",
+    "ศึกษากลุ่ม 4",
+    "ศึกษากลุ่ม 5",
+  ],
+  6: [
+    "STV 1",
+    "STV 2",
+    "STV 3",
+    "STV 4",
+    "STV 5",
+    "STV 6",
+    "STV 7",
+    "STV 8",
+    "STV 9",
+    "LIBRA OKE 1",
+    "LIBRA OKE 2",
+    "MINI THEATER",
+  ],
+});
 export default defineComponent({
   data() {
     return {
@@ -297,7 +369,6 @@ export default defineComponent({
           "ศึกษากลุ่ม 3",
           "ศึกษากลุ่ม 4",
           "ศึกษากลุ่ม 5",
-
         ],
         6: [
           "STV 1",
@@ -434,10 +505,8 @@ export default defineComponent({
 
       return thaiDate;
     },
-    
   },
 });
-
 
 const showDatePicker = ref(false);
 const currentDate = ref("");
@@ -490,7 +559,6 @@ onMounted(() => {
     console.log("Holidays fetched:", holidays.value); // Log to check the holidays
   });
 });
-
 
 const getDayClass = (day: { date: Date }) => {
   const date = new Date(day.date);
@@ -623,7 +691,6 @@ getCurrentDate();
   margin-right: 20px;
   color: #493628;
   margin-top: -10px;
-
 }
 
 .width-formdate1 {
@@ -720,6 +787,4 @@ getCurrentDate();
   height: 35px;
   border: 2px solid #493628;
 }
-
-
 </style>
