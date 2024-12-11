@@ -110,6 +110,15 @@
               v-model="lunch.budget"
             ></v-text-field>
           </div>
+          <div>
+        <h1 class="head-more ms-10">รายละเอียดเพิ่มเติม</h1>
+        <v-textarea
+          label=""
+          rows="3"
+          outlined
+          class="ms-10 text-field-rounded me-7 mt-2"
+        ></v-textarea>
+      </div>
         </div>
       </template>
     </v-expansion-panel>

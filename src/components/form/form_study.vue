@@ -16,6 +16,7 @@
           class="width-formname text-field-rounded"
           single-line
           outlined
+          :rules="[(v) => !!v || '']"
           label=""
         />
       </span>
@@ -24,24 +25,25 @@
       <span class="d-flex">
         <h1 class="mg-date1 head1-title">วันที่เริ่ม</h1>
 
+
         <v-menu
-          v-model="menu"
+          v-model="startMenu"
           :close-on-content-click="false"
-          :return-value.sync="date"
+          :return-value.sync="startDate"
           transition="scale-transition"
           offset-y
         >
           <template
             #activator="{ props }"
-            class="width-formdate text-field-rounded"
+            class="width-formdate1 text-field-rounded"
           >
             <!-- ปุ่มหรือฟิลด์ที่ใช้เปิด dropdown -->
             <v-text-field
               class="width-formdate1 text-field-rounded"
               v-bind="props"
               :value="
-                date
-                  ? new Date(date).toLocaleDateString('th-TH', {
+                startDate
+                  ? new Date(startDate).toLocaleDateString('th-TH', {
                       weekday: 'long',
                       year: 'numeric',
                       month: 'long',
@@ -58,15 +60,21 @@
             />
           </template>
           <v-date-picker
-            v-model="date"
+            v-model="startDate"
+            :min="new Date().toISOString().split('T')[0]"
             @update:model-value="
               (val) => {
-                date = val;
-                menu = false;
+                startDate = val;
+                endDate = val; // ตั้งค่า endDate ให้เท่ากับ startDate
+                endRepeatDate = val;
+                startMenu = false;
               }
             "
           />
         </v-menu>
+
+
+
 
         <h1 class="mg-time1 head1-title">เวลา</h1>
         <v-select
@@ -80,20 +88,24 @@
       <span class="d-flex">
         <h1 class="mg-date2 head1-title">วันที่จบ</h1>
         <v-menu
-          v-model="menu"
+          class="width-formdate2 text-field-rounded"
+          v-model="endMenu"
           :close-on-content-click="false"
-          :return-value.sync="date"
+          :return-value.sync="endDate"
           transition="scale-transition"
           offset-y
         >
-          <template #activator="{ props }">
+          <template
+            #activator="{ props }"
+            class="width-formdate2 text-field-rounded"
+          >
             <!-- ปุ่มหรือฟิลด์ที่ใช้เปิด dropdown -->
             <v-text-field
               class="width-formdate2 text-field-rounded"
               v-bind="props"
               :value="
-                date
-                  ? new Date(date).toLocaleDateString('th-TH', {
+                endDate
+                  ? new Date(endDate).toLocaleDateString('th-TH', {
                       weekday: 'long',
                       year: 'numeric',
                       month: 'long',
@@ -107,14 +119,15 @@
                     })
               "
               readonly
+              :disabled="true"
             />
           </template>
           <v-date-picker
-            v-model="date"
+            v-model="endDate"
             @update:model-value="
               (val) => {
-                date = val;
-                menu = false;
+                endDate = val;
+                endMenu = false;
               }
             "
           />
@@ -134,7 +147,7 @@
         <h1 class="mg-floor head1-title">ชั้น</h1>
         <v-select
           v-model="floor"
-          :items="[2, 3, 4, 5, 6, 7]"
+          :items="[3, 4, 5, 6]"
           outlined
           label=""
           class="width-formfloor text-field-rounded"
@@ -211,7 +224,7 @@
           class="width-detail text-field-rounded"
         ></v-textarea>
       </span>
-      <v-btn to="/table_meeting" type="submit" class="save-btn custom-btn">
+      <v-btn to="/table_study" type="submit" class="save-btn custom-btn">
         <v-icon left>mdi-content-save</v-icon>
         จองห้อง
       </v-btn>
@@ -220,7 +233,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 
 export default defineComponent({
   data() {
@@ -228,15 +241,16 @@ export default defineComponent({
       numPeople: "",
       phoneNumber: "",
       menu: false, // สำหรับควบคุมการเปิดปิดของ dropdown
+      startMenu: false,
+      endMenu: false,
+      startDate: null,
+      endDate: null,
       endRepeatMenu: false,
       endRepeatDate: null,
-      date: null,
-      startDate: "",
       startTime: "08:00",
-      endDate: "",
       endTime: "08:30",
-      floor: 2,
-      room: "201",
+      floor: 3,
+      room: "ศึกษากลุ่ม 1",
       repeatOption: "ไม่",
       timeOptions: [
         "08:00",
@@ -262,7 +276,6 @@ export default defineComponent({
         "18:00",
       ],
       floorRooms: {
-        2: ["201"],
         3: [
           "ศึกษากลุ่ม 1",
           "ศึกษากลุ่ม 2",
@@ -284,9 +297,7 @@ export default defineComponent({
           "ศึกษากลุ่ม 3",
           "ศึกษากลุ่ม 4",
           "ศึกษากลุ่ม 5",
-          "Lecturer's Room 1",
-          "Lecturer's Room 2",
-          "Lecturer's Room 3",
+
         ],
         6: [
           "STV 1",
@@ -301,13 +312,7 @@ export default defineComponent({
           "LIBRA OKE 1",
           "LIBRA OKE 2",
           "MINI THEATER",
-          "604 Smart Board",
-          "Mini Studio",
-          "Cyber Zone 1",
-          "Cyber Zone 2",
-          "Live for Life",
         ],
-        7: ["706", "707"],
       },
       currentDate: this.formatDate(
         new Date("Tue Dec 03 2024 00:00:00 GMT+0700")
@@ -429,8 +434,98 @@ export default defineComponent({
 
       return thaiDate;
     },
+    
   },
 });
+
+
+const showDatePicker = ref(false);
+const currentDate = ref("");
+const selectedDate = ref<string | null>(null);
+const holidays = ref<string[]>([]); // Store holiday dates
+
+// Fetch holidays from API
+const fetchHolidays = async (year: string) => {
+  const response = await fetch(
+    `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=2024`,
+    {
+      headers: {
+        "X-IBM-Client-Id": "516eaa15-07e4-428c-b4bf-84def4ea69ab",
+        accept: "application/json",
+      },
+    }
+  );
+
+  if (response.ok) {
+    const responseData = await response.json();
+    if (responseData.result && Array.isArray(responseData.result.data)) {
+      // เก็บวันหยุดจาก result.data
+      holidays.value = responseData.result.data.map(
+        (holiday: { Date: string }) => holiday.Date
+      );
+    } else {
+      console.error("Invalid data structure:", responseData);
+    }
+  } else {
+    console.error("Failed to fetch holidays");
+  }
+};
+
+const allowedDates = (date: unknown) => {
+  if (!(date instanceof Date)) return false;
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const formattedDate = `${year}-${month}-${day}`;
+
+  const isHoliday = holidays.value.includes(formattedDate);
+
+  return !isHoliday;
+};
+
+onMounted(() => {
+  const currentYear = new Date().getFullYear().toString();
+  fetchHolidays(currentYear).then(() => {
+    console.log("Holidays fetched:", holidays.value); // Log to check the holidays
+  });
+});
+
+
+const getDayClass = (day: { date: Date }) => {
+  const date = new Date(day.date);
+  const formattedDay = `${date.getFullYear()}-${String(
+    date.getMonth() + 1
+  ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+  const isHoliday = holidays.value.includes(formattedDay);
+  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+
+  return isHoliday || isWeekend ? "holiday" : "";
+};
+
+const handleDateSelect = (date: string | null) => {
+  selectedDate.value = date;
+  showDatePicker.value = false;
+};
+
+const getCurrentDate = () => {
+  const date = new Date();
+
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long", // แสดงชื่อวัน
+    day: "numeric", // แสดงวันที่
+    month: "long", // แสดงเดือน
+    year: "numeric", // แสดงปี
+  };
+
+  // ใช้ Intl.DateTimeFormat เพื่อแสดงวันที่ในรูปแบบที่ต้องการ
+  const formatter = new Intl.DateTimeFormat("th-TH", options);
+  currentDate.value = formatter.format(date);
+};
+
+// เรียกใช้ฟังก์ชั่นเพื่อให้ได้วันที่ปัจจุบันเมื่อโหลดหน้า
+getCurrentDate();
 </script>
 
 <style scoped>
@@ -625,4 +720,6 @@ export default defineComponent({
   height: 35px;
   border: 2px solid #493628;
 }
+
+
 </style>

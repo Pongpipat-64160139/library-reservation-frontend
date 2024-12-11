@@ -4,9 +4,18 @@
     <v-container>
       <v-row justify="center" align="center">
         <!-- Dropdown สำหรับเลือกประเภทห้อง -->
-        <v-col class="d-flex justify-center" cols="auto" style="margin-right: 100px">
-          <v-select class="width-dd v-selectcolor" label="Select room type" :items="typeroom" v-model="selectedPage"
-            @update:modelValue="onSelectChange">
+        <v-col
+          class="d-flex justify-center"
+          cols="auto"
+          style="margin-right: 100px"
+        >
+          <v-select
+            class="width-dd v-selectcolor"
+            label="Select room type"
+            :items="typeroom"
+            v-model="selectedPage"
+            @update:modelValue="onSelectChange"
+          >
           </v-select>
         </v-col>
 
@@ -16,25 +25,31 @@
             {{
               selectedDate
                 ? new Date(selectedDate).toLocaleDateString("th-TH", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
                 : new Date().toLocaleDateString("th-TH", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
             }}
             <v-icon class="calendar-icon">mdi-calendar</v-icon>
           </v-btn>
 
           <!-- v-date-picker แสดงเมื่อ showDatePicker เป็น true -->
-          <v-date-picker v-if="showDatePicker" class="date-picker-position" v-model="selectedDate"
-            @update:model-value="handleDateSelect" @click:clear="selectedDate = null" :allowed-dates="allowedDates"
-            :day-class="getDayClass"></v-date-picker>
+          <v-date-picker
+            v-if="showDatePicker"
+            class="date-picker-position"
+            v-model="selectedDate"
+            @update:model-value="handleDateSelect"
+            @click:clear="selectedDate = null"
+            :allowed-dates="allowedDates"
+            :day-class="getDayClass"
+          ></v-date-picker>
         </v-col>
       </v-row>
     </v-container>
@@ -45,14 +60,22 @@
         <thead>
           <tr>
             <th class="font-table">เวลา</th>
-            <th class="room-column font-table" v-for="room in rooms3" :key="room">
+            <th
+              class="room-column font-table"
+              v-for="room in rooms3"
+              :key="room"
+            >
               {{ room }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(time, index) in timeSlots" :key="time" :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
-            @click.stop="goToFormStudy">
+          <tr
+            v-for="(time, index) in timeSlots"
+            :key="time"
+            :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormStudy"
+          >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room6-column" v-for="room in rooms3" :key="room"></td>
           </tr>
@@ -73,8 +96,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(time, index) in timeSlots" :key="time" :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
-            @click.stop="goToFormStudy">
+          <tr
+            v-for="(time, index) in timeSlots"
+            :key="time"
+            :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormStudy"
+          >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room5-column" v-for="room in rooms4" :key="room"></td>
           </tr>
@@ -95,8 +122,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(time, index) in timeSlots" :key="time" :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
-            @click.stop="goToFormStudy">
+          <tr
+            v-for="(time, index) in timeSlots"
+            :key="time"
+            :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormStudy"
+          >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room5-column" v-for="room in rooms5" :key="room"></td>
           </tr>
@@ -108,11 +139,12 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+
+
 const showDatePicker = ref(false);
 const currentDate = ref("");
 const selectedDate = ref<string | null>(null);
-
 const holidays = ref<string[]>([]); // Store holiday dates
 
 // Fetch holidays from API
@@ -143,7 +175,7 @@ const fetchHolidays = async (year: string) => {
 };
 
 const allowedDates = (date: unknown) => {
-  if (!(date instanceof Date)) return false; 
+  if (!(date instanceof Date)) return false;
 
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -161,6 +193,7 @@ onMounted(() => {
     console.log("Holidays fetched:", holidays.value); // Log to check the holidays
   });
 });
+
 
 const getDayClass = (day: { date: Date }) => {
   const date = new Date(day.date);

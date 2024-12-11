@@ -160,7 +160,7 @@
         <h1 class="mg-floor pt-5 head1-title">ชั้น</h1>
         <v-select
           v-model="floor"
-          :items="[2, 3, 4, 5, 6, 7]"
+          :items="[2, 5, 6, 7]"
           outlined
           label=""
           class="width-formfloor text-field-rounded"
@@ -288,44 +288,15 @@ export default defineComponent({
       ],
       floorRooms: {
         2: ["201"],
-        3: [
-          "ศึกษากลุ่ม 1",
-          "ศึกษากลุ่ม 2",
-          "ศึกษากลุ่ม 3",
-          "ศึกษากลุ่ม 4",
-          "ศึกษากลุ่ม 5",
-          "ศึกษากลุ่ม 6",
-        ],
-        4: [
-          "ศึกษากลุ่ม 1",
-          "ศึกษากลุ่ม 2",
-          "ศึกษากลุ่ม 3",
-          "ศึกษากลุ่ม 4",
-          "ศึกษากลุ่ม 5",
-        ],
+        
+        
         5: [
-          "ศึกษากลุ่ม 1",
-          "ศึกษากลุ่ม 2",
-          "ศึกษากลุ่ม 3",
-          "ศึกษากลุ่ม 4",
-          "ศึกษากลุ่ม 5",
           "Lecturer's Room 1",
           "Lecturer's Room 2",
           "Lecturer's Room 3",
         ],
         6: [
-          "STV 1",
-          "STV 2",
-          "STV 3",
-          "STV 4",
-          "STV 5",
-          "STV 6",
-          "STV 7",
-          "STV 8",
-          "STV 9",
-          "LIBRA OKE 1",
-          "LIBRA OKE 2",
-          "MINI THEATER",
+          
           "604 Smart Board",
           "Mini Studio",
           "Cyber Zone 1",
