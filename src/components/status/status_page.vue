@@ -19,6 +19,7 @@
       :headers="headers"
       :items="data"
       style="background-color: #cdbba7"
+      class="rd-test"
     >
       <template v-slot:item="{ item, index }">
         <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
@@ -136,7 +137,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { computed, defineComponent, ref } from "vue";
 
 const sortBy = ref([
   { key: "index", order: "asc" },
@@ -262,6 +263,15 @@ const data = ref([
   },
 ]);
 
+const sortedData = computed(() => {
+  return [...data.value].sort((a, b) => {
+    // ถ้าสถานะของ a หรือ b เป็น "รอ" จะให้สถานะ "รอ" อยู่ข้างบน
+    if (a.status === "รอ" && b.status !== "รอ") return -1;
+    if (a.status !== "รอ" && b.status === "รอ") return 1;
+    return 0;
+  });
+});
+
 const dialog = ref(false);
 const selectedItem = ref<any>(null);
 
@@ -269,12 +279,14 @@ const showDialog = (item: any) => {
   selectedItem.value = item;
   dialog.value = true; // เปิด dialog
 };
+
+
 export default defineComponent({
   setup() {
     return {
       sortBy,
       headers,
-      data,
+      data: sortedData,
       dialog,
       selectedItem,
       showDialog,
@@ -406,5 +418,10 @@ th {
   width: 100px;
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+.rd-test {
+  background-color: #f5eded;
+  border-radius: 10px;
 }
 </style>
