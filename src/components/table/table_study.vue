@@ -135,11 +135,13 @@
       </v-simple-table>
     </v-container>
   </v-container>
+  <Footer_page />
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import Footer_page from "../footer/footer_page.vue";
 
 
 const showDatePicker = ref(false);

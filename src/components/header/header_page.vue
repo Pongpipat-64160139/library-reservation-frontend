@@ -36,7 +36,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import logobuu from "@/assets/logobuu.png";
-import router from "@/router";
 
 interface BreadcrumbItem {
   title: string;
@@ -60,12 +59,7 @@ export default defineComponent({
           href: "/form_study",
         },
         {
-          title: "Floor-Room",
-          disabled: false,
-          href: "breadcrumbs_link_2",
-        },
-        {
-          title: "ข้อร้องเรียน/ เสนอแนะ",
+          title: "รายละเอียดห้อง",
           disabled: false,
           href: "breadcrumbs_link_2",
         },
@@ -100,7 +94,7 @@ export default defineComponent({
 }
 
 .ms-136 {
-  margin-left: 650px;
+  margin-left: 800px;
 }
 
 .ms-020 {
