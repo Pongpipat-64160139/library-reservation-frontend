@@ -11,7 +11,7 @@
         >
           <v-select
             class="width-dd v-selectcolor"
-            label="Select room type"
+            label="ประเภทห้อง"
             :items="typeroom"
             v-model="selectedPage"
             @update:modelValue="onSelectChange"
@@ -54,7 +54,10 @@
       </v-row>
     </v-container>
     <!-- ตารางสำหรับชั้น 3 -->
-    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 3 ห้อง ศึกษากลุ่ม</h1>
+    <h1 class="pt-5 head-title pb-10 ml-left">
+      ชั้น 3 ห้อง ศึกษากลุ่ม
+      <v-icon class="mb-1 ms-2">mdi-account-group</v-icon>
+    </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
@@ -62,10 +65,11 @@
             <th class="font-table">เวลา</th>
             <th
               class="room-column font-table"
-              v-for="room in rooms3"
+              v-for="(room, index) in rooms3"
               :key="room"
             >
               {{ room }}
+              <v-icon class="ms-2">mdi-television</v-icon>
             </th>
           </tr>
         </thead>
@@ -84,14 +88,20 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 4 -->
-    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 4 ห้อง ศึกษากลุ่ม</h1>
+    <h1 class="pt-5 head-title pb-10 ml-left">
+      ชั้น 4 ห้อง ศึกษากลุ่ม
+      <v-icon class="mb-1 ms-2">mdi-account-group</v-icon>
+    </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th class="font-table" v-for="room in rooms4" :key="room">
+            <th class="font-table" v-for="(room, index) in rooms4" :key="room">
               {{ room }}
+              <v-icon v-if="index === 3 || index === 4" class="ms-2"
+                >mdi-television</v-icon
+              >
             </th>
           </tr>
         </thead>
@@ -110,14 +120,20 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 5 -->
-    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 5 ห้อง ศึกษากลุ่ม</h1>
+    <h1 class="pt-5 head-title pb-10 ml-left">
+      ชั้น 5 ห้อง ศึกษากลุ่ม
+      <v-icon class="mb-1 ms-2">mdi-account-group</v-icon>
+    </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th class="font-table" v-for="room in rooms5" :key="room">
+            <th class="font-table" v-for="(room, index) in rooms5" :key="room">
               {{ room }}
+              <v-icon v-if="index === 3 || index === 4" class="ms-2"
+                >mdi-television</v-icon
+              >
             </th>
           </tr>
         </thead>
@@ -142,7 +158,6 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Footer_page from "../footer/footer_page.vue";
-
 
 const showDatePicker = ref(false);
 const currentDate = ref("");
@@ -195,7 +210,6 @@ onMounted(() => {
     console.log("Holidays fetched:", holidays.value); // Log to check the holidays
   });
 });
-
 
 const getDayClass = (day: { date: Date }) => {
   const date = new Date(day.date);

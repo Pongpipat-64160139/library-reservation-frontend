@@ -5,7 +5,7 @@
       <v-row justify="center" align="center">
         <!-- Dropdown สำหรับเลือกประเภทห้อง -->
         <v-col class="d-flex justify-center" cols="auto" style="margin-right: 100px">
-          <v-select class="width-dd v-selectcolor" label="Select room type" :items="typeroom" v-model="selectedPage"
+          <v-select class="width-dd v-selectcolor" label="ประเภทห้อง" :items="typeroom" v-model="selectedPage"
             @update:modelValue="onSelectChange">
           </v-select>
         </v-col>
@@ -39,7 +39,10 @@
       </v-row>
     </v-container>
     <!-- ตารางสำหรับชั้น 2 ห้อง 201 -->
-    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 2 ห้อง 201</h1>
+    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 2 ห้อง 201
+      <v-icon class="mb-1 ms-2">mdi-lectern </v-icon>
+
+    </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
@@ -61,7 +64,10 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 5 ห้อง Lecturer's Room -->
-    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 5 ห้อง Lecturer's Room</h1>
+    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 5 ห้อง Lecturer's Room
+      <v-icon class="mb-1 ms-2">mdi-chair-school </v-icon>
+
+    </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
@@ -83,7 +89,10 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง 604 Smart Board -->
-    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง 604 Smart Board</h1>
+    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง 604 Smart Board
+      <v-icon class="mb-1 ms-2">mdi-human-male-board-poll</v-icon>
+
+    </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
@@ -105,7 +114,10 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง Mini Studio -->
-    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง Mini Studio</h1>
+    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง Mini Studio
+      <v-icon class="mb-1 ms-2">mdi-monitor-account</v-icon>
+
+    </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
@@ -127,7 +139,10 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง Cyber Zone -->
-    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง Cyber Zone</h1>
+    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง Cyber Zone
+      <v-icon class="mb-1 ms-2">mdi-desktop-tower-monitor</v-icon>
+
+    </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
@@ -149,7 +164,10 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง Live for Life -->
-    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง Live for Life</h1>
+    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง Live for Life
+      <v-icon class="mb-1 ms-2">mdi-monitor-account</v-icon>
+
+    </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
@@ -173,6 +191,8 @@
     <!-- ตารางสำหรับชั้น 7 ห้อง ประชุมบุคลากรภายใน -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 7 ห้อง ประชุมบุคลากรภายใน
+      <v-icon class="mb-1 ms-2">mdi-lectern </v-icon>
+
     </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
@@ -194,6 +214,7 @@
       </v-simple-table>
     </v-container>
   </v-container>
+  <Footer_page />
 </template>
 
 <script lang="ts" setup>

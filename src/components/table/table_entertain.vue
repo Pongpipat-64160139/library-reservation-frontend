@@ -5,7 +5,7 @@
       <v-row justify="center" align="center">
         <!-- Dropdown สำหรับเลือกประเภทห้อง -->
         <v-col class="d-flex justify-center" cols="auto" style="margin-right: 100px">
-          <v-select class="width-dd v-selectcolor" label="Select room type" :items="typeroom" v-model="selectedPage"
+          <v-select class="width-dd v-selectcolor" label="ประเภทห้อง" :items="typeroom" v-model="selectedPage"
             @update:modelValue="onSelectChange">
           </v-select>
         </v-col>
@@ -41,6 +41,7 @@
     <!-- ตารางสำหรับชั้น 6 ห้อง ศึกษากลุ่มมัลติมีเดีย (STV) -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 6 ห้อง ศึกษากลุ่มมัลติมีเดีย (STV)
+      <v-icon class="mb-1 ms-2">mdi-multimedia</v-icon>
     </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
@@ -63,7 +64,9 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง LIBRA OKE -->
-    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง LIBRA OKE</h1>
+    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง LIBRA OKE
+      <v-icon class="mb-1 ms-2">mdi-microphone-variant</v-icon>
+    </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
@@ -85,7 +88,10 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง Mini Theater -->
-    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง MINI THEATER</h1>
+    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง MINI THEATER
+      <v-icon class="mb-1 ms-2">mdi-theater</v-icon>
+    </h1>
+    
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
@@ -106,6 +112,7 @@
       </v-simple-table>
     </v-container>
   </v-container>
+  <Footer_page />
 </template>
 
 <script lang="ts" setup>
