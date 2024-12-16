@@ -60,15 +60,9 @@
           </template>
           <v-date-picker
             v-model="startDate"
+            :allowed-dates="allowedDates"
             :min="new Date().toISOString().split('T')[0]"
-            @update:model-value="
-              (val) => {
-                startDate = val;
-                endDate = val; // ตั้งค่า endDate ให้เท่ากับ startDate
-                endRepeatDate = val;
-                startMenu = false;
-              }
-            "
+            @update:model-value="handleDateUpdate"
           />
         </v-menu>
 
@@ -199,6 +193,7 @@
           </template>
           <v-date-picker
             v-model="endRepeatDate"
+            :allowed-dates="allowedDates"
             :min="new Date().toISOString().split('T')[0]"
             @update:model-value="
               (val) => {
@@ -393,6 +388,7 @@ export default defineComponent({
       showEndDatePicker: false,
       currentStartDate: "",
       currentEndDate: "",
+      holidays: [] as string[], // เพิ่มการประกาศ type
     };
   },
 
@@ -505,7 +501,51 @@ export default defineComponent({
 
       return thaiDate;
     },
+    allowedDates(date: Date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const formattedDate = `${year}-${month}-${day}`;
+      
+      const isHoliday = this.holidays.includes(formattedDate);
+      
+      return !isHoliday;
+    },
+    handleDateUpdate(val: Date) {
+      this.startDate = val;
+      this.endDate = val; // ตั้งค่า endDate ให้เท่ากับ startDate
+      this.endRepeatDate = val;
+      this.startMenu = false;
+    },
+    async fetchHolidays() {
+      try {
+        const response = await fetch(
+          `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=2024`,
+          {
+            headers: {
+              "X-IBM-Client-Id": "516eaa15-07e4-428c-b4bf-84def4ea69ab",
+              accept: "application/json",
+            },
+          }
+        );
+
+        if (response.ok) {
+          const responseData = await response.json();
+          if (responseData.result && Array.isArray(responseData.result.data)) {
+            this.holidays = responseData.result.data.map(
+              (holiday: { Date: string }) => holiday.Date
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch holidays:", error);
+      }
+    },
   },
+
+  async mounted() {
+    await this.fetchHolidays();
+  }
 });
 
 const showDatePicker = ref(false);
@@ -567,9 +607,7 @@ const getDayClass = (day: { date: Date }) => {
   ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
   const isHoliday = holidays.value.includes(formattedDay);
-  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
 
-  return isHoliday || isWeekend ? "holiday" : "";
 };
 
 const handleDateSelect = (date: string | null) => {

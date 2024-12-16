@@ -199,7 +199,8 @@ export default defineComponent({
 }
 
 .pd-more {
-  padding-right: 80px;
+  padding-right: 78px;
+  padding-left: 2px;
 }
 
 .text-field-rounded ::v-deep(.v-input__control) {

@@ -1,240 +1,135 @@
 <template class="back-ground">
   <v-container fluid class="back-ground ms-kob">
     <!-- Sheet1 จองห้อง -->
-    <v-sheet
-      class="mx-auto mt-10"
-      elevation="8"
-      max-width="1200"
-      style="background-color: #dfd3c3; border-radius: 16px"
-    >
+    <v-sheet class="mx-auto mt-10" elevation="8" max-width="1200"
+      style="background-color: #dfd3c3; border-radius: 16px">
       <h1 class="pt-5 head-title text-center pb-10">จองห้องประชุม</h1>
 
       <!-- span1 -->
       <span class="d-flex">
         <h1 class="mg-name pt-5 head1-title">ชื่อ</h1>
-        <v-text-field
-          class="width-formname text-field-rounded"
-          single-line
-          outlined
-          :rules="[(v) => !!v || '']"
-          label=""
-        />
+        <v-text-field class="width-formname text-field-rounded" single-line outlined :rules="[(v) => !!v || '']"
+          label="" />
         <h1 class="ps-15 pt-5 head1-title">จำนวนคน</h1>
-        <v-text-field
-          class="width-formamount text-field-rounded"
-          single-line
-          label=""
-          v-model="numPeople"
-          :rules="[(v) => /^\d+$/.test(v) || '', (v) => v > 0 || '']"
-          @input="validateNumber"
-        />
+        <v-text-field class="width-formamount text-field-rounded" single-line label="" v-model="numPeople"
+          :rules="[(v) => /^\d+$/.test(v) || '', (v) => v > 0 || '']" @input="validateNumber" />
 
         <h1 class="ps-15 pt-5 head1-title">เบอร์โทรติดต่อ</h1>
-        <v-text-field
-          class="width-formtell text-field-rounded pe-7"
-          single-line
-          label=""
-          v-model="phoneNumber"
-          :rules="[(v) => /^\d{10}$/.test(v) || '']"
-        />
+        <v-text-field class="width-formtell text-field-rounded pe-7" single-line label="" v-model="phoneNumber"
+          :rules="[(v) => /^\d{10}$/.test(v) || '']" />
       </span>
 
       <!-- span2 -->
       <span class="d-flex">
         <h1 class="mg-date pt-5 head1-title">วันที่เริ่ม</h1>
 
-        <v-menu
-          class="width-formdate text-field-rounded"
-          v-model="startMenu"
-          :close-on-content-click="false"
-          :return-value.sync="startDate"
-          transition="scale-transition"
-          offset-y
-        >
-          <template
-            #activator="{ props }"
-            class="width-formdate text-field-rounded"
-          >
+        <v-menu class="width-formdate text-field-rounded" v-model="startMenu" :close-on-content-click="false"
+          :return-value.sync="startDate" transition="scale-transition" offset-y>
+          <template #activator="{ props }" class="width-formdate text-field-rounded">
             <!-- ปุ่มหรือฟิลด์ที่ใช้เปิด dropdown -->
-            <v-text-field
-              class="width-formdate text-field-rounded"
-              v-bind="props"
-              :value="
-                startDate
-                  ? new Date(startDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-              "
-              readonly
-            />
+            <v-text-field class="width-formdate text-field-rounded" v-bind="props" :value="startDate
+                ? new Date(startDate).toLocaleDateString('th-TH', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+                : new Date().toLocaleDateString('th-TH', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+              " readonly />
           </template>
-          <v-date-picker
-            v-model="startDate"
-            :min="new Date().toISOString().split('T')[0]"
-            @update:model-value="
-              (val) => {
-                startDate = val;
-                endDate = val; // ตั้งค่า endDate ให้เท่ากับ startDate
-                endRepeatDate = val;
-                startMenu = false;
-              }
-            "
-          />
+          <v-date-picker v-model="startDate" :min="new Date().toISOString().split('T')[0]" 
+            :allowed-dates="allowedDates"
+            @update:model-value="(val) => {
+              startDate = val;
+              endDate = val; // ตั้งค่า endDate ให้เท่ากับ startDate
+              endRepeatDate = val;
+              startMenu = false;
+            }
+            " />
         </v-menu>
 
         <h1 class="ps-5 pt-5 head1-title">เวลา</h1>
-        <v-select
-          v-model="startTime"
-          :items="timeOptions"
-          outlined
-          label=""
-          class="width-formtime text-field-rounded pe-7"
-        />
+        <v-select v-model="startTime" :items="timeOptions" outlined label=""
+          class="width-formtime text-field-rounded pe-7" />
         <h1 class="pt-5 head1-title">วันที่จบ</h1>
-        <v-menu
-          class="width-formdate text-field-rounded"
-          v-model="endMenu"
-          :close-on-content-click="false"
-          :return-value.sync="endDate"
-          transition="scale-transition"
-          offset-y
-        >
-          <template
-            #activator="{ props }"
-            class="width-formdate text-field-rounded"
-          >
+        <v-menu class="width-formdate text-field-rounded" v-model="endMenu" :close-on-content-click="false"
+          :return-value.sync="endDate" transition="scale-transition" offset-y>
+          <template #activator="{ props }" class="width-formdate text-field-rounded">
             <!-- ปุ่มหรือฟิลด์ที่ใช้เปิด dropdown -->
-            <v-text-field
-              class="width-formdate text-field-rounded"
-              v-bind="props"
-              :value="
-                endDate
-                  ? new Date(endDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-              "
-              readonly
-              :disabled="true"
-            />
+            <v-text-field class="width-formdate text-field-rounded" v-bind="props" :value="endDate
+                ? new Date(endDate).toLocaleDateString('th-TH', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+                : new Date().toLocaleDateString('th-TH', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+              " readonly :disabled="true" />
           </template>
-          <v-date-picker
-            v-model="endDate"
-            @update:model-value="
-              (val) => {
-                endDate = val;
-                endMenu = false;
-              }
-            "
-          />
+          <v-date-picker v-model="endDate" 
+            @update:model-value="(val) => {
+              endDate = val;
+              endMenu = false;
+            }
+            " />
         </v-menu>
         <h1 class="ps-5 pt-5 head1-title">เวลา</h1>
-        <v-select
-          v-model="endTime"
-          :items="filteredEndTimes"
-          outlined
-          label=""
-          class="width-formtime1 text-field-rounded pe-7"
-        />
+        <v-select v-model="endTime" :items="filteredEndTimes" outlined label=""
+          class="width-formtime1 text-field-rounded pe-7" />
       </span>
 
       <!-- span3 -->
       <span class="d-flex">
         <h1 class="mg-floor pt-5 head1-title">ชั้น</h1>
-        <v-select
-          v-model="floor"
-          :items="[2, 5, 6, 7]"
-          outlined
-          label=""
-          class="width-formfloor text-field-rounded"
-        />
+        <v-select v-model="floor" :items="[2, 5, 6, 7]" outlined label="" class="width-formfloor text-field-rounded" />
         <h1 class="ps-15 pt-5 head1-title">ห้อง</h1>
-        <v-select
-          v-model="room"
-          :items="availableRooms"
-          outlined
-          label=""
-          class="width-formroom text-field-rounded"
-        />
+        <v-select v-model="room" :items="availableRooms" outlined label="" class="width-formroom text-field-rounded" />
         <h1 class="ps-15 pt-5 head1-title">ชื่อป้ายเวที</h1>
-        <v-text-field
-          class="width-formtag text-field-rounded pe-7"
-          single-line
-          outlined
-          label="กรุณาแจ้งล่วงหน้า 3 วันทำการ"
-        />
+        <v-text-field class="width-formtag text-field-rounded pe-7" single-line outlined
+          label="กรุณาแจ้งล่วงหน้า 3 วันทำการ" />
       </span>
 
       <!-- span4 -->
       <span class="d-flex">
         <h1 class="mg-repeat pt-5 head1-title">ทำซ้ำ</h1>
-        <v-select
-          v-model="repeatOption"
-          :items="['ไม่', 'ทำซ้ำ']"
-          outlined
-          label=""
-          class="width-formfloor text-field-rounded"
-          @change="onRepeatOptionChange"
-        />
+        <v-select v-model="repeatOption" :items="['ไม่', 'ทำซ้ำ']" outlined label=""
+          class="width-formfloor text-field-rounded" @change="onRepeatOptionChange" />
         <h1 class="ps-12 pt-5 head1-title">สิ้นสุด</h1>
-        <v-menu
-          class="width-formdate text-field-rounded"
-          v-model="endRepeatMenu"
-          :close-on-content-click="false"
-          :return-value.sync="endRepeatDate"
-          transition="scale-transition"
-          offset-y
-        >
+        <v-menu class="width-formdate text-field-rounded" v-model="endRepeatMenu" :close-on-content-click="false"
+          :return-value.sync="endRepeatDate" transition="scale-transition" offset-y>
           <template #activator="{ props }">
-            <v-text-field
-              class="width-formdate text-field-rounded"
-              v-bind="props"
-              :value="
-                endRepeatDate
-                  ? new Date(endRepeatDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-              "
-              readonly
-              :disabled="repeatOption === 'ไม่'"
-            />
+            <v-text-field class="width-formdate text-field-rounded" v-bind="props" :value="endRepeatDate
+                ? new Date(endRepeatDate).toLocaleDateString('th-TH', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+                : new Date().toLocaleDateString('th-TH', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+              " readonly :disabled="repeatOption === 'ไม่'" />
           </template>
-          <v-date-picker
-            v-model="endRepeatDate"
-            :min="new Date().toISOString().split('T')[0]"
-            @update:model-value="
-              (val) => {
-                endRepeatDate = val;
-                endRepeatMenu = false;
-              }
-            "
-          />
+          <v-date-picker v-model="endRepeatDate" 
+            :allowed-dates="allowedDates"
+          :min="new Date().toISOString().split('T')[0]" @update:model-value="(val) => {
+              endRepeatDate = val;
+              endRepeatMenu = false;
+            }
+            " />
         </v-menu>
         <h1 class="ps-15 width-formblank1"></h1>
       </span>
@@ -243,15 +138,15 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, ref, onMounted } from "vue";
 import router from "@/router";
-import { defineComponent } from "vue";
 
 export default defineComponent({
   data() {
     return {
       numPeople: "",
       phoneNumber: "",
-      menu: false, // สำหรับควบคุมการเปิดปิดของ dropdown
+      menu: false,
       startMenu: false,
       endMenu: false,
       startDate: null,
@@ -263,6 +158,7 @@ export default defineComponent({
       floor: 2,
       room: "201",
       repeatOption: "ไม่",
+      holidays: [] as string[],
       timeOptions: [
         "08:00",
         "08:30",
@@ -288,15 +184,15 @@ export default defineComponent({
       ],
       floorRooms: {
         2: ["201"],
-        
-        
+
+
         5: [
           "Lecturer's Room 1",
           "Lecturer's Room 2",
           "Lecturer's Room 3",
         ],
         6: [
-          
+
           "604 Smart Board",
           "Mini Studio",
           "Cyber Zone 1",
@@ -305,10 +201,7 @@ export default defineComponent({
         ],
         7: ["706", "707"],
       },
-      currentDate: this.formatDate(
-        new Date("Tue Dec 03 2024 00:00:00 GMT+0700")
-      ),
-
+      currentDate: null as string | null,
       showStartDatePicker: false,
       showEndDatePicker: false,
       currentStartDate: "",
@@ -624,34 +517,72 @@ export default defineComponent({
   },
 
   methods: {
-    
+    async fetchHolidays(year: string) {
+      try {
+        const response = await fetch(
+          `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=${year}`,
+          {
+            headers: {
+              "X-IBM-Client-Id": "516eaa15-07e4-428c-b4bf-84def4ea69ab",
+              accept: "application/json",
+            },
+          }
+        );
+
+        if (response.ok) {
+          const responseData = await response.json();
+          if (responseData.result && Array.isArray(responseData.result.data)) {
+            this.holidays = responseData.result.data.map(
+              (holiday: { Date: string }) => holiday.Date
+            );
+          } else {
+            console.error("Invalid data structure:", responseData);
+          }
+        } else {
+          console.error("Failed to fetch holidays");
+        }
+      } catch (error) {
+        console.error("Error fetching holidays:", error);
+      }
+    },
+
+    allowedDates(date: Date) {
+      if (!(date instanceof Date)) return false;
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const formattedDate = `${year}-${month}-${day}`;
+
+      return !this.holidays.includes(formattedDate);
+    },
+
     validateNumber() {
-      // กรองเฉพาะตัวเลข
       this.numPeople = this.numPeople.replace(/\D/g, "");
     },
 
     formatDate(date: Date) {
-      // แปลงวันที่เป็นภาษาไทยในรูปแบบที่ต้องการ
       const options: Intl.DateTimeFormatOptions = {
-        weekday: "long", // วันในสัปดาห์
-        day: "numeric", // วันที่
-        month: "long", // เดือน
-        year: "numeric", // ปี
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
       };
-
-      const thaiDate = new Intl.DateTimeFormat("th-TH", options).format(date);
-
-      return thaiDate;
+      return new Intl.DateTimeFormat("th-TH", options).format(date);
     },
+
     onRepeatOptionChange() {
       if (this.repeatOption === "ไม่") {
-        this.endRepeatDate = null; // ล้างค่าที่เลือกในวันที่สิ้นสุด
+        this.endRepeatDate = null;
       }
-   
     },
-    
   },
-  
+
+  mounted() {
+    const currentYear = new Date().getFullYear().toString();
+    this.fetchHolidays(currentYear);
+    this.currentDate = this.formatDate(new Date());
+  },
 });
 </script>
 

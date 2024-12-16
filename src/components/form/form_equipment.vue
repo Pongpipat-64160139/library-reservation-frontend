@@ -69,10 +69,10 @@
       <span>
         <Form_restaurant />
       </span>
-      <span class="d-flex">
+      <span >
         <h1 class="head-more ms-10 mt-5">ไฟล์เอกสารเพิ่มเติม</h1>
         <v-file-input
-          class="text-field-rounded width-file"
+          class="text-field-rounded width-file mt-2"
           label="เพิ่มไฟล์"
           single-line
           outlined
@@ -167,10 +167,9 @@ export default defineComponent({
 }
 
 .width-file {
-  width: 100px;
-  margin-left: 10px;
+  margin-left: 12px;
   color: #493628;
-  padding-right: 30px;
+  padding-right: 28px;
 }
 
 .width-formblank1 {
