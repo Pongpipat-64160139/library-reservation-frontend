@@ -19,6 +19,18 @@
           :rules="[(v) => /^\d{10}$/.test(v) || '']" />
       </span>
 
+      <!-- span3 -->
+      <span class="d-flex">
+        <h1 class="ps-2 pt-5 head1-title">ชื่อป้ายเวที</h1>
+        <v-text-field class="width-formtag text-field-rounded " single-line outlined
+          label="กรุณาแจ้งล่วงหน้า 3 วันทำการ" />
+        <h1 class=" mg-floor pt-5 head1-title">ชั้น</h1>
+        <v-select v-model="floor" :items="[2, 5, 6, 7]" outlined label="" class="width-formfloor text-field-rounded" />
+        <h1 class="mg-room ps-15 pt-5 head1-title">ห้อง</h1>
+        <v-select v-model="room" :items="availableRooms" outlined label="" class="width-formroom text-field-rounded pe-7" />
+        
+      </span>
+
       <!-- span2 -->
       <span class="d-flex">
         <h1 class="mg-date pt-5 head1-title">วันที่เริ่ม</h1>
@@ -88,22 +100,13 @@
           class="width-formtime1 text-field-rounded pe-7" />
       </span>
 
-      <!-- span3 -->
-      <span class="d-flex">
-        <h1 class="mg-floor pt-5 head1-title">ชั้น</h1>
-        <v-select v-model="floor" :items="[2, 5, 6, 7]" outlined label="" class="width-formfloor text-field-rounded" />
-        <h1 class="ps-15 pt-5 head1-title">ห้อง</h1>
-        <v-select v-model="room" :items="availableRooms" outlined label="" class="width-formroom text-field-rounded" />
-        <h1 class="ps-15 pt-5 head1-title">ชื่อป้ายเวที</h1>
-        <v-text-field class="width-formtag text-field-rounded pe-7" single-line outlined
-          label="กรุณาแจ้งล่วงหน้า 3 วันทำการ" />
-      </span>
+      
 
       <!-- span4 -->
       <span class="d-flex">
         <h1 class="mg-repeat pt-5 head1-title">ทำซ้ำ</h1>
         <v-select v-model="repeatOption" :items="['ไม่', 'ทำซ้ำ']" outlined label=""
-          class="width-formfloor text-field-rounded" @change="onRepeatOptionChange" />
+          class="width-formrepeat text-field-rounded" @change="onRepeatOptionChange" />
         <h1 class="ps-12 pt-5 head1-title">สิ้นสุด</h1>
         <v-menu class="width-formdate text-field-rounded" v-model="endRepeatMenu" :close-on-content-click="false"
           :return-value.sync="endRepeatDate" transition="scale-transition" offset-y>
@@ -625,7 +628,18 @@ export default defineComponent({
 }
 
 .mg-floor {
-  margin-left: 56px;
+  margin-left: 26px;
+}
+
+.mg-room {
+  margin-left: 65px;
+}
+
+.width-formtag {
+  width: 194px;
+  margin-left: 20px;
+  margin-right: 77px;
+  color: #493628;
 }
 
 .mg-repeat {
@@ -644,7 +658,7 @@ export default defineComponent({
   width: 195px;
   height: 1px;
   font-weight: 500;
-  margin-left: 20px;
+  margin-left: 21px;
   color: #493628;
 }
 
@@ -682,22 +696,23 @@ export default defineComponent({
 }
 
 .width-formfloor {
-  width: 10px;
+  width: 65px;
   margin-left: 20px;
   color: #493628;
 }
 
+.width-formrepeat {
+  width: 65px;
+  margin-left: 18px;
+  color: #493628;
+}
 .width-formroom {
-  width: 100px;
+  width: 200px;
   margin-left: 20px;
   color: #493628;
 }
 
-.width-formtag {
-  width: 130px;
-  margin-left: 20px;
-  color: #493628;
-}
+
 
 .width-formblank1 {
   width: 460px;
