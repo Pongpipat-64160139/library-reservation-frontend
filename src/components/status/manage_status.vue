@@ -1,10 +1,21 @@
-
 <template class="back-ground">
   <!-- เรียกใช้ HeaderStudent ข้างบน -->
   <Header_page />
 
   <v-container fluid class="back-ground ms-kob">
-    <h1 class="pt-5 head-title text-center pb-10">สถานะการจอง</h1>
+
+    <v-breadcrumbs :items="items" divider=">">
+  <template v-slot:item="{ item }">
+    <v-btn
+      :disabled="item.disabled"
+      @click="router.push(item.href)"
+      class="breadcrumb-link pa-0"
+    >
+      {{ item.title }}
+    </v-btn>
+  </template>
+</v-breadcrumbs>
+
 
     <v-data-table
       v-model:sort-by="sortBy"
@@ -128,8 +139,31 @@
   </v-dialog>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+
+interface BreadcrumbItem {
+  title: string;
+  disabled: boolean;
+  href?: string;
+}
+
+const items: BreadcrumbItem[] = [
+  {
+    title: "อนุมัติสถานะห้อง",
+    disabled: false,
+    href: "/manage_status",
+  },
+  {
+    title: "สถานะห้อง",
+    disabled: false,
+    href: "/manage_room",
+  },
+];
 
 const sortBy = ref([
   { key: "index", order: "asc" },
@@ -154,6 +188,7 @@ const headers = ref([
 
 const data = ref([
   {
+
     index: 1,
     user: "64160136",
     name: "นวพรรษ สีหาบุตร",
@@ -255,14 +290,7 @@ const data = ref([
   },
 ]);
 
-const sortedData = computed(() => {
-  return [...data.value].sort((a, b) => {
-    // ถ้าสถานะของ a หรือ b เป็น "รอ" จะให้สถานะ "รอ" อยู่ข้างบน
-    if (a.status === "รอ" && b.status !== "รอ") return -1;
-    if (a.status !== "รอ" && b.status === "รอ") return 1;
-    return 0;
-  });
-});
+
 
 const dialog = ref(false);
 const selectedItem = ref<any>(null);
@@ -271,20 +299,6 @@ const showDialog = (item: any) => {
   selectedItem.value = item;
   dialog.value = true; // เปิด dialog
 };
-
-
-export default defineComponent({
-  setup() {
-    return {
-      sortBy,
-      headers,
-      data: sortedData,
-      dialog,
-      selectedItem,
-      showDialog,
-    };
-  },
-});
 </script>
 
 <style scoped>
@@ -326,60 +340,40 @@ th {
   margin-top: -600px;
 }
 
-.head-detailuser {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
+.breadcrumb-link {
+  text-decoration: none;
+  color: #493628 !important; /* สีข้อความ */
+  font-weight: 600;
+  background: transparent !important; /* พื้นหลังโปร่งใส */
+  box-shadow: none !important; /* ลบเงาปุ่ม */
+  border: none !important; /* ลบเส้นขอบ */
+  outline: none !important; /* ลบเส้นโฟกัส */
+  cursor: pointer; /* เปลี่ยนเป็นลูกศรเมื่อชี้ */
+  padding: 0; /* ไม่มี padding เพื่อให้เหมือนข้อความ */
+  min-width: 0; /* ไม่มีขนาดปุ่ม */
+  height: auto; /* ปรับความสูงตามข้อความ */
 }
 
-.head-detailname {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
+.breadcrumb-link:hover {
+  text-decoration: underline; /* ขีดเส้นใต้เมื่อ hover */
+  background: transparent !important; /* ไม่เปลี่ยนพื้นหลัง */
 }
 
-.head-detaildate1 {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
+.breadcrumb-link:focus {
+  outline: none !important; /* ลบโฟกัส */
 }
 
-.head-detaildate2 {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: -10px;
-  margin-left: 25px;
+.breadcrumb-link:active {
+  box-shadow: none !important; /* ไม่มีเงาตอนคลิก */
+  transform: none !important; /* ไม่มีเอฟเฟกต์ตอนคลิก */
 }
 
-.head-detailfloor {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
-}
-
-.head-detailrepeat {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: -10px;
-  margin-left: 25px;
-}
 
 .head-detail {
   font-weight: 300;
   font-size: 18px;
   margin-top: 20px;
   margin-left: 25px;
-}
-.back-ground {
-  background-color: #f9f3ea;
-}
-
-.ms-kob {
-  margin-top: -600px;
 }
 
 .rd-btndetail {
@@ -392,6 +386,7 @@ th {
   background-color: #f5eded;
   border-radius: 20px;
 }
+
 .rd-btncancel {
   font-weight: 400;
   font-size: 16px;
@@ -415,5 +410,9 @@ th {
 .rd-test {
   background-color: #f5eded;
   border-radius: 10px;
+}
+
+.v-data-table {
+  overflow: visible !important;
 }
 </style>

@@ -19,7 +19,7 @@
 
       <div class="d-flex mt-11 ms-136 buu-font">
         <div>
-          <v-breadcrumbs :items="items" divider="|"></v-breadcrumbs>
+          <v-breadcrumbs :items="items" divider="|"></v-breadcrumbs> 
         </div>
       </div>
 
@@ -43,28 +43,34 @@ interface BreadcrumbItem {
   href: string;
 }
 
+const items: BreadcrumbItem[] = [
+  {
+    title: "สถานะการจอง",
+    disabled: false,
+    href: "/status_page",
+  },
+  {
+    title: "คู่มือใช้งาน",
+    disabled: false,
+    href: "/manage_status",
+  },
+  {
+    title: "รายละเอียดห้อง",
+    disabled: false,
+    href: "/manage_room",
+  },
+];
+
 export default defineComponent({
   data() {
     return {
       logobuu,
-      items: [
-        {
-          title: "สถานะการจอง",
-          disabled: false,
-          href: "/status_page",
-        },
-        {
-          title: "คู่มือใช้งาน",
-          disabled: false,
-          href: "/form_study",
-        },
-        {
-          title: "รายละเอียดห้อง",
-          disabled: false,
-          href: "breadcrumbs_link_2",
-        },
-      ] as BreadcrumbItem[],
     };
+  },
+  computed: {
+    items() {
+      return items;
+    },
   },
 });
 </script>

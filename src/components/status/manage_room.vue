@@ -1,11 +1,28 @@
-
-<template class="back-ground">
-  <!-- เรียกใช้ HeaderStudent ข้างบน -->
+<template>
   <Header_page />
+  <v-container fluid class="back-ground ms-kob ">
+    <!-- Breadcrumbs -->
+    <v-breadcrumbs :items="items" divider=">" class="head-title pb-10">
+      <template v-slot:item="{ item }" class="head-title">
+        <!-- ลิงก์ที่สามารถคลิกได้ -->
+        <router-link
+          v-if="!item.disabled && item.href"
+          :to="item.href"
+          class="breadcrumb-link head-title"
+        >
+          {{ item.title }}
+        </router-link>
 
-  <v-container fluid class="back-ground ms-kob">
-    <h1 class="pt-5 head-title text-center pb-10">สถานะการจอง</h1>
+        <!-- ลิงก์ที่ไม่สามารถคลิกได้ -->
+        <span v-else class="breadcrumb-disabled head-title">
+          {{ item.title }}
+        </span>
+      </template>
+    </v-breadcrumbs>
 
+    <!-- Header -->
+
+    <!-- Data Table -->
     <v-data-table
       v-model:sort-by="sortBy"
       :headers="headers"
@@ -128,8 +145,8 @@
   </v-dialog>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { ref } from "vue";
 
 const sortBy = ref([
   { key: "index", order: "asc" },
@@ -141,6 +158,7 @@ const sortBy = ref([
   { key: "status", order: "asc" },
 ]);
 
+// Headers Configuration
 const headers = ref([
   { title: "ลำดับ", align: "start", key: "index" },
   { title: "ชื่อ", key: "name" },
@@ -152,6 +170,7 @@ const headers = ref([
   { title: "เพิ่มเติม", key: "more" },
 ]);
 
+// Mock Data
 const data = ref([
   {
     index: 1,
@@ -255,15 +274,13 @@ const data = ref([
   },
 ]);
 
-const sortedData = computed(() => {
-  return [...data.value].sort((a, b) => {
-    // ถ้าสถานะของ a หรือ b เป็น "รอ" จะให้สถานะ "รอ" อยู่ข้างบน
-    if (a.status === "รอ" && b.status !== "รอ") return -1;
-    if (a.status !== "รอ" && b.status === "รอ") return 1;
-    return 0;
-  });
-});
+// Breadcrumbs Configuration
+const items = [
+  { title: "อนุมัติสถานะการจอง", disabled: true, href: "/" },
+  { title: "สถานะห้อง", disabled: false, href: "/manage_status" },
+];
 
+// Dialog Handling
 const dialog = ref(false);
 const selectedItem = ref<any>(null);
 
@@ -271,23 +288,10 @@ const showDialog = (item: any) => {
   selectedItem.value = item;
   dialog.value = true; // เปิด dialog
 };
-
-
-export default defineComponent({
-  setup() {
-    return {
-      sortBy,
-      headers,
-      data: sortedData,
-      dialog,
-      selectedItem,
-      showDialog,
-    };
-  },
-});
 </script>
 
 <style scoped>
+
 /* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
@@ -297,7 +301,40 @@ export default defineComponent({
   color: #493628;
 }
 
-/* กำหนดสีพื้นหลังให้กับแถวคี่และแถวคู่ */
+.head-title {
+  font-weight: 600;
+  font-size: 24px;
+}
+
+.back-ground {
+  background-color: #f9f3ea;
+}
+
+.ms-kob {
+  position: absolute; /* ใช้ absolute เพื่อควบคุมตำแหน่ง */
+  top: 0; /* เลื่อนให้อยู่ด้านบน */
+  left: 0;
+  width: 100%; /* ให้ครอบคลุมพื้นที่หน้าจอ */
+  z-index: 1;
+  margin-top: 100px;
+}
+
+
+.breadcrumb-link {
+  text-decoration: none;
+  color: #aaa; /* สีสำหรับลิงก์ที่คลิกได้ */
+  font-weight: 600;
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-disabled {
+  color: #493628; /* สีสำหรับลิงก์ที่ปิดใช้งาน */
+  font-weight: 600;
+}
+
 .row-even {
   background-color: #f2efea;
 }
@@ -306,10 +343,11 @@ export default defineComponent({
   background-color: #e6dfd5;
 }
 
-.head-title {
-  font-weight: 600;
-  font-size: 24px;
+.rd-icon-magnify {
+  cursor: pointer;
+  color: #493628;
 }
+
 
 /* ปรับสีหัวคอลัมน์ */
 th {
@@ -318,13 +356,6 @@ th {
   font-size: 16px;
 }
 
-.back-ground {
-  background-color: #f9f3ea;
-}
-
-.ms-kob {
-  margin-top: -600px;
-}
 
 .head-detailuser {
   font-weight: 300;
@@ -378,9 +409,7 @@ th {
   background-color: #f9f3ea;
 }
 
-.ms-kob {
-  margin-top: -600px;
-}
+
 
 .rd-btndetail {
   background-color: #f5eded;
