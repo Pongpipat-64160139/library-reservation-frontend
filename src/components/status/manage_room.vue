@@ -276,8 +276,8 @@ const data = ref([
 
 // Breadcrumbs Configuration
 const items = [
-  { title: "อนุมัติสถานะการจอง", disabled: true, href: "/" },
-  { title: "สถานะห้อง", disabled: false, href: "/manage_status" },
+  { title: "อนุมัติสถานะการจอง", disabled: false, href: "/manage_status" },
+  { title: "สถานะห้อง", disabled: true, href: "/" },
 ];
 
 // Dialog Handling

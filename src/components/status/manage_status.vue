@@ -1,26 +1,32 @@
-<template class="back-ground">
-  <!-- เรียกใช้ HeaderStudent ข้างบน -->
+<template>
   <Header_page />
-
   <v-container fluid class="back-ground ms-kob">
+    <!-- Breadcrumbs -->
+    <v-breadcrumbs :items="items" divider=">" class="head-title pb-10">
+      <template v-slot:item="{ item }" class="head-title">
+        <!-- ลิงก์ที่สามารถคลิกได้ -->
+        <router-link
+          v-if="!item.disabled && item.href"
+          :to="item.href"
+          class="breadcrumb-link head-title"
+        >
+          {{ item.title }}
+        </router-link>
 
-    <v-breadcrumbs :items="items" divider=">">
-  <template v-slot:item="{ item }">
-    <v-btn
-      :disabled="item.disabled"
-      @click="router.push(item.href)"
-      class="breadcrumb-link pa-0"
-    >
-      {{ item.title }}
-    </v-btn>
-  </template>
-</v-breadcrumbs>
+        <!-- ลิงก์ที่ไม่สามารถคลิกได้ -->
+        <span v-else class="breadcrumb-disabled head-title">
+          {{ item.title }}
+        </span>
+      </template>
+    </v-breadcrumbs>
 
+    <!-- Header -->
 
+    <!-- Data Table -->
     <v-data-table
       v-model:sort-by="sortBy"
       :headers="headers"
-      :items="data"
+      :items="sortedData"
       style="background-color: #cdbba7"
       class="rd-test"
     >
@@ -32,7 +38,16 @@
           <td>{{ item.room }}</td>
           <td>{{ item.date }}</td>
           <td>{{ item.time }}</td>
-          <td>{{ item.status }}</td>
+          <td class="align-center justify-center">
+            <v-select
+              v-model="item.status"
+              :items="['รอ', 'อนุมัติ', 'ยกเลิก']"
+              variant="outlined"
+              density="compact"
+              class="cl-dropd mt-6"
+            ></v-select>
+          </td>
+
           <td>
             <!-- ปุ่มค้นหา icon -->
             <v-btn
@@ -41,8 +56,17 @@
               icon="mdi-magnify"
               width="40"
               height="40"
-              class="rd-btndetail"
+              class="rd-btndetail ms-1"
             ></v-btn>
+          </td>
+          <td>
+            <!-- Checkbox รับกุญแจ -->
+            <v-checkbox
+              v-model="item.keyReceived"
+              density="compact"
+              hide-details
+              class="custom-checkbox"
+            ></v-checkbox>
           </td>
         </tr>
       </template>
@@ -50,7 +74,7 @@
   </v-container>
 
   <!-- Dialog -->
-  <v-dialog v-model="dialog" max-width="500px">
+  <v-dialog v-model="dialog" max-width="500px" max-height="600px">
     <v-card class="rd-dialog">
       <span class="head-detailuser">
         <div class="head-detail">
@@ -94,14 +118,31 @@
 
       <span class="d-flex head-detailfloor">
         <v-row>
-          <v-col cols="5">
-            <div class="head-detail">
-              <strong>ชั้น</strong> {{ selectedItem?.floor }}
+          <v-col>
+            <div class="head-detail wth-btnedit">
+              <strong class="me-1">ชั้น</strong>
+              <v-select
+                v-if="editMode"
+                v-model="editedFloor"
+                :items="Object.keys(floorRooms)"
+                density="compact"
+                variant="outlined"
+                @update:modelValue="updateAvailableRooms"
+              ></v-select>
+              <span v-else>{{ selectedItem?.floor }}</span>
             </div>
           </v-col>
           <v-col>
-            <div class="head-detail ms-10">
-              <strong>ห้อง</strong> {{ selectedItem?.room }}
+            <div class="head-detail wth-btnedit">
+              <strong class="me-1">ห้อง</strong>
+              <v-select
+                v-if="editMode"
+                v-model="editedRoom"
+                :items="availableRooms"
+                density="compact"
+                variant="outlined"
+              ></v-select>
+              <span v-else>{{ selectedItem?.room }}</span>
             </div>
           </v-col>
         </v-row>
@@ -120,50 +161,52 @@
         </v-row>
       </span>
 
-      <span class="d-flex head-detail">
+      <span class="d-flex head-detail ms-6">
         <div class="head-detail">
           <strong>รายละเอียด</strong>
         </div>
       </span>
 
+      <!-- ปุ่ม Dialog -->
       <v-card-text> </v-card-text>
       <v-card-actions class="d-flex justify-center mb-8">
-        <v-btn class="rd-btncancel" text="ยกเลิกจอง" @click="dialog = false"
-          >ยกเลิกจอง</v-btn
+        <v-btn
+        class="rd-btncancel"
+          :style="{
+            backgroundColor: editMode ? '#ea8a8a' : '#dad0c2',
+            color: '#493628',
+          }"
+          @click="handleCancel"
         >
-        <v-btn class="rd-btnclose" text="ปิด" @click="dialog = false"
-          >ปิด</v-btn
+          {{ editMode ? "ยกเลิก" : "ปิด" }}
+        </v-btn>
+
+        <!-- ปุ่มบันทึก -->
+        <v-btn class="rd-btnclose"
+          :style="{
+            backgroundColor: editMode ? '#B5CFB7' : '#f0c8a4',
+            color: '#493628',
+          }"
+          @click="toggleEditMode"
         >
+          {{ editMode ? "บันทึก" : "แก้ไข" }}
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
+import { computed, ref, watch } from "vue";
 
-const router = useRouter();
+const formatDate = (date: string): string => {
+  const dateObj = new Date(date);
+  const day = String(dateObj.getDate()).padStart(2, "0");
+  const month = String(dateObj.getMonth() + 1).padStart(2, "0"); // เดือนเริ่มต้นที่ 0
+  const year = dateObj.getFullYear();
 
-
-interface BreadcrumbItem {
-  title: string;
-  disabled: boolean;
-  href?: string;
-}
-
-const items: BreadcrumbItem[] = [
-  {
-    title: "อนุมัติสถานะห้อง",
-    disabled: false,
-    href: "/manage_status",
-  },
-  {
-    title: "สถานะห้อง",
-    disabled: false,
-    href: "/manage_room",
-  },
-];
+  return `${day}/${month}/${year}`;
+};
 
 const sortBy = ref([
   { key: "index", order: "asc" },
@@ -184,120 +227,266 @@ const headers = ref([
   { title: "เวลา", key: "time" },
   { title: "สถานะ", key: "status" },
   { title: "เพิ่มเติม", key: "more" },
+  { title: "รับกุญแจ", key: "keyReceived" },
+
 ]);
 
+// Headers Configuration
 const data = ref([
   {
-
     index: 1,
     user: "64160136",
     name: "นวพรรษ สีหาบุตร",
     floor: 3,
     room: "ศึกษากลุ่ม 1",
-    date: "2024-12-11",
-    time: "08:00",
+    date: formatDate("2024-12-17"),
+    time: "08:00-10:00", // เวลาที่เริ่มต้นและสิ้นสุด
     status: "รอ",
+    keyReceived: false,
   },
   {
     index: 2,
-    user: "64160136",
-    name: "นวพรรษ",
+    user: "64160137",
+    name: "สมคิด ธรรมวงศ์",
     floor: 4,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-12",
-    time: "09:00",
+    room: "ศึกษากลุ่ม 2",
+    date: formatDate("2024-12-12"),
+    time: "09:00-11:00",
     status: "อนุมัติ",
+    keyReceived: true,
   },
   {
     index: 3,
-    user: "64160136",
-    name: "นางสาวนวพรรษ สีหาบุตร",
+    user: "64160138",
+    name: "กนกพร พันธ์นุช",
     floor: 5,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-13",
-    time: "10:00",
+    room: "ศึกษากลุ่ม 3",
+    date: formatDate("2024-12-13"),
+    time: "10:00-12:00",
     status: "ยกเลิก",
+    keyReceived: false,
   },
   {
     index: 4,
-    user: "64160136",
-    name: "Nawapat Seehabut",
+    user: "64160139",
+    name: "พรพรรณ ศรีธนู",
     floor: 3,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-14",
-    time: "11:00",
+    room: "ศึกษากลุ่ม 4",
+    date: formatDate("2024-12-17"),
+    time: "11:00-13:00",
     status: "รอ",
+    keyReceived: false,
   },
   {
     index: 5,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
+    user: "64160140",
+    name: "ณัฐวุฒิ ประเสริฐศักดิ์",
     floor: 6,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-15",
-    time: "12:00",
+    room: "STV 1",
+    date: formatDate("2024-12-15"),
+    time: "12:00-14:00",
     status: "อนุมัติ",
+    keyReceived: true,
   },
   {
     index: 6,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
+    user: "64160141",
+    name: "อรอุมา คงสมบูรณ์",
     floor: 4,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-16",
-    time: "13:00",
+    room: "ศึกษากลุ่ม 3",
+    date: formatDate("2024-12-17"),
+    time: "13:00-15:00",
     status: "รอ",
+    keyReceived: false,
   },
   {
     index: 7,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
+    user: "64160142",
+    name: "ธนชัย ศรีวิวัฒน์",
     floor: 5,
     room: "ศึกษากลุ่ม 1",
-    date: "2024-12-17",
-    time: "14:00",
+    date: formatDate("2024-12-17"),
+    time: "14:00-16:00",
     status: "ยกเลิก",
+    keyReceived: false,
   },
   {
     index: 8,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
+    user: "64160143",
+    name: "ภัทรา สุขสว่าง",
     floor: 3,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-18",
-    time: "15:00",
+    room: "ศึกษากลุ่ม 4",
+    date: formatDate("2024-12-18"),
+    time: "15:00-17:00",
     status: "อนุมัติ",
+    keyReceived: true,
   },
   {
     index: 9,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
+    user: "64160144",
+    name: "วรัญญา สร้างเจริญ",
     floor: 6,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-19",
-    time: "16:00",
+    room: "LIBRA OKE I",
+    date: formatDate("2024-12-17"),
+    time: "16:00-18:00",
     status: "รอ",
+    keyReceived: false,
   },
   {
     index: 10,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 4,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-20",
-    time: "17:00",
+    user: "64160145",
+    name: "สุทธิชัย วัฒนากร",
+    floor: 6,
+    room: "Mini Studio",
+    date: formatDate("2024-12-20"),
+    time: "08:00-16:00",
     status: "อนุมัติ",
+    keyReceived: true,
   },
 ]);
 
+// Breadcrumbs Configuration
+const items = [
+  { title: "อนุมัติสถานะการจอง", disabled: true, href: "/" },
+  { title: "สถานะห้อง", disabled: false, href: "/manage_room" },
+];
 
+const sortedData = computed(() => {
+  let sortedItems = [...data.value];
+
+  // จัดลำดับสถานะ
+  sortedItems.sort((a, b) => {
+    // ให้สถานะ "รอ" อยู่บนสุด
+    if (a.status === "รอ" && b.status !== "รอ") return -1;
+    if (a.status !== "รอ" && b.status === "รอ") return 1;
+
+    // ให้สถานะ "อนุมัติ" อยู่ท้ายสุด
+    if (a.status === "อนุมัติ" && b.status !== "อนุมัติ") return 1;
+    if (a.status !== "อนุมัติ" && b.status === "อนุมัติ") return -1;
+
+    // หากสถานะเป็นค่าเดียวกัน จะให้เรียงตาม index เดิม
+    return a.index - b.index;
+  });
+
+  // กำหนดให้ index ใหม่ตามลำดับ
+  return sortedItems.map((item, idx) => ({
+    ...item,
+    index: idx + 1, // ให้ลำดับ index เริ่มต้นจาก 1
+  }));
+});
+
+interface FloorRooms {
+  [key: string]: string[];
+}
+
+const floorRooms: FloorRooms = {
+  2: ["201"],
+  3: [
+    "ศึกษากลุ่ม 1",
+    "ศึกษากลุ่ม 2",
+    "ศึกษากลุ่ม 3",
+    "ศึกษากลุ่ม 4",
+    "ศึกษากลุ่ม 5",
+    "ศึกษากลุ่ม 6",
+  ],
+  4: [
+    "ศึกษากลุ่ม 1",
+    "ศึกษากลุ่ม 2",
+    "ศึกษากลุ่ม 3",
+    "ศึกษากลุ่ม 4",
+    "ศึกษากลุ่ม 5",
+  ],
+  5: [
+    "ศึกษากลุ่ม 1",
+    "ศึกษากลุ่ม 2",
+    "ศึกษากลุ่ม 3",
+    "ศึกษากลุ่ม 4",
+    "ศึกษากลุ่ม 5",
+    "Lecturer's Room 1",
+    "Lecturer's Room 2",
+    "Lecturer's Room 3",
+  ],
+  6: [
+    "STV 1",
+    "STV 2",
+    "STV 3",
+    "STV 4",
+    "STV 5",
+    "STV 6",
+    "STV 7",
+    "STV 8",
+    "STV 9",
+    "LIBRA OKE 1",
+    "LIBRA OKE 2",
+    "MINI THEATER",
+    "604 Smart Board",
+    "Mini Studio",
+    "Cyber Zone 1",
+    "Cyber Zone 2",
+    "Live for Life",
+  ],
+  7: ["706", "707"],
+};
 
 const dialog = ref(false);
 const selectedItem = ref<any>(null);
+const editMode = ref(false); // โหมดแก้ไข
 
+// ฟิลด์ที่แก้ไขได้
+const editedFloor = ref<number>(0);
+const editedRoom = ref("");
+
+// ห้องที่สามารถเลือกได้ตามชั้นที่เลือก
+const availableRooms = computed(() => {
+  return floorRooms[editedFloor.value as keyof typeof floorRooms] || [];
+});
+
+// Watcher เพื่ออัปเดตห้องเมื่อแก้ไขชั้น
+watch(
+  () => editedFloor.value,
+  (newFloor) => {
+    const rooms = floorRooms[newFloor as keyof typeof floorRooms];
+    editedRoom.value = rooms ? rooms[0] : ""; // เซ็ตห้องแรกในชั้นที่เลือก
+  }
+);
+
+// แสดง Dialog พร้อมตั้งค่าเริ่มต้น
 const showDialog = (item: any) => {
-  selectedItem.value = item;
-  dialog.value = true; // เปิด dialog
+  selectedItem.value = { ...item };
+  editedFloor.value = item.floor;
+  editedRoom.value = item.room;
+  dialog.value = true;
+  editMode.value = false;
+};
+
+// อัปเดตห้องเมื่อเลือกชั้นใหม่
+const updateAvailableRooms = () => {
+  const rooms = floorRooms.value[editedFloor.value];
+  editedRoom.value = rooms ? rooms[0] : ""; // เลือกห้องแรกเป็นค่าเริ่มต้น
+};
+
+// ปุ่ม "แก้ไข" / "บันทึก"
+const toggleEditMode = () => {
+  if (editMode.value) {
+    // เมื่อกด "บันทึก" อัปเดตข้อมูล
+    selectedItem.value.floor = editedFloor.value;
+    selectedItem.value.room = editedRoom.value;
+    editMode.value = false;
+  } else {
+    editMode.value = true; // เปิดโหมดแก้ไข
+  }
+};
+
+// ปุ่ม "ยกเลิก" / "ปิด"
+const handleCancel = () => {
+  if (editMode.value) {
+    // ยกเลิกการแก้ไข
+    editedFloor.value = selectedItem.value.floor;
+    editedRoom.value = selectedItem.value.room;
+    editMode.value = false;
+  } else {
+    dialog.value = false; // ปิด Dialog
+  }
 };
 </script>
 
@@ -311,7 +500,44 @@ const showDialog = (item: any) => {
   color: #493628;
 }
 
-/* กำหนดสีพื้นหลังให้กับแถวคี่และแถวคู่ */
+.cl-dropd {
+  max-width: 110px;
+  max-height: 62px;
+}
+
+.head-title {
+  font-weight: 600;
+  font-size: 24px;
+}
+
+.back-ground {
+  background-color: #f9f3ea;
+}
+
+.ms-kob {
+  position: absolute; /* ใช้ absolute เพื่อควบคุมตำแหน่ง */
+  top: 0; /* เลื่อนให้อยู่ด้านบน */
+  left: 0;
+  width: 100%; /* ให้ครอบคลุมพื้นที่หน้าจอ */
+  z-index: 1;
+  margin-top: 100px;
+}
+
+.breadcrumb-link {
+  text-decoration: none;
+  color: #aaa; /* สีสำหรับลิงก์ที่คลิกได้ */
+  font-weight: 600;
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-disabled {
+  color: #493628; /* สีสำหรับลิงก์ที่ปิดใช้งาน */
+  font-weight: 600;
+}
+
 .row-even {
   background-color: #f2efea;
 }
@@ -320,9 +546,9 @@ const showDialog = (item: any) => {
   background-color: #e6dfd5;
 }
 
-.head-title {
-  font-weight: 600;
-  font-size: 24px;
+.rd-icon-magnify {
+  cursor: pointer;
+  color: #493628;
 }
 
 /* ปรับสีหัวคอลัมน์ */
@@ -332,42 +558,47 @@ th {
   font-size: 16px;
 }
 
-.back-ground {
-  background-color: #f9f3ea;
+.head-detailuser {
+  font-weight: 300;
+  font-size: 18px;
+  margin-top: 20px;
+  margin-left: 25px;
 }
 
-.ms-kob {
-  margin-top: -600px;
+.head-detailname {
+  font-weight: 300;
+  font-size: 18px;
+  margin-top: 20px;
+  margin-left: 25px;
 }
 
-.breadcrumb-link {
-  text-decoration: none;
-  color: #493628 !important; /* สีข้อความ */
-  font-weight: 600;
-  background: transparent !important; /* พื้นหลังโปร่งใส */
-  box-shadow: none !important; /* ลบเงาปุ่ม */
-  border: none !important; /* ลบเส้นขอบ */
-  outline: none !important; /* ลบเส้นโฟกัส */
-  cursor: pointer; /* เปลี่ยนเป็นลูกศรเมื่อชี้ */
-  padding: 0; /* ไม่มี padding เพื่อให้เหมือนข้อความ */
-  min-width: 0; /* ไม่มีขนาดปุ่ม */
-  height: auto; /* ปรับความสูงตามข้อความ */
+.head-detaildate1 {
+  font-weight: 300;
+  font-size: 18px;
+  margin-top: 20px;
+  margin-left: 25px;
 }
 
-.breadcrumb-link:hover {
-  text-decoration: underline; /* ขีดเส้นใต้เมื่อ hover */
-  background: transparent !important; /* ไม่เปลี่ยนพื้นหลัง */
+.head-detaildate2 {
+  font-weight: 300;
+  font-size: 18px;
+  margin-top: -10px;
+  margin-left: 25px;
 }
 
-.breadcrumb-link:focus {
-  outline: none !important; /* ลบโฟกัส */
+.head-detailfloor {
+  font-weight: 300;
+  font-size: 18px;
+  margin-top: 20px;
+  margin-left: 25px;
 }
 
-.breadcrumb-link:active {
-  box-shadow: none !important; /* ไม่มีเงาตอนคลิก */
-  transform: none !important; /* ไม่มีเอฟเฟกต์ตอนคลิก */
+.head-detailrepeat {
+  font-weight: 300;
+  font-size: 18px;
+  margin-top: -10px;
+  margin-left: 25px;
 }
-
 
 .head-detail {
   font-weight: 300;
@@ -376,43 +607,54 @@ th {
   margin-left: 25px;
 }
 
+.wth-btnedit {
+  width: 150px;
+}
+.back-ground {
+  background-color: #f9f3ea;
+}
+
 .rd-btndetail {
   background-color: #f5eded;
   border-radius: 10px;
   border: 1px solid #493628;
 }
 
+.custom-checkbox {
+  color: #493628;
+  font-size: 25px;
+  margin-left: 13px;
+}
+
 .rd-dialog {
   background-color: #f5eded;
   border-radius: 20px;
 }
-
 .rd-btncancel {
   font-weight: 400;
   font-size: 16px;
   color: #493628;
-  background-color: #ea8a8a;
+  background-color: #dad0c2;
   width: 100px;
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
   margin-right: 30px;
 }
-
 .rd-btnclose {
   font-weight: 400;
   font-size: 16px;
-  background-color: #dad0c2;
+  background-color: #f0c8a4;
   width: 100px;
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
 }
-
+.head-detail {
+  font-weight: 300;
+  font-size: 18px;
+  margin: 10px 0;
+}
 .rd-test {
   background-color: #f5eded;
   border-radius: 10px;
-}
-
-.v-data-table {
-  overflow: visible !important;
 }
 </style>
