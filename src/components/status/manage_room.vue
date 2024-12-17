@@ -2,7 +2,7 @@
   <Header_page />
   <v-container fluid class="back-ground ms-kob">
     <!-- Breadcrumbs -->
-    <v-breadcrumbs :items="items" divider=">" class="head-title pb-10">
+    <v-breadcrumbs :items="items" divider=">" class="head-title pb-5">
       <template v-slot:item="{ item }" class="head-title">
         <!-- ลิงก์ที่สามารถคลิกได้ -->
         <router-link
@@ -19,6 +19,19 @@
         </span>
       </template>
     </v-breadcrumbs>
+
+    <v-row>
+      <v-col cols="10">
+
+      </v-col>
+      <v-col cols="2">
+        <v-btn class="close-service-btn ms-5 mb-5" rounded large>
+      <v-icon left>mdi-close</v-icon>
+      ปิดบริการ
+    </v-btn>
+      </v-col>
+    </v-row>
+    
 
     <!-- Data Table -->
     <div v-for="floor in 6" :key="floor" class="mb-10">
@@ -40,14 +53,19 @@
           </tr>
         </template>
         <template v-slot:item="{ item, index }">
-          <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'" >
+          <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
             <td>{{ item.room }}</td>
             <td>{{ item.user }}</td>
             <td>{{ item.time }}</td>
             <td>{{ item.status }}</td>
             <td>
-              <v-btn icon class="rd-btndetail" width="40"
-              height="40" @click="showDialog(item)">
+              <v-btn
+                icon
+                class="rd-btndetail"
+                width="40"
+                height="40"
+                @click="showDialog(item)"
+              >
                 <v-icon>mdi-cog</v-icon>
               </v-btn>
             </td>
@@ -221,11 +239,6 @@ watch(
   color: #493628;
 }
 
-.cl-dropd {
-  max-width: 110px;
-  max-height: 62px;
-}
-
 .head-title {
   font-weight: 600;
   font-size: 24px;
@@ -279,58 +292,6 @@ th {
   font-size: 16px;
 }
 
-.head-detailuser {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
-}
-
-.head-detailname {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
-}
-
-.head-detaildate1 {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
-}
-
-.head-detaildate2 {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: -10px;
-  margin-left: 25px;
-}
-
-.head-detailfloor {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
-}
-
-.head-detailrepeat {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: -10px;
-  margin-left: 25px;
-}
-
-.head-detail {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
-}
-
-.wth-btnedit {
-  width: 150px;
-}
 .back-ground {
   background-color: #f9f3ea;
 }
@@ -341,41 +302,22 @@ th {
   border: 1px solid #493628;
 }
 
-.custom-checkbox {
-  color: #493628;
-  font-size: 25px;
-  margin-left: 13px;
-}
-
-.rd-dialog {
-  background-color: #f5eded;
-  border-radius: 20px;
-}
-.rd-btncancel {
-  font-weight: 400;
-  font-size: 16px;
-  color: #493628;
-  background-color: #dad0c2;
-  width: 100px;
-  border-radius: 10px;
-  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
-  margin-right: 30px;
-}
-.rd-btnclose {
-  font-weight: 400;
-  font-size: 16px;
-  background-color: #f0c8a4;
-  width: 100px;
-  border-radius: 10px;
-  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
-}
-.head-detail {
-  font-weight: 300;
-  font-size: 18px;
-  margin: 10px 0;
-}
 .rd-test {
   background-color: #f5eded;
   border-radius: 10px;
+}
+
+.close-service-btn {
+  font-weight: bold;
+  background-color: #edf5ee; /* สีพื้นหลัง */
+  color: #493628; /* สีข้อความ */
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.close-service-btn:hover {
+  background-color: #f5eded; /* สีพื้นหลังเมื่อ hover */
 }
 </style>
