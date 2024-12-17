@@ -1,6 +1,6 @@
 <template>
   <Header_page />
-  <v-container fluid class="back-ground ms-kob ">
+  <v-container fluid class="back-ground ms-kob">
     <!-- Breadcrumbs -->
     <v-breadcrumbs :items="items" divider=">" class="head-title pb-10">
       <template v-slot:item="{ item }" class="head-title">
@@ -20,259 +20,62 @@
       </template>
     </v-breadcrumbs>
 
-    <!-- Header -->
-
     <!-- Data Table -->
-    <v-data-table
-      v-model:sort-by="sortBy"
-      :headers="headers"
-      :items="data"
-      style="background-color: #cdbba7"
-      class="rd-test"
-    >
-      <template v-slot:item="{ item, index }">
-        <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
-          <td>{{ item.index }}</td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.floor }}</td>
-          <td>{{ item.room }}</td>
-          <td>{{ item.date }}</td>
-          <td>{{ item.time }}</td>
-          <td>{{ item.status }}</td>
-          <td>
-            <!-- ปุ่มค้นหา icon -->
-            <v-btn
-              color="#F5EDED"
-              @click="showDialog(item)"
-              icon="mdi-magnify"
-              width="40"
-              height="40"
-              class="rd-btndetail"
-            ></v-btn>
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
+    <div v-for="floor in 6" :key="floor" class="mb-10">
+      <h2 class="text-h5 font-weight-bold ms-5 mb-2">ชั้น {{ floor + 1 }}</h2>
+      <v-data-table
+        :headers="headers"
+        :items="filteredRooms(floor + 1)"
+        class="rd-test"
+        style="table-layout: fixed; width: 100%"
+        hide-default-footer
+      >
+        <template v-slot:headers>
+          <tr>
+            <th style="width: 20%">ห้อง</th>
+            <th style="width: 20%">ผู้จอง</th>
+            <th style="width: 20%">เวลา</th>
+            <th style="width: 20%">สถานะ</th>
+            <th style="width: 20%">จัดการ</th>
+          </tr>
+        </template>
+        <template v-slot:item="{ item, index }">
+          <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'" >
+            <td>{{ item.room }}</td>
+            <td>{{ item.user }}</td>
+            <td>{{ item.time }}</td>
+            <td>{{ item.status }}</td>
+            <td>
+              <v-btn icon class="rd-btndetail" width="40"
+              height="40" @click="showDialog(item)">
+                <v-icon>mdi-cog</v-icon>
+              </v-btn>
+            </td>
+          </tr>
+        </template>
+      </v-data-table>
+    </div>
+
+    <!-- Dialog -->
+    <v-dialog v-model="dialog" max-width="600px">
+      <v-card>
+        <v-card-title>รายละเอียดการจอง</v-card-title>
+        <v-card-text>
+          <div><strong>ห้อง:</strong> {{ selectedItem?.room }}</div>
+          <div><strong>ผู้จอง:</strong> {{ selectedItem?.user }}</div>
+          <div><strong>เวลา:</strong> {{ selectedItem?.time }}</div>
+          <div><strong>สถานะ:</strong> {{ selectedItem?.status }}</div>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="primary" @click="dialog = false">ปิด</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
-
-  <!-- Dialog -->
-  <v-dialog v-model="dialog" max-width="500px">
-    <v-card class="rd-dialog">
-      <span class="head-detailuser">
-        <div class="head-detail">
-          <strong>ผู้ใช้</strong> {{ selectedItem?.user }}
-        </div>
-      </span>
-
-      <span class="head-detailname">
-        <div class="head-detail">
-          <strong>ชื่อ</strong> {{ selectedItem?.name }}
-        </div>
-      </span>
-
-      <span class="d-flex head-detaildate1">
-        <v-row>
-          <v-col cols="5">
-            <div class="head-detail">
-              <strong>วันที่เริ่ม</strong> {{ selectedItem?.date }}
-            </div>
-          </v-col>
-          <v-col>
-            <div class="head-detail ms-10">
-              <strong>เวลา</strong> {{ selectedItem?.time }}
-            </div>
-          </v-col>
-        </v-row>
-      </span>
-
-      <span class="d-flex head-detaildate2">
-        <v-row>
-          <v-col cols="5">
-            <div class="head-detail">
-              <strong>วันที่จบ</strong> {{ selectedItem?.date }}
-            </div>
-          </v-col>
-          <v-col>
-            <div class="head-detail ms-10"><strong>เวลา</strong> 08.30</div>
-          </v-col>
-        </v-row>
-      </span>
-
-      <span class="d-flex head-detailfloor">
-        <v-row>
-          <v-col cols="5">
-            <div class="head-detail">
-              <strong>ชั้น</strong> {{ selectedItem?.floor }}
-            </div>
-          </v-col>
-          <v-col>
-            <div class="head-detail ms-10">
-              <strong>ห้อง</strong> {{ selectedItem?.room }}
-            </div>
-          </v-col>
-        </v-row>
-      </span>
-
-      <span class="d-flex head-detailrepeat">
-        <v-row>
-          <v-col cols="5">
-            <div class="head-detail"><strong>ทำซ้ำ</strong> ไม่</div>
-          </v-col>
-          <v-col>
-            <div class="head-detail ms-10">
-              <strong>สิ้นสุด</strong> {{ selectedItem?.date }}
-            </div>
-          </v-col>
-        </v-row>
-      </span>
-
-      <span class="d-flex head-detail">
-        <div class="head-detail">
-          <strong>รายละเอียด</strong>
-        </div>
-      </span>
-
-      <v-card-text> </v-card-text>
-      <v-card-actions class="d-flex justify-center mb-8">
-        <v-btn class="rd-btncancel" text="ยกเลิกจอง" @click="dialog = false"
-          >ยกเลิกจอง</v-btn
-        >
-        <v-btn class="rd-btnclose" text="ปิด" @click="dialog = false"
-          >ปิด</v-btn
-        >
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-
-const sortBy = ref([
-  { key: "index", order: "asc" },
-  { key: "name", order: "asc" },
-  { key: "floor", order: "asc" },
-  { key: "room", order: "asc" },
-  { key: "date", order: "asc" },
-  { key: "time", order: "asc" },
-  { key: "status", order: "asc" },
-]);
-
-// Headers Configuration
-const headers = ref([
-  { title: "ลำดับ", align: "start", key: "index" },
-  { title: "ชื่อ", key: "name" },
-  { title: "ชั้น", key: "floor" },
-  { title: "ห้อง", key: "room" },
-  { title: "วันที่", key: "date" },
-  { title: "เวลา", key: "time" },
-  { title: "สถานะ", key: "status" },
-  { title: "เพิ่มเติม", key: "more" },
-]);
-
-// Mock Data
-const data = ref([
-  {
-    index: 1,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 3,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-11",
-    time: "08:00",
-    status: "รอ",
-  },
-  {
-    index: 2,
-    user: "64160136",
-    name: "นวพรรษ",
-    floor: 4,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-12",
-    time: "09:00",
-    status: "อนุมัติ",
-  },
-  {
-    index: 3,
-    user: "64160136",
-    name: "นางสาวนวพรรษ สีหาบุตร",
-    floor: 5,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-13",
-    time: "10:00",
-    status: "ยกเลิก",
-  },
-  {
-    index: 4,
-    user: "64160136",
-    name: "Nawapat Seehabut",
-    floor: 3,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-14",
-    time: "11:00",
-    status: "รอ",
-  },
-  {
-    index: 5,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 6,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-15",
-    time: "12:00",
-    status: "อนุมัติ",
-  },
-  {
-    index: 6,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 4,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-16",
-    time: "13:00",
-    status: "รอ",
-  },
-  {
-    index: 7,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 5,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-17",
-    time: "14:00",
-    status: "ยกเลิก",
-  },
-  {
-    index: 8,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 3,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-18",
-    time: "15:00",
-    status: "อนุมัติ",
-  },
-  {
-    index: 9,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 6,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-19",
-    time: "16:00",
-    status: "รอ",
-  },
-  {
-    index: 10,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 4,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-20",
-    time: "17:00",
-    status: "อนุมัติ",
-  },
-]);
+import { computed, ref, watch } from "vue";
 
 // Breadcrumbs Configuration
 const items = [
@@ -280,18 +83,135 @@ const items = [
   { title: "สถานะห้อง", disabled: true, href: "/" },
 ];
 
-// Dialog Handling
+const headers = [
+  { title: "ห้อง", key: "room" },
+  { title: "ผู้จอง", key: "user" },
+  { title: "วันที่", key: "date" },
+  { title: "สถานะ", key: "status" },
+  { title: "จัดการ", key: "actions" },
+];
+
+const floorRooms: FloorRooms = {
+  2: ["201"],
+  3: [
+    "ศึกษากลุ่ม 1",
+    "ศึกษากลุ่ม 2",
+    "ศึกษากลุ่ม 3",
+    "ศึกษากลุ่ม 4",
+    "ศึกษากลุ่ม 5",
+    "ศึกษากลุ่ม 6",
+  ],
+  4: [
+    "ศึกษากลุ่ม 1",
+    "ศึกษากลุ่ม 2",
+    "ศึกษากลุ่ม 3",
+    "ศึกษากลุ่ม 4",
+    "ศึกษากลุ่ม 5",
+  ],
+  5: [
+    "ศึกษากลุ่ม 1",
+    "ศึกษากลุ่ม 2",
+    "ศึกษากลุ่ม 3",
+    "ศึกษากลุ่ม 4",
+    "ศึกษากลุ่ม 5",
+    "Lecturer's Room 1",
+    "Lecturer's Room 2",
+    "Lecturer's Room 3",
+  ],
+  6: [
+    "STV 1",
+    "STV 2",
+    "STV 3",
+    "STV 4",
+    "STV 5",
+    "STV 6",
+    "STV 7",
+    "STV 8",
+    "STV 9",
+    "LIBRA OKE 1",
+    "LIBRA OKE 2",
+    "MINI THEATER",
+    "604 Smart Board",
+    "Mini Studio",
+    "Cyber Zone 1",
+    "Cyber Zone 2",
+    "Live for Life",
+  ],
+  7: ["706", "707"],
+};
+
+const mockUsers = [
+  "สมชาย ใจดี",
+  "สมหญิง รักเรียน",
+  "นพดล ก้าวหน้า",
+  "กนกพร ตั้งใจ",
+  "อนุชา ขยัน",
+  "วิไลวรรณ สุขสันต์",
+  "สุชาติ สมบูรณ์",
+  "ศิริพร จันทร์เจริญ",
+];
+
+const data = ref(
+  Object.entries(floorRooms).flatMap(([floor, rooms]) =>
+    rooms.map((room) => ({
+      room,
+      user:
+        Math.random() > 0.5
+          ? mockUsers[Math.floor(Math.random() * mockUsers.length)]
+          : "-", // บางห้องใส่ชื่อ บางห้องใส่ "-"
+      time: "08:00-10:00",
+      status: Math.random() > 0.5 ? "จอง" : "ว่าง", // สถานะแบบสุ่ม
+      floor: Number(floor),
+    }))
+  )
+);
+
+// กรองข้อมูลห้องตามชั้น
+const filteredRooms = (floor: number) => {
+  return data.value.filter((item) => item.floor === floor);
+};
+
+// Dialog
 const dialog = ref(false);
 const selectedItem = ref<any>(null);
 
+// เปิด Dialog
 const showDialog = (item: any) => {
   selectedItem.value = item;
-  dialog.value = true; // เปิด dialog
+  dialog.value = true;
 };
+
+// Filter data by floor
+const filteredData = (floor: number) => {
+  return data.value.filter((item) => item.floor === floor) || [];
+};
+
+interface FloorRooms {
+  [key: string]: string[];
+}
+
+const editMode = ref(false); // โหมดแก้ไข
+
+// ฟิลด์ที่แก้ไขได้
+const editedFloor = ref<number>(0);
+const editedRoom = ref("");
+
+// ห้องที่สามารถเลือกได้ตามชั้นที่เลือก
+const availableRooms = computed(() => {
+  return floorRooms[editedFloor.value as keyof typeof floorRooms] || [];
+});
+
+// Watcher เพื่ออัปเดตห้องเมื่อแก้ไขชั้น
+watch(
+  () => editedFloor.value,
+  (newFloor) => {
+    const rooms = floorRooms[newFloor as keyof typeof floorRooms];
+    editedRoom.value = rooms ? rooms[0] : ""; // เซ็ตห้องแรกในชั้นที่เลือก
+  }
+);
 </script>
 
 <style scoped>
-
 /* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
@@ -299,6 +219,11 @@ const showDialog = (item: any) => {
 * {
   font-family: "Kanit", sans-serif;
   color: #493628;
+}
+
+.cl-dropd {
+  max-width: 110px;
+  max-height: 62px;
 }
 
 .head-title {
@@ -319,11 +244,10 @@ const showDialog = (item: any) => {
   margin-top: 100px;
 }
 
-
 .breadcrumb-link {
   text-decoration: none;
-  color: #aaa; /* สีสำหรับลิงก์ที่คลิกได้ */
-  font-weight: 600;
+  color: #493628; /* สีสำหรับลิงก์ที่คลิกได้ */
+  font-weight: 400;
 }
 
 .breadcrumb-link:hover {
@@ -348,14 +272,12 @@ const showDialog = (item: any) => {
   color: #493628;
 }
 
-
 /* ปรับสีหัวคอลัมน์ */
 th {
   background-color: #cdbba7;
   font-weight: bold;
   font-size: 16px;
 }
-
 
 .head-detailuser {
   font-weight: 300;
@@ -405,16 +327,24 @@ th {
   margin-top: 20px;
   margin-left: 25px;
 }
+
+.wth-btnedit {
+  width: 150px;
+}
 .back-ground {
   background-color: #f9f3ea;
 }
-
-
 
 .rd-btndetail {
   background-color: #f5eded;
   border-radius: 10px;
   border: 1px solid #493628;
+}
+
+.custom-checkbox {
+  color: #493628;
+  font-size: 25px;
+  margin-left: 13px;
 }
 
 .rd-dialog {
@@ -425,22 +355,25 @@ th {
   font-weight: 400;
   font-size: 16px;
   color: #493628;
-  background-color: #ea8a8a;
+  background-color: #dad0c2;
   width: 100px;
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
   margin-right: 30px;
 }
-
 .rd-btnclose {
   font-weight: 400;
   font-size: 16px;
-  background-color: #dad0c2;
+  background-color: #f0c8a4;
   width: 100px;
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
 }
-
+.head-detail {
+  font-weight: 300;
+  font-size: 18px;
+  margin: 10px 0;
+}
 .rd-test {
   background-color: #f5eded;
   border-radius: 10px;

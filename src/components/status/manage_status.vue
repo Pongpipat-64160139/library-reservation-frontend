@@ -20,8 +20,6 @@
       </template>
     </v-breadcrumbs>
 
-    <!-- Header -->
-
     <!-- Data Table -->
     <v-data-table
       v-model:sort-by="sortBy"
@@ -171,7 +169,7 @@
       <v-card-text> </v-card-text>
       <v-card-actions class="d-flex justify-center mb-8">
         <v-btn
-        class="rd-btncancel"
+          class="rd-btncancel"
           :style="{
             backgroundColor: editMode ? '#ea8a8a' : '#dad0c2',
             color: '#493628',
@@ -182,7 +180,8 @@
         </v-btn>
 
         <!-- ปุ่มบันทึก -->
-        <v-btn class="rd-btnclose"
+        <v-btn
+          class="rd-btnclose"
           :style="{
             backgroundColor: editMode ? '#B5CFB7' : '#f0c8a4',
             color: '#493628',
@@ -228,7 +227,6 @@ const headers = ref([
   { title: "สถานะ", key: "status" },
   { title: "เพิ่มเติม", key: "more" },
   { title: "รับกุญแจ", key: "keyReceived" },
-
 ]);
 
 // Headers Configuration
@@ -525,8 +523,8 @@ const handleCancel = () => {
 
 .breadcrumb-link {
   text-decoration: none;
-  color: #aaa; /* สีสำหรับลิงก์ที่คลิกได้ */
-  font-weight: 600;
+  color: #493628; /* สีสำหรับลิงก์ที่คลิกได้ */
+  font-weight: 400;
 }
 
 .breadcrumb-link:hover {
