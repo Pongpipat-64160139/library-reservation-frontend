@@ -47,7 +47,7 @@
         <h1 class="ps-16 pt-5 head1-title">Entertain Room</h1>
         <router-link
           to="/table_entertain"
-          class="ps-16 pt-4 regularstu-title regularstu-line"
+          class="pt-4 regularenter-title regularstu-line"
         >
           จองห้อง <v-icon right>mdi-arrow-right</v-icon>
         </router-link>
@@ -228,19 +228,19 @@ export default defineComponent({
 .regularstu-title {
   font-weight: 400;
   font-size: 16px;
-  margin-left: 350px;
+  margin-left: 355px;
   margin-top: 10px;
 }
 .regularenter-title {
   font-weight: 400;
   font-size: 16px;
-  margin-left: 330px;
+  margin-left: 447px;
   margin-top: 10px;
 }
 .regularmeet-title {
   font-weight: 400;
   font-size: 16px;
-  margin-left: 386px;
+  margin-left: 395px;
   margin-top: 10px;
 }
 
@@ -254,6 +254,12 @@ export default defineComponent({
   height: 200px;
   border-radius: 10px;
   object-fit: cover;
+  transition: transform 0.3s ease-in-out; /* เพิ่มการเปลี่ยนแปลง */
+}
+
+.slide-image:hover {
+  transform: scale(1.1); /* ขยายขนาด 10% */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* เพิ่มเงาเมื่อ hover */
 }
 
 .text-center {
@@ -269,11 +275,15 @@ export default defineComponent({
 }
 
 .back-ground {
-  background-color: #f9f3ea;
+  background-color: #f9f3ea; /* พื้นหลังสีหลัก */
+  background-image: url("@/assets/crisp-paper-ruffles.png"); /* ใส่ Texture ที่โหลดมา */
+  background-repeat: repeat; /* ทำให้ Texture ซ้ำเต็มจอ */
+  background-size: auto; /* ปรับให้ขนาดของ Texture เป็นค่าเริ่มต้น */
+  background-position: top left; /* ตำแหน่งเริ่มต้น */
 }
 
 .ms-kob {
-  margin-top: -700px;
+  margin-top: -615px;
 }
 
 .regularstu-line {
@@ -282,6 +292,8 @@ export default defineComponent({
   text-decoration: none; /* ไม่มีเส้นใต้ในสถานะปกติ */
   color: #493628; /* สีข้อความ */
   transition: text-decoration 0.2s ease-in-out; /* เพิ่มความนุ่มนวล */
+  position: relative;
+  z-index: 10; /* เพิ่มเพื่อให้ลอยอยู่ข้างบน */
 }
 
 .regularstu-line:hover {
