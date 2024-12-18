@@ -23,10 +23,17 @@
     <v-row>
       <v-col cols="10"> </v-col>
       <v-col cols="2">
-        <v-btn class="close-service-btn ms-5 mb-5" rounded large>
-          <v-icon left>mdi-close</v-icon>
-          ปิดบริการ
-        </v-btn>
+        <v-btn
+  class="close-service-btn ms-5 mb-5"
+  rounded
+  large
+  @click="closeServiceDialog = true"
+>
+  <v-icon left>mdi-close</v-icon>
+  ปิดบริการ
+</v-btn>
+
+
       </v-col>
     </v-row>
 
@@ -172,12 +179,95 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="closeServiceDialog" max-width="500px" max-height="600px">
+  <v-card>
+    <v-card-title class="head-dialog text-center mt-5">
+      ยืนยันการปิดให้บริการ
+    </v-card-title>
+    <v-card-text>
+      <v-text-field
+        label="หมายเหตุ"
+        v-model="remark"
+        density="compact"
+        variant="outlined"
+      ></v-text-field>
+
+      <v-select
+        label="สถานะ"
+        :items="['เปิด', 'ปิด']"
+        v-model="status"
+        density="compact"
+        variant="outlined"
+      ></v-select>
+
+      <v-row>
+        <v-col cols="6">
+          <v-text-field
+            label="วันที่เริ่ม"
+            v-model="startDate"
+            type="date"
+            density="compact"
+            variant="outlined"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="6">
+          <v-text-field
+            label="เวลา"
+            v-model="startTime"
+            type="time"
+            density="compact"
+            variant="outlined"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="6">
+          <v-text-field
+            label="ถึงวันที่"
+            v-model="endDate"
+            type="date"
+            density="compact"
+            variant="outlined"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="6">
+          <v-text-field
+            label="เวลา"
+            v-model="endTime"
+            type="time"
+            density="compact"
+            variant="outlined"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-card-text>
+    <v-card-actions class="d-flex justify-center mb-5">
+      <v-btn class="rd-btncancel" variant="flat" @click="closeServiceDialog = false">
+        ยกเลิก
+      </v-btn>
+      <v-btn class="rd-btnclose" variant="flat" @click="saveCloseService">
+        ตกลง
+      </v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 
+const closeServiceDialog = ref(false);
+
+const saveCloseService = () => {
+  console.log("หมายเหตุ:", remark.value);
+  console.log("สถานะ:", status.value);
+  console.log("วันที่เริ่ม:", startDate.value, startTime.value);
+  console.log("ถึงวันที่:", endDate.value, endTime.value);
+  closeServiceDialog.value = false;
+};
 // Breadcrumbs Configuration
 const items = [
   { title: "อนุมัติสถานะการจอง", disabled: false, href: "/manage_status" },
