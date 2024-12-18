@@ -21,17 +21,14 @@
     </v-breadcrumbs>
 
     <v-row>
-      <v-col cols="10">
-
-      </v-col>
+      <v-col cols="10"> </v-col>
       <v-col cols="2">
         <v-btn class="close-service-btn ms-5 mb-5" rounded large>
-      <v-icon left>mdi-close</v-icon>
-      ปิดบริการ
-    </v-btn>
+          <v-icon left>mdi-close</v-icon>
+          ปิดบริการ
+        </v-btn>
       </v-col>
     </v-row>
-    
 
     <!-- Data Table -->
     <div v-for="floor in 6" :key="floor" class="mb-10">
@@ -75,17 +72,103 @@
     </div>
 
     <!-- Dialog -->
-    <v-dialog v-model="dialog" max-width="600px">
+    <v-dialog v-model="dialog" max-width="500px" max-height="600px">
       <v-card>
-        <v-card-title>รายละเอียดการจอง</v-card-title>
+        <v-card-title class="head-dialog text-center mt-5"
+          >ปิดให้บริการจองห้อง (รายห้อง)</v-card-title
+        >
         <v-card-text>
-          <div><strong>ห้อง:</strong> {{ selectedItem?.room }}</div>
-          <div><strong>ผู้จอง:</strong> {{ selectedItem?.user }}</div>
-          <div><strong>เวลา:</strong> {{ selectedItem?.time }}</div>
-          <div><strong>สถานะ:</strong> {{ selectedItem?.status }}</div>
+          <!-- หมายเหตุ -->
+          <v-text-field
+            label="หมายเหตุ"
+            v-model="remark"
+            density="compact"
+            variant="outlined"
+          ></v-text-field>
+
+          <!-- Dropdown เปิด-ปิด -->
+          <v-select
+            label="สถานะ"
+            :items="['เปิด', 'ปิด']"
+            v-model="status"
+            density="compact"
+            variant="outlined"
+          ></v-select>
+
+          <!-- วันที่และเวลา -->
+          <v-row>
+            <v-col cols="6">
+              <v-text-field
+                label="วันที่เริ่ม"
+                v-model="startDate"
+                type="date"
+                density="compact"
+                variant="outlined"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field
+                label="เวลา"
+                v-model="startTime"
+                type="time"
+                density="compact"
+                variant="outlined"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col cols="6">
+              <v-text-field
+                label="ถึงวันที่"
+                v-model="endDate"
+                type="date"
+                density="compact"
+                variant="outlined"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field
+                label="เวลา"
+                v-model="endTime"
+                type="time"
+                density="compact"
+                variant="outlined"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+
+          <!-- ชั้น/ห้อง -->
+          <v-row>
+            <v-col cols="6">
+              <v-select
+                label="ชั้น"
+                v-model="selectedFloor"
+                :items="Object.keys(floorRooms)"
+                density="compact"
+                variant="outlined"
+                @update:modelValue="updateRoomOptions"
+              ></v-select>
+            </v-col>
+            <v-col cols="6">
+              <v-select
+                label="ห้อง"
+                v-model="selectedRoom"
+                :items="roomOptions"
+                density="compact"
+                variant="outlined"
+              ></v-select>
+            </v-col>
+          </v-row>
         </v-card-text>
-        <v-card-actions>
-          <v-btn color="primary" @click="dialog = false">ปิด</v-btn>
+
+        <v-card-actions class="d-flex justify-center mb-5">
+          <v-btn class="rd-btncancel" variant="flat" @click="dialog = false"
+            >ยกเลิก</v-btn
+          >
+          <v-btn class="rd-btnclose" variant="flat" @click="saveChanges"
+            >ตกลง</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -199,34 +282,35 @@ const showDialog = (item: any) => {
   dialog.value = true;
 };
 
-// Filter data by floor
-const filteredData = (floor: number) => {
-  return data.value.filter((item) => item.floor === floor) || [];
-};
-
 interface FloorRooms {
   [key: string]: string[];
 }
 
-const editMode = ref(false); // โหมดแก้ไข
+const remark = ref("");
+const status = ref("เปิด");
+const startDate = ref("2024-11-13");
+const startTime = ref("08:00");
+const endDate = ref("2024-11-13");
+const endTime = ref("08:00");
 
-// ฟิลด์ที่แก้ไขได้
-const editedFloor = ref<number>(0);
-const editedRoom = ref("");
+const saveChanges = () => {
+  console.log("หมายเหตุ:", remark.value);
+  console.log("สถานะ:", status.value);
+  console.log("วันที่เริ่ม:", startDate.value, startTime.value);
+  console.log("ถึงวันที่:", endDate.value, endTime.value);
+  console.log("ชั้น:", selectedFloor.value);
+  console.log("ห้อง:", selectedRoom.value);
+  dialog.value = false;
+};
 
-// ห้องที่สามารถเลือกได้ตามชั้นที่เลือก
-const availableRooms = computed(() => {
-  return floorRooms[editedFloor.value as keyof typeof floorRooms] || [];
-});
+const selectedFloor = ref("2");
+const roomOptions = ref<string[]>(floorRooms[selectedFloor.value]); // ตั้งค่าเริ่มต้นให้ตรงกับ floorRooms[2]
+const selectedRoom = ref(roomOptions.value[0]); // ตั้งค่าห้องเริ่มต้นเป็นตัวแรกใน roomOptions
 
-// Watcher เพื่ออัปเดตห้องเมื่อแก้ไขชั้น
-watch(
-  () => editedFloor.value,
-  (newFloor) => {
-    const rooms = floorRooms[newFloor as keyof typeof floorRooms];
-    editedRoom.value = rooms ? rooms[0] : ""; // เซ็ตห้องแรกในชั้นที่เลือก
-  }
-);
+const updateRoomOptions = () => {
+  roomOptions.value = floorRooms[selectedFloor.value] || [];
+  selectedRoom.value = roomOptions.value[0] || ""; // เซ็ตห้องเป็นตัวแรกเมื่อเปลี่ยนชั้น
+};
 </script>
 
 <style scoped>
@@ -242,6 +326,11 @@ watch(
 .head-title {
   font-weight: 600;
   font-size: 24px;
+}
+
+.head-dialog {
+  font-weight: 600;
+  font-size: 18px;
 }
 
 .back-ground {
@@ -280,11 +369,6 @@ watch(
   background-color: #e6dfd5;
 }
 
-.rd-icon-magnify {
-  cursor: pointer;
-  color: #493628;
-}
-
 /* ปรับสีหัวคอลัมน์ */
 th {
   background-color: #cdbba7;
@@ -292,14 +376,38 @@ th {
   font-size: 16px;
 }
 
-.back-ground {
-  background-color: #f9f3ea;
-}
-
 .rd-btndetail {
   background-color: #f5eded;
   border-radius: 10px;
   border: 1px solid #493628;
+}
+
+.rd-btncancel {
+  font-weight: 400;
+  font-size: 16px;
+  color: #493628;
+  background-color: #dad0c2;
+  width: 100px;
+  border-radius: 10px;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+  margin-right: 30px;
+}
+
+.rd-btnclose {
+  font-weight: 400;
+  font-size: 16px;
+  background-color: #b5cfb7;
+  width: 100px;
+  border-radius: 10px;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* ปรับกรอบฟอร์มให้มุมมน 10px */
+.rd-form,
+.v-input.v-input--outlined .v-input__control {
+  border-radius: 5px !important;
+  border: 2px solid #493628;
+  height: 55px;
 }
 
 .rd-test {
