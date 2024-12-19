@@ -11,7 +11,6 @@
 </template>
 
 <style scoped>
-/* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
 * {
@@ -31,9 +30,8 @@
   font-size: 16px;
 }
 
-/* กำหนดสีพื้นหลังและสีข้อความของปุ่ม */
 .custom-btn {
-  background-color: #f5eded !important; /* ใช้ !important เพื่อให้แน่ใจว่าการตั้งค่านี้จะถูกใช้ */
+  background-color: #f5eded !important;
   color: #493628 !important;
   margin-left: 1190px;
   width: 150px;
@@ -41,7 +39,6 @@
   border: 2px solid #493628;
 }
 
-/* ถ้าต้องการเปลี่ยนสีไอคอน */
 .custom-btn .v-icon {
   color: #493628 !important;
   margin-right: 10px;

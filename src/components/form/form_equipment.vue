@@ -69,7 +69,7 @@
       <span>
         <Form_restaurant />
       </span>
-      <span >
+      <span>
         <h1 class="head-more ms-10 mt-5">ไฟล์เอกสารเพิ่มเติม</h1>
         <v-file-input
           class="text-field-rounded width-file mt-2"
@@ -96,10 +96,8 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
-/* ใช้ฟอนต์ Kanit ทั่วทั้งโปรเจ็กต์ */
 * {
   font-family: "Kanit", sans-serif;
   color: #493628;
@@ -179,7 +177,7 @@ export default defineComponent({
 }
 
 .text-field-rounded ::v-deep(.v-input__control) {
-  background-color: #f5eded; /* ตั้งค่าสีพื้นหลัง */
+  background-color: #f5eded;
   border-radius: 5px;
   border: 2px solid #493628;
 }

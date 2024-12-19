@@ -1,6 +1,5 @@
 <template>
   <v-app style="background-color: #f9f3ea">
-    <!-- กำหนดพื้นหลังสำหรับทั้งแอป -->
     <v-app-bar
       :elevation="3"
       class="head-font"
@@ -19,7 +18,7 @@
 
       <div class="d-flex mt-11 ms-136 buu-font">
         <div>
-          <v-breadcrumbs :items="items" divider="|"></v-breadcrumbs> 
+          <v-breadcrumbs :items="items" divider="|"></v-breadcrumbs>
         </div>
       </div>
 
@@ -34,7 +33,6 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
 import logobuu from "@/assets/logobuu.png";
 
 interface BreadcrumbItem {
@@ -61,7 +59,7 @@ const items: BreadcrumbItem[] = [
   },
 ];
 
-export default defineComponent({
+export default {
   data() {
     return {
       logobuu,
@@ -72,14 +70,12 @@ export default defineComponent({
       return items;
     },
   },
-});
+};
 </script>
 
 <style scoped>
-/* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
-/* ใช้ฟอนต์ Kanit ทั่วทั้งโปรเจ็กต์ */
 * {
   font-family: "Kanit", sans-serif;
   color: #493628;
@@ -112,11 +108,11 @@ export default defineComponent({
 }
 
 .custom-router-link {
-  text-decoration: none; /* เอาเส้นใต้ออก */
+  text-decoration: none;
   color: inherit;
 }
 
 .custom-router-link:hover {
-  text-decoration: none; /* ไม่มีเส้นใต้ตอนโฮเวอร์ */
+  text-decoration: none;
 }
 </style>

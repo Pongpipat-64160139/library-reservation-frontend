@@ -1,6 +1,4 @@
-
 <template class="back-ground">
-  <!-- เรียกใช้ HeaderStudent ข้างบน -->
   <Header_page />
 
   <v-container fluid class="back-ground ms-kob">
@@ -23,7 +21,6 @@
           <td>{{ item.time }}</td>
           <td>{{ item.status }}</td>
           <td>
-            <!-- ปุ่มค้นหา icon -->
             <v-btn
               color="#F5EDED"
               @click="showDialog(item)"
@@ -38,7 +35,6 @@
     </v-data-table>
   </v-container>
 
-  <!-- Dialog -->
   <v-dialog v-model="dialog" max-width="500px">
     <v-card class="rd-dialog">
       <span class="head-detailuser">
@@ -257,7 +253,6 @@ const data = ref([
 
 const sortedData = computed(() => {
   return [...data.value].sort((a, b) => {
-    // ถ้าสถานะของ a หรือ b เป็น "รอ" จะให้สถานะ "รอ" อยู่ข้างบน
     if (a.status === "รอ" && b.status !== "รอ") return -1;
     if (a.status !== "รอ" && b.status === "รอ") return 1;
     return 0;
@@ -269,9 +264,8 @@ const selectedItem = ref<any>(null);
 
 const showDialog = (item: any) => {
   selectedItem.value = item;
-  dialog.value = true; // เปิด dialog
+  dialog.value = true;
 };
-
 
 export default defineComponent({
   setup() {
@@ -288,16 +282,13 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
-/* ใช้ฟอนต์ Kanit ทั่วทั้งโปรเจ็กต์ */
 * {
   font-family: "Kanit", sans-serif;
   color: #493628;
 }
 
-/* กำหนดสีพื้นหลังให้กับแถวคี่และแถวคู่ */
 .row-even {
   background-color: #f2efea;
 }
@@ -311,7 +302,6 @@ export default defineComponent({
   font-size: 24px;
 }
 
-/* ปรับสีหัวคอลัมน์ */
 th {
   background-color: #cdbba7;
   font-weight: bold;

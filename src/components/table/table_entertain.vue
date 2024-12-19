@@ -3,10 +3,19 @@
   <v-container fluid class="back-ground ms-kob">
     <v-container>
       <v-row justify="center" align="center">
-        <!-- Dropdown สำหรับเลือกประเภทห้อง -->
-        <v-col class="d-flex justify-center" cols="auto" style="margin-right: 100px">
-          <v-select class="width-dd v-selectcolor" label="ประเภทห้อง" :items="typeroom" v-model="selectedPage"
-            @update:modelValue="onSelectChange">
+        <!-- Dropdown เลือกประเภทห้อง -->
+        <v-col
+          class="d-flex justify-center"
+          cols="auto"
+          style="margin-right: 100px"
+        >
+          <v-select
+            class="width-dd v-selectcolor"
+            label="ประเภทห้อง"
+            :items="typeroom"
+            v-model="selectedPage"
+            @update:modelValue="onSelectChange"
+          >
           </v-select>
         </v-col>
 
@@ -16,25 +25,30 @@
             {{
               selectedDate
                 ? new Date(selectedDate).toLocaleDateString("th-TH", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
                 : new Date().toLocaleDateString("th-TH", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
             }}
             <v-icon class="calendar-icon">mdi-calendar</v-icon>
           </v-btn>
 
-          <!-- v-date-picker แสดงเมื่อ showDatePicker เป็น true -->
-          <v-date-picker v-if="showDatePicker" class="date-picker-position" v-model="selectedDate"
-            @update:model-value="handleDateSelect" @click:clear="selectedDate = null" :allowed-dates="allowedDates"
-            :day-class="getDayClass"></v-date-picker>
+          <v-date-picker
+            v-if="showDatePicker"
+            class="date-picker-position"
+            v-model="selectedDate"
+            @update:model-value="handleDateSelect"
+            @click:clear="selectedDate = null"
+            :allowed-dates="allowedDates"
+            :day-class="getDayClass"
+          ></v-date-picker>
         </v-col>
       </v-row>
     </v-container>
@@ -54,8 +68,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(time, index) in timeSlots" :key="time" :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
-            @click.stop="goToFormStudy">
+          <tr
+            v-for="(time, index) in timeSlots"
+            :key="time"
+            :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormStudy"
+          >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room9-column" v-for="room in stv" :key="room"></td>
           </tr>
@@ -64,7 +82,8 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง LIBRA OKE -->
-    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง LIBRA OKE
+    <h1 class="pt-5 head-title pb-10 ml-left">
+      ชั้น 6 ห้อง LIBRA OKE
       <v-icon class="mb-1 ms-2">mdi-microphone-variant</v-icon>
     </h1>
     <v-container class="ms-minustop">
@@ -78,8 +97,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(time, index) in timeSlots" :key="time" :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
-            @click.stop="goToFormStudy">
+          <tr
+            v-for="(time, index) in timeSlots"
+            :key="time"
+            :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormStudy"
+          >
             <td class="time-column font-table">{{ time }}</td>
             <td class="room2-column" v-for="room in oke" :key="room"></td>
           </tr>
@@ -88,10 +111,11 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง Mini Theater -->
-    <h1 class="pt-5 head-title pb-10 ml-left">ชั้น 6 ห้อง MINI THEATER
+    <h1 class="pt-5 head-title pb-10 ml-left">
+      ชั้น 6 ห้อง MINI THEATER
       <v-icon class="mb-1 ms-2">mdi-theater</v-icon>
     </h1>
-    
+
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
@@ -103,10 +127,18 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(time, index) in timeSlots" :key="time" :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
-            @click.stop="goToFormStudy">
+          <tr
+            v-for="(time, index) in timeSlots"
+            :key="time"
+            :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+            @click.stop="goToFormStudy"
+          >
             <td class="time-column font-table">{{ time }}</td>
-            <td class="room1-column" v-for="room in minitheater" :key="room"></td>
+            <td
+              class="room1-column"
+              v-for="room in minitheater"
+              :key="room"
+            ></td>
           </tr>
         </tbody>
       </v-simple-table>
@@ -121,9 +153,7 @@ import { useRouter } from "vue-router";
 const showDatePicker = ref(false);
 const currentDate = ref("");
 const selectedDate = ref<string | null>(null);
-const holidays = ref<string[]>([]); // Store holiday dates
-
-// Fetch holidays from API
+const holidays = ref<string[]>([]);
 const fetchHolidays = async (year: string) => {
   const response = await fetch(
     `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=2024`,
@@ -138,7 +168,6 @@ const fetchHolidays = async (year: string) => {
   if (response.ok) {
     const responseData = await response.json();
     if (responseData.result && Array.isArray(responseData.result.data)) {
-      // เก็บวันหยุดจาก result.data
       holidays.value = responseData.result.data.map(
         (holiday: { Date: string }) => holiday.Date
       );
@@ -151,7 +180,7 @@ const fetchHolidays = async (year: string) => {
 };
 
 const allowedDates = (date: unknown) => {
-  if (!(date instanceof Date)) return false; 
+  if (!(date instanceof Date)) return false;
 
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -166,7 +195,7 @@ const allowedDates = (date: unknown) => {
 onMounted(() => {
   const currentYear = new Date().getFullYear().toString();
   fetchHolidays(currentYear).then(() => {
-    console.log("Holidays fetched:", holidays.value); // Log to check the holidays
+    console.log("Holidays fetched:", holidays.value);
   });
 });
 
@@ -191,18 +220,16 @@ const getCurrentDate = () => {
   const date = new Date();
 
   const options: Intl.DateTimeFormatOptions = {
-    weekday: "long", // แสดงชื่อวัน
-    day: "numeric", // แสดงวันที่
-    month: "long", // แสดงเดือน
-    year: "numeric", // แสดงปี
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
   };
 
-  // ใช้ Intl.DateTimeFormat เพื่อแสดงวันที่ในรูปแบบที่ต้องการ
   const formatter = new Intl.DateTimeFormat("th-TH", options);
   currentDate.value = formatter.format(date);
 };
 
-// เรียกใช้ฟังก์ชั่นเพื่อให้ได้วันที่ปัจจุบันเมื่อโหลดหน้า
 getCurrentDate();
 
 const router = useRouter();
@@ -278,12 +305,9 @@ const onSelectChange = (value: string) => {
 const goToFormStudy = () => {
   router.push("/booking_study");
 };
-
-
 </script>
 
 <style scoped>
-/* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
 * {
@@ -373,7 +397,6 @@ const goToFormStudy = () => {
   cursor: pointer;
 }
 
-
 .width-dd {
   width: 300px;
 }
@@ -399,15 +422,11 @@ const goToFormStudy = () => {
 
 .date-picker-position {
   position: absolute;
-  /* ทำให้มันลอย */
   top: 190px;
-  /* เลือกตำแหน่งที่ต้องการให้แสดง */
   left: 500;
   z-index: 1000;
-  /* ควบคุมลำดับชั้นไม่ให้ทับส่วนอื่น */
   background-color: #f5eded;
   box-shadow: 0px 10px 8px rgba(0, 0, 0, 0.1);
-  /* เพิ่มเงา */
   border: 1px solid #493628;
   width: 300px;
   height: 440px;
@@ -429,14 +448,11 @@ const goToFormStudy = () => {
 
 .v-date-picker :deep(.v-btn) {
   font-size: 10px !important;
-  /* ปรับขนาดฟอนต์ */
   width: 20px !important;
   height: 20px !important;
   border-radius: 100% !important;
-  /* หากต้องการให้ปุ่มเป็นวงกลม */
 }
 
-/* ขนาดฟอนต์สำหรับ "Select date" */
 .v-date-picker :deep(.v-picker-title) {
   font-size: 15px !important;
   margin-top: 10px;

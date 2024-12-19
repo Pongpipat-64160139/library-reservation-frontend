@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <!-- Col แรกอยู่ฝั่งซ้าย -->
+    <!-- Col ซ้าย -->
     <v-col cols="12" md="5" class="ms-15">
       <div>
         <v-img :src="buulib" width="350" height="100" class="mt-10"></v-img>
@@ -10,14 +10,12 @@
         <v-card-text class="mt-15 ms-6">
           <p class="font-head2">Username</p>
           <v-form @submit.prevent="submitForm" class="width-form">
-            <!-- ทำกรอบและมุมมนให้กับ v-text-field โดยไม่มีเส้นใต้ -->
             <v-text-field
               class="mt-2 text-field-rounded"
               label="Username"
               type="text"
               v-model="username"
-               prepend-inner-icon="mdi-account-circle-outline"
-
+              prepend-inner-icon="mdi-account-circle-outline"
               hide-details
             ></v-text-field>
 
@@ -28,7 +26,7 @@
               label="Password"
               type="password"
               v-model="password"
-               prepend-inner-icon="mdi-lock-outline"
+              prepend-inner-icon="mdi-lock-outline"
             ></v-text-field>
           </v-form>
           <v-btn
@@ -44,44 +42,46 @@
       </div>
     </v-col>
 
-    <!-- Col ที่สองอยู่ฝั่งขวา -->
-    <v-col cols="12" md="6">
-      <v-img :src="lib" width="700" height="700" class="mt-1"></v-img>
+    <!-- Col ขวา -->
+    <v-col cols="12" md="6" >
+      <v-img :src="lib" width="700" height="700"></v-img>
     </v-col>
   </v-row>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
 import lib from "@/assets/lib.png";
 import buulib from "@/assets/buulib.png";
-export default defineComponent({
+
+const data = {
+  lib,
+  buulib,
+  username: "",
+  password: "",
+};
+
+const methods = {
+  submitForm() {
+    if (data.username && data.password) {
+      console.log("Form submitted:", {
+        username: data.username,
+        password: data.password,
+      });
+    }
+  },
+};
+
+export default {
   data() {
-    return {
-      lib,
-      buulib,
-      username: "",
-      password: "",
-    };
+    return data;
   },
-  methods: {
-    submitForm() {
-      if (this.username && this.password) {
-        console.log("Form submitted:", {
-          username: this.username,
-          password: this.password,
-        });
-      }
-    },
-  },
-});
+  methods,
+};
 </script>
 
 <style>
-/* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
-/* ใช้ฟอนต์ Kanit ทั่วทั้งโปรเจ็กต์ */
 * {
   font-family: "Kanit", sans-serif;
   color: #493628;
@@ -107,7 +107,6 @@ export default defineComponent({
   width: 500px;
 }
 
-/* ทำกรอบและมุมมนให้กับ v-text-field โดยไม่ใช้เส้นใต้ */
 .text-field-rounded .v-input__control {
   border-radius: 5px;
   border: 2px solid #493628;
@@ -119,12 +118,10 @@ export default defineComponent({
 
 .v-input__control .v-input__slot {
   border-bottom: none;
-  /* เอาเส้นใต้ของ v-text-field ออก */
 }
 
 .font-bold {
   font-weight: bold !important;
   font-size: 18px !important;
-  
 }
 </style>

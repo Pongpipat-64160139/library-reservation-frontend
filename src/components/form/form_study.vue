@@ -228,7 +228,7 @@ import { defineComponent, onMounted, ref } from "vue";
 
 const numPeople = ref("");
 const phoneNumber = ref("");
-const menu = ref(false); // สำหรับควบคุมการเปิดปิดของ dropdown
+const menu = ref(false); 
 const startMenu = ref(false);
 const endMenu = ref(false);
 const startDate = ref(null);
@@ -307,7 +307,7 @@ export default defineComponent({
     return {
       numPeople: "",
       phoneNumber: "",
-      menu: false, // สำหรับควบคุมการเปิดปิดของ dropdown
+      menu: false,
       startMenu: false,
       endMenu: false,
       startDate: null,
@@ -388,7 +388,7 @@ export default defineComponent({
       showEndDatePicker: false,
       currentStartDate: "",
       currentEndDate: "",
-      holidays: [] as string[], // เพิ่มการประกาศ type
+      holidays: [] as string[],
     };
   },
 
@@ -484,17 +484,15 @@ export default defineComponent({
 
   methods: {
     validateNumber() {
-      // กรองเฉพาะตัวเลข
       this.numPeople = this.numPeople.replace(/\D/g, "");
     },
 
     formatDate(date: Date) {
-      // แปลงวันที่เป็นภาษาไทยในรูปแบบที่ต้องการ
       const options: Intl.DateTimeFormatOptions = {
-        weekday: "long", // วันในสัปดาห์
-        day: "numeric", // วันที่
-        month: "long", // เดือน
-        year: "numeric", // ปี
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
       };
 
       const thaiDate = new Intl.DateTimeFormat("th-TH", options).format(date);
@@ -506,14 +504,14 @@ export default defineComponent({
       const month = String(date.getMonth() + 1).padStart(2, "0");
       const day = String(date.getDate()).padStart(2, "0");
       const formattedDate = `${year}-${month}-${day}`;
-      
+
       const isHoliday = this.holidays.includes(formattedDate);
-      
+
       return !isHoliday;
     },
     handleDateUpdate(val: Date) {
       this.startDate = val;
-      this.endDate = val; // ตั้งค่า endDate ให้เท่ากับ startDate
+      this.endDate = val;
       this.endRepeatDate = val;
       this.startMenu = false;
     },
@@ -551,9 +549,8 @@ export default defineComponent({
 const showDatePicker = ref(false);
 const currentDate = ref("");
 const selectedDate = ref<string | null>(null);
-const holidays = ref<string[]>([]); // Store holiday dates
+const holidays = ref<string[]>([]);
 
-// Fetch holidays from API
 const fetchHolidays = async (year: string) => {
   const response = await fetch(
     `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=2024`,
@@ -568,7 +565,6 @@ const fetchHolidays = async (year: string) => {
   if (response.ok) {
     const responseData = await response.json();
     if (responseData.result && Array.isArray(responseData.result.data)) {
-      // เก็บวันหยุดจาก result.data
       holidays.value = responseData.result.data.map(
         (holiday: { Date: string }) => holiday.Date
       );
@@ -596,7 +592,7 @@ const allowedDates = (date: unknown) => {
 onMounted(() => {
   const currentYear = new Date().getFullYear().toString();
   fetchHolidays(currentYear).then(() => {
-    console.log("Holidays fetched:", holidays.value); // Log to check the holidays
+    console.log("Holidays fetched:", holidays.value);
   });
 });
 
@@ -619,26 +615,22 @@ const getCurrentDate = () => {
   const date = new Date();
 
   const options: Intl.DateTimeFormatOptions = {
-    weekday: "long", // แสดงชื่อวัน
-    day: "numeric", // แสดงวันที่
-    month: "long", // แสดงเดือน
-    year: "numeric", // แสดงปี
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
   };
 
-  // ใช้ Intl.DateTimeFormat เพื่อแสดงวันที่ในรูปแบบที่ต้องการ
   const formatter = new Intl.DateTimeFormat("th-TH", options);
   currentDate.value = formatter.format(date);
 };
 
-// เรียกใช้ฟังก์ชั่นเพื่อให้ได้วันที่ปัจจุบันเมื่อโหลดหน้า
 getCurrentDate();
 </script>
 
 <style scoped>
-/* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
-/* ใช้ฟอนต์ Kanit ทั่วทั้งโปรเจ็กต์ */
 * {
   font-family: "Kanit", sans-serif;
   color: #493628;

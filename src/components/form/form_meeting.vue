@@ -82,7 +82,6 @@
             #activator="{ props }"
             class="width-formdate text-field-rounded"
           >
-            <!-- ปุ่มหรือฟิลด์ที่ใช้เปิด dropdown -->
             <v-text-field
               class="width-formdate text-field-rounded"
               v-bind="props"
@@ -140,7 +139,6 @@
             #activator="{ props }"
             class="width-formdate text-field-rounded"
           >
-            <!-- ปุ่มหรือฟิลด์ที่ใช้เปิด dropdown -->
             <v-text-field
               class="width-formdate text-field-rounded"
               v-bind="props"
@@ -245,8 +243,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
-import router from "@/router";
+import { defineComponent } from "vue";
 
 export default defineComponent({
   data() {
@@ -309,6 +306,7 @@ export default defineComponent({
       currentEndDate: "",
     };
   },
+  
 
   computed: {
     filteredEndTimes() {
@@ -688,10 +686,8 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
-/* ใช้ฟอนต์ Kanit ทั่วทั้งโปรเจ็กต์ */
 * {
   font-family: "Kanit", sans-serif;
   color: #493628;

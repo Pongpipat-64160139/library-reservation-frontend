@@ -111,14 +111,14 @@
             ></v-text-field>
           </div>
           <div>
-        <h1 class="head-more ms-10">รายละเอียดเพิ่มเติม</h1>
-        <v-textarea
-          label=""
-          rows="3"
-          outlined
-          class="ms-10 text-field-rounded me-7 mt-2"
-        ></v-textarea>
-      </div>
+            <h1 class="head-more ms-10">รายละเอียดเพิ่มเติม</h1>
+            <v-textarea
+              label=""
+              rows="3"
+              outlined
+              class="ms-10 text-field-rounded me-7 mt-2"
+            ></v-textarea>
+          </div>
         </div>
       </template>
     </v-expansion-panel>
@@ -155,7 +155,7 @@ export default defineComponent({
         "17:30",
         "18:00",
         "18:30",
-      ], // รายการเวลาที่เลือกได้
+      ],
       breakMorning: { time: "-", people: 0, budget: 0 },
       breakLunch: { time: "-", people: 0, budget: 0 },
       breakAfternoon: { time: "-", people: 0, budget: 0 },
@@ -166,10 +166,8 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
-/* ใช้ฟอนต์ Kanit ทั่วทั้งโปรเจ็กต์ */
 * {
   font-family: "Kanit", sans-serif;
   color: #493628;
@@ -205,7 +203,6 @@ export default defineComponent({
 
 .text-field-rounded ::v-deep(.v-input__control) {
   background-color: #f5eded;
-  /* ตั้งค่าสีพื้นหลัง */
   border-radius: 5px;
   border: 2px solid #493628;
 }

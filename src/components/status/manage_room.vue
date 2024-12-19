@@ -2,7 +2,7 @@
   <Header_page />
   <v-container fluid class="back-ground ms-kob">
     <!-- Breadcrumbs -->
-    <v-breadcrumbs :items="items" divider=">" class="head-title pb-5">
+    <v-breadcrumbs :items="items" divider=">" class="head-title mg-table">
       <template v-slot:item="{ item }" class="head-title">
         <!-- ลิงก์ที่สามารถคลิกได้ -->
         <router-link
@@ -24,20 +24,17 @@
       <v-col cols="10"> </v-col>
       <v-col cols="2">
         <v-btn
-  class="close-service-btn ms-5 mb-5"
-  rounded
-  large
-  @click="closeServiceDialog = true"
->
-  <v-icon left>mdi-close</v-icon>
-  ปิดบริการ
-</v-btn>
-
-
+          class="close-service-btn ms-5 mb-5"
+          rounded
+          large
+          @click="closeServiceDialog = true"
+        >
+          <v-icon left>mdi-close</v-icon>
+          ปิดบริการ
+        </v-btn>
       </v-col>
     </v-row>
 
-    <!-- Data Table -->
     <div v-for="floor in 6" :key="floor" class="mb-10">
       <h2 class="text-h5 font-weight-bold ms-5 mb-2">ชั้น {{ floor + 1 }}</h2>
       <v-data-table
@@ -78,7 +75,6 @@
       </v-data-table>
     </div>
 
-    <!-- Dialog -->
     <v-dialog v-model="dialog" max-width="500px" max-height="600px">
       <v-card>
         <v-card-title class="head-dialog text-center mt-5"
@@ -181,78 +177,81 @@
     </v-dialog>
 
     <v-dialog v-model="closeServiceDialog" max-width="500px" max-height="600px">
-  <v-card>
-    <v-card-title class="head-dialog text-center mt-5">
-      ยืนยันการปิดให้บริการ
-    </v-card-title>
-    <v-card-text>
-      <v-text-field
-        label="หมายเหตุ"
-        v-model="remark"
-        density="compact"
-        variant="outlined"
-      ></v-text-field>
+      <v-card>
+        <v-card-title class="head-dialog text-center mt-5">
+          ยืนยันการปิดให้บริการ
+        </v-card-title>
+        <v-card-text>
+          <v-text-field
+            label="หมายเหตุ"
+            v-model="remark"
+            density="compact"
+            variant="outlined"
+          ></v-text-field>
 
-      <v-select
-        label="สถานะ"
-        :items="['เปิด', 'ปิด']"
-        v-model="status"
-        density="compact"
-        variant="outlined"
-      ></v-select>
+          <v-select
+            label="สถานะ"
+            :items="['เปิด', 'ปิด']"
+            v-model="status"
+            density="compact"
+            variant="outlined"
+          ></v-select>
 
-      <v-row>
-        <v-col cols="6">
-          <v-text-field
-            label="วันที่เริ่ม"
-            v-model="startDate"
-            type="date"
-            density="compact"
-            variant="outlined"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="6">
-          <v-text-field
-            label="เวลา"
-            v-model="startTime"
-            type="time"
-            density="compact"
-            variant="outlined"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="6">
-          <v-text-field
-            label="ถึงวันที่"
-            v-model="endDate"
-            type="date"
-            density="compact"
-            variant="outlined"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="6">
-          <v-text-field
-            label="เวลา"
-            v-model="endTime"
-            type="time"
-            density="compact"
-            variant="outlined"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-    </v-card-text>
-    <v-card-actions class="d-flex justify-center mb-5">
-      <v-btn class="rd-btncancel" variant="flat" @click="closeServiceDialog = false">
-        ยกเลิก
-      </v-btn>
-      <v-btn class="rd-btnclose" variant="flat" @click="saveCloseService">
-        ตกลง
-      </v-btn>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
-
+          <v-row>
+            <v-col cols="6">
+              <v-text-field
+                label="วันที่เริ่ม"
+                v-model="startDate"
+                type="date"
+                density="compact"
+                variant="outlined"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field
+                label="เวลา"
+                v-model="startTime"
+                type="time"
+                density="compact"
+                variant="outlined"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="6">
+              <v-text-field
+                label="ถึงวันที่"
+                v-model="endDate"
+                type="date"
+                density="compact"
+                variant="outlined"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field
+                label="เวลา"
+                v-model="endTime"
+                type="time"
+                density="compact"
+                variant="outlined"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions class="d-flex justify-center mb-5">
+          <v-btn
+            class="rd-btncancel"
+            variant="flat"
+            @click="closeServiceDialog = false"
+          >
+            ยกเลิก
+          </v-btn>
+          <v-btn class="rd-btnclose" variant="flat" @click="saveCloseService">
+            ตกลง
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -268,7 +267,6 @@ const saveCloseService = () => {
   console.log("ถึงวันที่:", endDate.value, endTime.value);
   closeServiceDialog.value = false;
 };
-// Breadcrumbs Configuration
 const items = [
   { title: "อนุมัติสถานะการจอง", disabled: false, href: "/manage_status" },
   { title: "สถานะห้อง", disabled: true, href: "/" },
@@ -349,24 +347,21 @@ const data = ref(
       user:
         Math.random() > 0.5
           ? mockUsers[Math.floor(Math.random() * mockUsers.length)]
-          : "-", // บางห้องใส่ชื่อ บางห้องใส่ "-"
+          : "-",
       time: "08:00-10:00",
-      status: Math.random() > 0.5 ? "จอง" : "ว่าง", // สถานะแบบสุ่ม
+      status: Math.random() > 0.5 ? "จอง" : "ว่าง",
       floor: Number(floor),
     }))
   )
 );
 
-// กรองข้อมูลห้องตามชั้น
 const filteredRooms = (floor: number) => {
   return data.value.filter((item) => item.floor === floor);
 };
 
-// Dialog
 const dialog = ref(false);
 const selectedItem = ref<any>(null);
 
-// เปิด Dialog
 const showDialog = (item: any) => {
   selectedItem.value = item;
   dialog.value = true;
@@ -394,20 +389,18 @@ const saveChanges = () => {
 };
 
 const selectedFloor = ref("2");
-const roomOptions = ref<string[]>(floorRooms[selectedFloor.value]); // ตั้งค่าเริ่มต้นให้ตรงกับ floorRooms[2]
-const selectedRoom = ref(roomOptions.value[0]); // ตั้งค่าห้องเริ่มต้นเป็นตัวแรกใน roomOptions
+const roomOptions = ref<string[]>(floorRooms[selectedFloor.value]);
+const selectedRoom = ref(roomOptions.value[0]);
 
 const updateRoomOptions = () => {
   roomOptions.value = floorRooms[selectedFloor.value] || [];
-  selectedRoom.value = roomOptions.value[0] || ""; // เซ็ตห้องเป็นตัวแรกเมื่อเปลี่ยนชั้น
+  selectedRoom.value = roomOptions.value[0] || "";
 };
 </script>
 
 <style scoped>
-/* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
-/* ใช้ฟอนต์ Kanit ทั่วทั้งโปรเจ็กต์ */
 * {
   font-family: "Kanit", sans-serif;
   color: #493628;
@@ -416,6 +409,11 @@ const updateRoomOptions = () => {
 .head-title {
   font-weight: 600;
   font-size: 24px;
+  margin-top: -1px;
+}
+
+.mg-table {
+  margin-bottom: -45px;
 }
 
 .head-dialog {
@@ -428,17 +426,17 @@ const updateRoomOptions = () => {
 }
 
 .ms-kob {
-  position: absolute; /* ใช้ absolute เพื่อควบคุมตำแหน่ง */
-  top: 0; /* เลื่อนให้อยู่ด้านบน */
+  position: absolute;
+  top: 0;
   left: 0;
-  width: 100%; /* ให้ครอบคลุมพื้นที่หน้าจอ */
+  width: 100%;
   z-index: 1;
   margin-top: 100px;
 }
 
 .breadcrumb-link {
   text-decoration: none;
-  color: #493628; /* สีสำหรับลิงก์ที่คลิกได้ */
+  color: #493628;
   font-weight: 400;
 }
 
@@ -447,7 +445,7 @@ const updateRoomOptions = () => {
 }
 
 .breadcrumb-disabled {
-  color: #493628; /* สีสำหรับลิงก์ที่ปิดใช้งาน */
+  color: #493628;
   font-weight: 600;
 }
 
@@ -459,7 +457,6 @@ const updateRoomOptions = () => {
   background-color: #e6dfd5;
 }
 
-/* ปรับสีหัวคอลัมน์ */
 th {
   background-color: #cdbba7;
   font-weight: bold;
@@ -492,7 +489,6 @@ th {
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
 }
 
-/* ปรับกรอบฟอร์มให้มุมมน 10px */
 .rd-form,
 .v-input.v-input--outlined .v-input__control {
   border-radius: 5px !important;
@@ -507,8 +503,8 @@ th {
 
 .close-service-btn {
   font-weight: bold;
-  background-color: #edf5ee; /* สีพื้นหลัง */
-  color: #493628; /* สีข้อความ */
+  background-color: #edf5ee;
+  color: #493628;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
   border-radius: 10px;
   font-size: 16px;
@@ -516,6 +512,6 @@ th {
 }
 
 .close-service-btn:hover {
-  background-color: #f5eded; /* สีพื้นหลังเมื่อ hover */
+  background-color: #f5eded;
 }
 </style>

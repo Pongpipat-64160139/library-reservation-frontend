@@ -3,7 +3,7 @@
   <v-container fluid class="back-ground ms-kob">
     <v-container>
       <v-row justify="center" align="center">
-        <!-- Dropdown สำหรับเลือกประเภทห้อง -->
+        <!-- Dropdown เลือกประเภทห้อง -->
         <v-col
           class="d-flex justify-center"
           cols="auto"
@@ -40,7 +40,6 @@
             <v-icon class="calendar-icon">mdi-calendar</v-icon>
           </v-btn>
 
-          <!-- v-date-picker แสดงเมื่อ showDatePicker เป็น true -->
           <v-date-picker
             v-if="showDatePicker"
             class="date-picker-position"
@@ -162,9 +161,8 @@ import Footer_page from "../footer/footer_page.vue";
 const showDatePicker = ref(false);
 const currentDate = ref("");
 const selectedDate = ref<string | null>(null);
-const holidays = ref<string[]>([]); // Store holiday dates
+const holidays = ref<string[]>([]); 
 
-// Fetch holidays from API
 const fetchHolidays = async (year: string) => {
   const response = await fetch(
     `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=2024`,
@@ -179,7 +177,6 @@ const fetchHolidays = async (year: string) => {
   if (response.ok) {
     const responseData = await response.json();
     if (responseData.result && Array.isArray(responseData.result.data)) {
-      // เก็บวันหยุดจาก result.data
       holidays.value = responseData.result.data.map(
         (holiday: { Date: string }) => holiday.Date
       );
@@ -207,7 +204,7 @@ const allowedDates = (date: unknown) => {
 onMounted(() => {
   const currentYear = new Date().getFullYear().toString();
   fetchHolidays(currentYear).then(() => {
-    console.log("Holidays fetched:", holidays.value); // Log to check the holidays
+    console.log("Holidays fetched:", holidays.value); 
   });
 });
 
@@ -232,18 +229,16 @@ const getCurrentDate = () => {
   const date = new Date();
 
   const options: Intl.DateTimeFormatOptions = {
-    weekday: "long", // แสดงชื่อวัน
-    day: "numeric", // แสดงวันที่
-    month: "long", // แสดงเดือน
-    year: "numeric", // แสดงปี
+    weekday: "long",
+    day: "numeric",
+    month: "long", 
+    year: "numeric", 
   };
 
-  // ใช้ Intl.DateTimeFormat เพื่อแสดงวันที่ในรูปแบบที่ต้องการ
   const formatter = new Intl.DateTimeFormat("th-TH", options);
   currentDate.value = formatter.format(date);
 };
 
-// เรียกใช้ฟังก์ชั่นเพื่อให้ได้วันที่ปัจจุบันเมื่อโหลดหน้า
 getCurrentDate();
 
 const router = useRouter();
@@ -312,7 +307,6 @@ const goToFormStudy = () => {
 </script>
 
 <style scoped>
-/* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
 * {
@@ -438,14 +432,11 @@ const goToFormStudy = () => {
 
 .v-date-picker :deep(.v-btn) {
   font-size: 10px !important;
-  /* ปรับขนาดฟอนต์ */
   width: 20px !important;
   height: 20px !important;
   border-radius: 100% !important;
-  /* หากต้องการให้ปุ่มเป็นวงกลม */
 }
 
-/* ขนาดฟอนต์สำหรับ "Select date" */
 .v-date-picker :deep(.v-picker-title) {
   font-size: 15px !important;
   margin-top: 10px;

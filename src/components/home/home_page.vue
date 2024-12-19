@@ -1,5 +1,4 @@
 <template class="back-ground">
-  <!-- เรียกใช้ HeaderStudent ข้างบน -->
   <Header_page />
 
   <v-container fluid class="back-ground ms-kob">
@@ -25,9 +24,7 @@
       <v-slide-group show-arrows class="ps-13">
         <v-slide-group-item v-for="(image, index) in studys" :key="index">
           <div class="ma-4 d-flex flex-column align-center">
-            <!-- รูปภาพ -->
             <img :src="image.src" :alt="image.alt" class="slide-image" />
-            <!-- ข้อความใต้รูป -->
             <span class="mt-2 text-center room-caption">
               {{ image.caption }}
             </span>
@@ -59,9 +56,7 @@
           :key="index"
         >
           <div class="ma-4 d-flex flex-column align-center">
-            <!-- รูปภาพ -->
             <img :src="image.src" :alt="image.alt" class="slide-image" />
-            <!-- ข้อความใต้รูป -->
             <span class="mt-2 text-center room-caption">
               {{ image.caption }}
             </span>
@@ -90,9 +85,7 @@
       <v-slide-group show-arrows class="">
         <v-slide-group-item v-for="(image, index) in meeting" :key="index">
           <div class="ma-4 d-flex flex-column align-center">
-            <!-- รูปภาพ -->
             <img :src="image.src" :alt="image.alt" class="slide-image" />
-            <!-- ข้อความใต้รูป -->
             <span class="mt-2 text-center room-caption">
               {{ image.caption }}
             </span>
@@ -104,8 +97,6 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-
 import room201 from "@/assets/201.png";
 import cyber1 from "@/assets/cyber1.png";
 import cyber2 from "@/assets/cyber2.png";
@@ -120,96 +111,88 @@ import study4 from "@/assets/study4.png";
 import study5 from "@/assets/study5.png";
 import stv from "@/assets/stv.png";
 
-export default defineComponent({
+// สร้างข้อมูลแบบ static ข้างนอก
+const studys = [
+  {
+    src: study3,
+    alt: "ห้องศึกษากลุ่ม ชั้น 3",
+    caption: "ห้องศึกษากลุ่ม ชั้น 3",
+  },
+  {
+    src: study4,
+    alt: "ห้องศึกษากลุ่ม ชั้น 4",
+    caption: "ห้องศึกษากลุ่ม ชั้น 4",
+  },
+  {
+    src: study5,
+    alt: "ห้องศึกษากลุ่ม ชั้น 5",
+    caption: "ห้องศึกษากลุ่ม ชั้น 5",
+  },
+];
+
+const entertainment = [
+  {
+    src: stv,
+    alt: "ห้องศึกษากลุ่มมัลติมีเดีย (STV) ชั้น 6",
+    caption: "ห้องศึกษากลุ่มมัลติมีเดีย ชั้น 6",
+  },
+  { src: karake, alt: "LIBRA OKE ชั้น 6", caption: "LIBRA OKE ชั้น 6" },
+  {
+    src: minitheater,
+    alt: "MINI THEATER ชั้น 6",
+    caption: "MINI THEATER ชั้น 6",
+  },
+];
+
+const meeting = [
+  { src: room201, alt: "ห้อง 201 ชั้น 2", caption: "ห้อง 201 ชั้น 2" },
+  {
+    src: lectureroom,
+    alt: "ห้อง Lecturer's Room ชั้น 5",
+    caption: "ห้อง Lecturer's Room ชั้น 5",
+  },
+  {
+    src: smartboard,
+    alt: "ห้อง 604 Smart Board ชั้น 6",
+    caption: "ห้อง 604 Smart Board ชั้น 6",
+  },
+  {
+    src: ministudio,
+    alt: "ห้อง Mini Studio ชั้น 6",
+    caption: "ห้อง Mini Studio ชั้น 6",
+  },
+  {
+    src: cyber1,
+    alt: "ห้อง Cyber Zone I ชั้น 6",
+    caption: "ห้อง Cyber Zone I ชั้น 6",
+  },
+  {
+    src: cyber2,
+    alt: "ห้อง Cyber Zone II ชั้น 6",
+    caption: "ห้อง Cyber Zone II ชั้น 6",
+  },
+  {
+    src: lfl,
+    alt: "ห้อง Live for Life ชั้น 6",
+    caption: "ห้อง Live for Life ชั้น 6",
+  },
+];
+
+export default {
   name: "SlideGroupWithStaticImages",
-  setup() {
-    const studys = ref([
-      {
-        src: study3,
-        alt: "ห้องศึกษากลุ่ม ชั้น 3",
-        caption: "ห้องศึกษากลุ่ม ชั้น 3",
-      },
-      {
-        src: study4,
-        alt: "ห้องศึกษากลุ่ม ชั้น 4",
-        caption: "ห้องศึกษากลุ่ม ชั้น 4",
-      },
-      {
-        src: study5,
-        alt: "ห้องศึกษากลุ่ม ชั้น 5",
-        caption: "ห้องศึกษากลุ่ม ชั้น 5",
-      },
-    ]);
-
-    const entertainment = ref([
-      {
-        src: stv,
-        alt: "ห้องศึกษากลุ่มมัลติมีเดีย (STV) ชั้น 6",
-        caption: "ห้องศึกษากลุ่มมัลติมีเดีย ชั้น 6",
-      },
-      {
-        src: karake,
-        alt: "LIBRA OKE ชั้น 6",
-        caption: "LIBRA OKE ชั้น 6",
-      },
-      {
-        src: minitheater,
-        alt: "MINI THEATER ชั้น 6",
-        caption: "MINI THEATER ชั้น 6",
-      },
-    ]);
-
-    const meeting = ref([
-      {
-        src: room201,
-        alt: "ห้อง 201 ชั้น 2",
-        caption: "ห้อง 201 ชั้น 2",
-      },
-      {
-        src: lectureroom,
-        alt: "ห้อง Lecturer's Room ชั้น 5",
-        caption: "ห้อง Lecturer's Room ชั้น 5",
-      },
-      {
-        src: smartboard,
-        alt: "ห้อง 604 Smart Board ชั้น 6",
-        caption: "ห้อง 604 Smart Board ชั้น 6",
-      },
-      {
-        src: ministudio,
-        alt: "ห้อง Mini Studio ชั้น 6",
-        caption: "ห้อง Mini Studio ชั้น 6",
-      },
-      {
-        src: cyber1,
-        alt: "ห้อง Cyber Zone I ชั้น 6",
-        caption: "ห้อง Cyber Zone I ชั้น 6",
-      },
-      {
-        src: cyber2,
-        alt: "ห้อง Cyber Zone II ชั้น 6",
-        caption: "ห้อง Cyber Zone II ชั้น 6",
-      },
-      {
-        src: lfl,
-        alt: "ห้อง Live for Life ชั้น 6",
-        caption: "ห้อง Live for Life ชั้น 6",
-      },
-    ]);
+  data() {
     return {
       studys,
       entertainment,
       meeting,
     };
   },
-});
+};
 </script>
 
 <style scoped>
-/* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
-/* ใช้ฟอนต์ Kanit ทั่วทั้งโปรเจ็กต์ */
 * {
   font-family: "Kanit", sans-serif;
   color: #493628;
@@ -254,12 +237,12 @@ export default defineComponent({
   height: 200px;
   border-radius: 10px;
   object-fit: cover;
-  transition: transform 0.3s ease-in-out; /* เพิ่มการเปลี่ยนแปลง */
+  transition: transform 0.3s ease-in-out;
 }
 
 .slide-image:hover {
-  transform: scale(1.1); /* ขยายขนาด 10% */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* เพิ่มเงาเมื่อ hover */
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .text-center {
@@ -276,10 +259,10 @@ export default defineComponent({
 
 .back-ground {
   background-color: #f9f3ea; /* พื้นหลังสีหลัก */
-  background-image: url("@/assets/crisp-paper-ruffles.png"); /* ใส่ Texture ที่โหลดมา */
-  background-repeat: repeat; /* ทำให้ Texture ซ้ำเต็มจอ */
-  background-size: auto; /* ปรับให้ขนาดของ Texture เป็นค่าเริ่มต้น */
-  background-position: top left; /* ตำแหน่งเริ่มต้น */
+  background-image: url("@/assets/crisp-paper-ruffles.png");
+  background-repeat: repeat;
+  background-size: auto;
+  background-position: top left;
 }
 
 .ms-kob {
@@ -287,16 +270,11 @@ export default defineComponent({
 }
 
 .regularstu-line {
-  /* ปรับให้เหมาะสมกับ layout */
-  cursor: pointer; /* เพิ่มเพื่อให้ผู้ใช้รู้ว่าสามารถคลิกได้ */
-  text-decoration: none; /* ไม่มีเส้นใต้ในสถานะปกติ */
-  color: #493628; /* สีข้อความ */
-  transition: text-decoration 0.2s ease-in-out; /* เพิ่มความนุ่มนวล */
+  cursor: pointer;
+  text-decoration: none;
+  color: #493628;
+  transition: text-decoration 0.2s ease-in-out;
   position: relative;
-  z-index: 10; /* เพิ่มเพื่อให้ลอยอยู่ข้างบน */
-}
-
-.regularstu-line:hover {
-  text-decoration: underline; /* เพิ่มเส้นใต้เมื่อ hover */
+  z-index: 10;
 }
 </style>

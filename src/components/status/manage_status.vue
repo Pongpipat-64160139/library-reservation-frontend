@@ -2,7 +2,7 @@
   <Header_page />
   <v-container fluid class="back-ground ms-kob">
     <!-- Breadcrumbs -->
-    <v-breadcrumbs :items="items" divider=">" class="head-title pb-10">
+    <v-breadcrumbs :items="items" divider=">" class="head-title mg-table">
       <template v-slot:item="{ item }" class="head-title">
         <!-- ลิงก์ที่สามารถคลิกได้ -->
         <router-link
@@ -47,7 +47,6 @@
           </td>
 
           <td>
-            <!-- ปุ่มค้นหา icon -->
             <v-btn
               color="#F5EDED"
               @click="showDialog(item)"
@@ -58,7 +57,6 @@
             ></v-btn>
           </td>
           <td>
-            <!-- Checkbox รับกุญแจ -->
             <v-checkbox
               v-model="item.keyReceived"
               density="compact"
@@ -71,7 +69,6 @@
     </v-data-table>
   </v-container>
 
-  <!-- Dialog -->
   <v-dialog v-model="dialog" max-width="500px" max-height="600px">
     <v-card class="rd-dialog">
       <span class="head-detailuser">
@@ -165,7 +162,6 @@
         </div>
       </span>
 
-      <!-- ปุ่ม Dialog -->
       <v-card-text> </v-card-text>
       <v-card-actions class="d-flex justify-center mb-8">
         <v-btn
@@ -179,7 +175,6 @@
           {{ editMode ? "ยกเลิก" : "ปิด" }}
         </v-btn>
 
-        <!-- ปุ่มบันทึก -->
         <v-btn
           class="rd-btnclose"
           :style="{
@@ -229,7 +224,6 @@ const headers = ref([
   { title: "รับกุญแจ", key: "keyReceived" },
 ]);
 
-// Headers Configuration
 const data = ref([
   {
     index: 1,
@@ -238,7 +232,7 @@ const data = ref([
     floor: 3,
     room: "ศึกษากลุ่ม 1",
     date: formatDate("2024-12-17"),
-    time: "08:00-10:00", // เวลาที่เริ่มต้นและสิ้นสุด
+    time: "08:00-10:00",
     status: "รอ",
     keyReceived: false,
   },
@@ -343,7 +337,6 @@ const data = ref([
   },
 ]);
 
-// Breadcrumbs Configuration
 const items = [
   { title: "อนุมัติสถานะการจอง", disabled: true, href: "/" },
   { title: "สถานะห้อง", disabled: false, href: "/manage_room" },
@@ -352,24 +345,19 @@ const items = [
 const sortedData = computed(() => {
   let sortedItems = [...data.value];
 
-  // จัดลำดับสถานะ
   sortedItems.sort((a, b) => {
-    // ให้สถานะ "รอ" อยู่บนสุด
     if (a.status === "รอ" && b.status !== "รอ") return -1;
     if (a.status !== "รอ" && b.status === "รอ") return 1;
 
-    // ให้สถานะ "อนุมัติ" อยู่ท้ายสุด
     if (a.status === "อนุมัติ" && b.status !== "อนุมัติ") return 1;
     if (a.status !== "อนุมัติ" && b.status === "อนุมัติ") return -1;
 
-    // หากสถานะเป็นค่าเดียวกัน จะให้เรียงตาม index เดิม
     return a.index - b.index;
   });
 
-  // กำหนดให้ index ใหม่ตามลำดับ
   return sortedItems.map((item, idx) => ({
     ...item,
-    index: idx + 1, // ให้ลำดับ index เริ่มต้นจาก 1
+    index: idx + 1,
   }));
 });
 
@@ -428,27 +416,23 @@ const floorRooms: FloorRooms = {
 
 const dialog = ref(false);
 const selectedItem = ref<any>(null);
-const editMode = ref(false); // โหมดแก้ไข
+const editMode = ref(false);
 
-// ฟิลด์ที่แก้ไขได้
 const editedFloor = ref<number>(0);
 const editedRoom = ref("");
 
-// ห้องที่สามารถเลือกได้ตามชั้นที่เลือก
 const availableRooms = computed(() => {
   return floorRooms[editedFloor.value as keyof typeof floorRooms] || [];
 });
 
-// Watcher เพื่ออัปเดตห้องเมื่อแก้ไขชั้น
 watch(
   () => editedFloor.value,
   (newFloor) => {
     const rooms = floorRooms[newFloor as keyof typeof floorRooms];
-    editedRoom.value = rooms ? rooms[0] : ""; // เซ็ตห้องแรกในชั้นที่เลือก
+    editedRoom.value = rooms ? rooms[0] : "";
   }
 );
 
-// แสดง Dialog พร้อมตั้งค่าเริ่มต้น
 const showDialog = (item: any) => {
   selectedItem.value = { ...item };
   editedFloor.value = item.floor;
@@ -457,42 +441,35 @@ const showDialog = (item: any) => {
   editMode.value = false;
 };
 
-// อัปเดตห้องเมื่อเลือกชั้นใหม่
 const updateAvailableRooms = () => {
   const rooms = floorRooms.value[editedFloor.value];
-  editedRoom.value = rooms ? rooms[0] : ""; // เลือกห้องแรกเป็นค่าเริ่มต้น
+  editedRoom.value = rooms ? rooms[0] : "";
 };
 
-// ปุ่ม "แก้ไข" / "บันทึก"
 const toggleEditMode = () => {
   if (editMode.value) {
-    // เมื่อกด "บันทึก" อัปเดตข้อมูล
     selectedItem.value.floor = editedFloor.value;
     selectedItem.value.room = editedRoom.value;
     editMode.value = false;
   } else {
-    editMode.value = true; // เปิดโหมดแก้ไข
+    editMode.value = true;
   }
 };
 
-// ปุ่ม "ยกเลิก" / "ปิด"
 const handleCancel = () => {
   if (editMode.value) {
-    // ยกเลิกการแก้ไข
     editedFloor.value = selectedItem.value.floor;
     editedRoom.value = selectedItem.value.room;
     editMode.value = false;
   } else {
-    dialog.value = false; // ปิด Dialog
+    dialog.value = false;
   }
 };
 </script>
 
 <style scoped>
-/* เพิ่มการอ้างอิงฟอนต์ Kanit จาก Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
-/* ใช้ฟอนต์ Kanit ทั่วทั้งโปรเจ็กต์ */
 * {
   font-family: "Kanit", sans-serif;
   color: #493628;
@@ -506,6 +483,11 @@ const handleCancel = () => {
 .head-title {
   font-weight: 600;
   font-size: 24px;
+  margin-top: -1px;
+}
+
+.mg-table {
+  margin-bottom: 22px;
 }
 
 .back-ground {
@@ -513,17 +495,17 @@ const handleCancel = () => {
 }
 
 .ms-kob {
-  position: absolute; /* ใช้ absolute เพื่อควบคุมตำแหน่ง */
-  top: 0; /* เลื่อนให้อยู่ด้านบน */
+  position: absolute;
+  top: 0;
   left: 0;
-  width: 100%; /* ให้ครอบคลุมพื้นที่หน้าจอ */
+  width: 100%;
   z-index: 1;
   margin-top: 100px;
 }
 
 .breadcrumb-link {
   text-decoration: none;
-  color: #493628; /* สีสำหรับลิงก์ที่คลิกได้ */
+  color: #493628;
   font-weight: 400;
 }
 
@@ -532,7 +514,7 @@ const handleCancel = () => {
 }
 
 .breadcrumb-disabled {
-  color: #493628; /* สีสำหรับลิงก์ที่ปิดใช้งาน */
+  color: #493628;
   font-weight: 600;
 }
 
@@ -549,7 +531,6 @@ const handleCancel = () => {
   color: #493628;
 }
 
-/* ปรับสีหัวคอลัมน์ */
 th {
   background-color: #cdbba7;
   font-weight: bold;
