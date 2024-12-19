@@ -71,15 +71,25 @@
             </th>
           </tr>
         </thead>
+
         <tbody>
           <tr
-            v-for="(time, index) in timeSlots"
+            v-for="(time, timeIndex) in timeSlots"
             :key="time"
-            :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
-            @click.stop="goToFormMeeting"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
           >
             <td class="time-column font-table">{{ time }}</td>
-            <td class="room1-column" v-for="room in twozo" :key="room"></td>
+            <td
+              class="room1-column"
+              v-for="(room, roomIndex) in twozo"
+              :key="roomIndex"
+            >
+              <a
+                :href="generateBookingLink(roomIndex, time, 2)"
+                class="table-link"
+              >
+              </a>
+            </td>
           </tr>
         </tbody>
       </v-simple-table>
@@ -100,15 +110,25 @@
             </th>
           </tr>
         </thead>
+
         <tbody>
           <tr
-            v-for="(time, index) in timeSlots"
+            v-for="(time, timeIndex) in timeSlots"
             :key="time"
-            :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
-            @click.stop="goToFormStudy"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
           >
             <td class="time-column font-table">{{ time }}</td>
-            <td class="room3-column" v-for="room in lecture" :key="room"></td>
+            <td
+              class="room3-column"
+              v-for="(room, roomIndex) in lecture"
+              :key="roomIndex"
+            >
+              <a
+                :href="generateBookingLink(roomIndex, time, 5)"
+                class="table-link"
+              >
+              </a>
+            </td>
           </tr>
         </tbody>
       </v-simple-table>
@@ -131,17 +151,22 @@
         </thead>
         <tbody>
           <tr
-            v-for="(time, index) in timeSlots"
+            v-for="(time, timeIndex) in timeSlots"
             :key="time"
-            :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
-            @click.stop="goToFormStudy"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
           >
             <td class="time-column font-table">{{ time }}</td>
             <td
               class="room1-column"
-              v-for="room in smartboard"
-              :key="room"
-            ></td>
+              v-for="(room, roomIndex) in smartboard"
+              :key="roomIndex"
+            >
+              <a
+                :href="generateBookingLink(roomIndex, time, 5)"
+                class="table-link"
+              >
+              </a>
+            </td>
           </tr>
         </tbody>
       </v-simple-table>
@@ -164,17 +189,22 @@
         </thead>
         <tbody>
           <tr
-            v-for="(time, index) in timeSlots"
+            v-for="(time, timeIndex) in timeSlots"
             :key="time"
-            :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
-            @click.stop="goToFormStudy"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
           >
             <td class="time-column font-table">{{ time }}</td>
             <td
               class="room1-column"
-              v-for="room in ministudio"
-              :key="room"
-            ></td>
+              v-for="(room, roomIndex) in ministudio"
+              :key="roomIndex"
+            >
+              <a
+                :href="generateBookingLink(roomIndex, time, 6)"
+                class="table-link"
+              >
+              </a>
+            </td>
           </tr>
         </tbody>
       </v-simple-table>
@@ -197,13 +227,22 @@
         </thead>
         <tbody>
           <tr
-            v-for="(time, index) in timeSlots"
+            v-for="(time, timeIndex) in timeSlots"
             :key="time"
-            :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
-            @click.stop="goToFormMeeting"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
           >
             <td class="time-column font-table">{{ time }}</td>
-            <td class="room2-column" v-for="room in cyberzone" :key="room"></td>
+            <td
+              class="room2-column"
+              v-for="(room, roomIndex) in cyberzone"
+              :key="roomIndex"
+            >
+              <a
+                :href="generateBookingLink(roomIndex, time, 6)"
+                class="table-link"
+              >
+              </a>
+            </td>
           </tr>
         </tbody>
       </v-simple-table>
@@ -226,17 +265,22 @@
         </thead>
         <tbody>
           <tr
-            v-for="(time, index) in timeSlots"
+            v-for="(time, timeIndex) in timeSlots"
             :key="time"
-            :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
-            @click.stop="goToFormStudy"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
           >
             <td class="time-column font-table">{{ time }}</td>
             <td
               class="room1-column"
-              v-for="room in liveforlife"
-              :key="room"
-            ></td>
+              v-for="(room, roomIndex) in liveforlife"
+              :key="roomIndex"
+            >
+              <a
+                :href="generateBookingLink(roomIndex, time, 6)"
+                class="table-link"
+              >
+              </a>
+            </td>
           </tr>
         </tbody>
       </v-simple-table>
@@ -259,17 +303,22 @@
         </thead>
         <tbody>
           <tr
-            v-for="(time, index) in timeSlots"
+            v-for="(time, timeIndex) in timeSlots"
             :key="time"
-            :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
-            @click.stop="goToFormMeeting"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
           >
             <td class="time-column font-table">{{ time }}</td>
             <td
               class="room2-column"
-              v-for="room in sevenfloor"
-              :key="room"
-            ></td>
+              v-for="(room, roomIndex) in sevenfloor"
+              :key="roomIndex"
+            >
+              <a
+                :href="generateBookingLink(roomIndex, time, 7)"
+                class="table-link"
+              >
+              </a>
+            </td>
           </tr>
         </tbody>
       </v-simple-table>
@@ -435,6 +484,20 @@ const goToFormMeeting = () => {
 const goToFormStudy = () => {
   router.push("/booking_study");
 };
+
+const generateBookingLink = (roomIndex: number, time: string, floor: number) => {
+  const date = selectedDate.value || new Date();
+  const formattedDate = (date as Date).toISOString().split("T")[0];
+  
+  // ถ้าห้องอยู่ในชั้น 2 หรือชั้น 7 ให้ไป booking_meeting
+  if (floor === 2 || floor === 7) {
+    return `/booking_meeting?floor=${floor}&room=${roomIndex + 1}&time=${time}&date=${formattedDate}`;
+  }
+
+  // ค่าเริ่มต้นสำหรับหน้า booking_study
+  return `/booking_study?floor=${floor}&room=${roomIndex + 1}&time=${time}&date=${formattedDate}`;
+};
+
 </script>
 
 <style scoped>
@@ -499,6 +562,28 @@ const goToFormStudy = () => {
 
 .room9-column {
   width: calc(100% / 9);
+}
+
+.table-bordered td {
+  height: 20px; /* ความสูงของเซลล์ */
+  padding: 0; /* กำจัด Padding */
+  text-align: center;
+  vertical-align: middle; /* จัดข้อความให้อยู่กลาง */
+  overflow: hidden;
+  position: relative; /* เพื่อให้ลูกของ td อยู่ในตำแหน่งที่สัมพันธ์กัน */
+}
+
+.table-link {
+  display: block; /* ให้คลุมพื้นที่ทั้งหมดของเซลล์ */
+  height: 100%; /* ความสูงเต็มเซลล์ */
+  width: 100%; /* ความกว้างเต็มเซลล์ */
+  text-decoration: none; /* ลบเส้นใต้ */
+  background-color: transparent; /* ไม่มีพื้นหลังเริ่มต้น */
+  font-size: 12px;
+}
+
+.table-link:hover {
+  background-color: #edb3bc; /* สีพื้นหลังเมื่อชี้เมาส์ */
 }
 
 .table-bordered thead th {
