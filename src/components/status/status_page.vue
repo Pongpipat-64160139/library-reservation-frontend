@@ -1,4 +1,4 @@
-<template class="back-ground">
+<template>
   <Header_page />
 
   <v-container fluid class="back-ground ms-kob">
@@ -310,6 +310,10 @@ th {
 
 .back-ground {
   background-color: #f9f3ea;
+  background-image: url("@/assets/subtle-dark-vertical.png");
+  background-repeat: repeat;
+  background-size: auto;
+  background-position: top left;
 }
 
 .ms-kob {
@@ -405,5 +409,7 @@ th {
 .rd-test {
   background-color: #f5eded;
   border-radius: 10px;
+  border: 1px solid #cdbba7; /* กำหนดกรอบของตาราง */
+  border-collapse: collapse; /* ให้กรอบรวมกัน */
 }
 </style>

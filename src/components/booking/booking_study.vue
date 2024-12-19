@@ -23,6 +23,10 @@ import Form_study from "../form/form_study.vue";
 }
 .back-ground {
   background-color: #f9f3ea;
+  background-image: url("@/assets/subtle-dark-vertical.png");
+  background-repeat: repeat;
+  background-size: auto;
+  background-position: top left;
 }
 .ms-kob {
   margin-top: -300px;

@@ -1,5 +1,5 @@
 <template>
-  <v-app style="background-color: #f9f3ea">
+  <v-app class="back-ground">
     <v-app-bar
       :elevation="3"
       class="head-font"
@@ -79,6 +79,14 @@ export default {
 * {
   font-family: "Kanit", sans-serif;
   color: #493628;
+}
+
+.back-ground {
+  background-color: #f9f3ea;
+  background-image: url("@/assets/subtle-dark-vertical.png");
+  background-repeat: repeat;
+  background-size: auto;
+  background-position: top left;
 }
 
 .head-font {

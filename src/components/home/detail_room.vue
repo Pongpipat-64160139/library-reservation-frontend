@@ -3,11 +3,11 @@
   <v-container fluid class="back-ground ms-kob">
     <h1 class="pt-5 head-title text-center pb-10">รายละเอียดห้อง</h1>
 
-    <div v-for="floor in 6" :key="floor" class="mb-10">
-      <h2 class="text-h5 font-weight-bold ms-5 mb-2">ชั้น {{ floor + 1 }}</h2>
+    <div v-for="floor in Object.keys(floorRooms)" :key="floor" class="mb-10">
+      <h2 class="text-h5 font-weight-bold ms-5 mb-2">ชั้น {{ floor }}</h2>
       <v-data-table
         :headers="headers"
-        :items="filteredRooms(floor + 1)"
+        :items="filteredRooms(Number(floor))"
         class="rd-test"
         style="table-layout: fixed; width: 100%"
         hide-default-footer
@@ -63,13 +63,13 @@ const floorRooms = {
     "Cyber Zone 2",
     "Live for Life (ใช้สำหรับ Live - ผลิตสื่อ)",
   ],
-  7: ["706", "707"],
+  //   7: ["706", "707"],
 };
 
-const roomDetails = {
+const roomDetails: { [key: string]: string } = {
   "201": "4-6",
   "ศึกษากลุ่ม ": "3-5",
-  "ศึกษากลุ่ม": "3-5",
+  ศึกษากลุ่ม: "3-5",
   "Lecturer's Room": "3-5",
   "STV (Netflix)": "3-5",
   "LIBRA OKE": "3-5",
@@ -79,14 +79,14 @@ const roomDetails = {
   "Cyber Zone 1": "อนุญาตใช้บริการไม่เกิน 70 คน",
   "Cyber Zone 2": "อนุญาตใช้บริการไม่เกิน 30 คน",
   "Live for Life (ใช้สำหรับ Live - ผลิตสื่อ)": "อนุญาตใช้บริการ 3 คนขึ้นไป",
-  "706": "อนุญาตใช้บริการไม่เกิน 12 คน",
-  "707": "อนุญาตใช้บริการไม่เกิน 20 คน",
+  //   "706": "อนุญาตใช้บริการไม่เกิน 12 คน",
+  //   "707": "อนุญาตใช้บริการไม่เกิน 20 คน",
 };
 
-const keyPickupDetails = {
+const keyPickupDetails: { [key: string]: string } = {
   "201": "ชั้น 2",
   "ศึกษากลุ่ม ": "ชั้น 2",
-  "ศึกษากลุ่ม": "ชั้น 4",
+  ศึกษากลุ่ม: "ชั้น 4",
   "Lecturer's Room": "ชั้น 4",
   "STV (Netflix)": "ชั้น 6",
   "LIBRA OKE": "ชั้น 6",
@@ -96,8 +96,8 @@ const keyPickupDetails = {
   "Cyber Zone 1": "ชั้น 6",
   "Cyber Zone 2": "ชั้น 6",
   "Live for Life (ใช้สำหรับ Live - ผลิตสื่อ)": "ชั้น 6",
-  "706": "ชั้น ",
-  "707": "ชั้น ",
+  //   "706": "ชั้น ",
+  //   "707": "ชั้น ",
 };
 
 const data = ref(
@@ -111,7 +111,7 @@ const data = ref(
   )
 );
 
-const filteredRooms = (floor) => {
+const filteredRooms = (floor: number) => {
   return data.value.filter((item) => item.floor === floor);
 };
 </script>
@@ -144,6 +144,10 @@ const filteredRooms = (floor) => {
 
 .back-ground {
   background-color: #f9f3ea;
+  background-image: url("@/assets/subtle-dark-vertical.png");
+  background-repeat: repeat;
+  background-size: auto;
+  background-position: top left;
 }
 
 .row-even {
@@ -163,5 +167,7 @@ th {
 .rd-test {
   background-color: #f5eded;
   border-radius: 10px;
+  border: 1px solid #cdbba7; /* กำหนดกรอบของตาราง */
+  border-collapse: collapse; /* ให้กรอบรวมกัน */
 }
 </style>

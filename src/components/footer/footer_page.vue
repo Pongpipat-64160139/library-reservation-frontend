@@ -32,6 +32,7 @@ const breadcrumbs = [
     disabled: false,
     href: "/status_page",
     icon: "mdi-calendar-today",
+  },
   {
     title: "มุมมองรายเดือน",
     disabled: false,

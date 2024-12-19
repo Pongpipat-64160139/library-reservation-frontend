@@ -259,7 +259,7 @@ export default {
 
 .back-ground {
   background-color: #f9f3ea; /* พื้นหลังสีหลัก */
-  background-image: url("@/assets/crisp-paper-ruffles.png");
+  background-image: url("@/assets/subtle-dark-vertical.png");
   background-repeat: repeat;
   background-size: auto;
   background-position: top left;

@@ -541,6 +541,10 @@ const goToFormStudy = () => {
 
 .back-ground {
   background-color: #f9f3ea;
+  background-image: url("@/assets/subtle-dark-vertical.png");
+  background-repeat: repeat;
+  background-size: auto;
+  background-position: top left;
 }
 
 .v-selectcolor {
