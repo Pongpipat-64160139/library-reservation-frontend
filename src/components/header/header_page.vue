@@ -55,7 +55,7 @@ const items: BreadcrumbItem[] = [
   {
     title: "รายละเอียดห้อง",
     disabled: false,
-    href: "/manage_room",
+    href: "/detail_room",
   },
 ];
 
