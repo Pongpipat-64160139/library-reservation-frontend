@@ -54,24 +54,25 @@
           </tr>
         </template>
         <template v-slot:item="{ item, index }">
-          <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
-            <td>{{ item.room }}</td>
-            <td>{{ item.user }}</td>
-            <td>{{ item.time }}</td>
-            <td>{{ item.status }}</td>
-            <td>
-              <v-btn
-                icon
-                class="rd-btndetail"
-                width="40"
-                height="40"
-                @click="showDialog(item)"
-              >
-                <v-icon>mdi-cog</v-icon>
-              </v-btn>
-            </td>
-          </tr>
-        </template>
+  <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
+    <td>{{ item.room }}</td>
+    <td>{{ item.user }}</td>
+    <td>{{ item.time }}</td>
+    <td>{{ item.status }}</td>
+    <td>
+      <v-btn
+        icon
+        class="rd-btndetail"
+        width="40"
+        height="40"
+        @click="showDialog(item)"
+      >
+        <v-icon>mdi-cog</v-icon>
+      </v-btn>
+    </td>
+  </tr>
+</template>
+
       </v-data-table>
     </div>
 
@@ -344,20 +345,28 @@ const data = ref(
   Object.entries(floorRooms).flatMap(([floor, rooms]) =>
     rooms.map((room) => ({
       room,
-      user:
-        Math.random() > 0.5
-          ? mockUsers[Math.floor(Math.random() * mockUsers.length)]
-          : "-",
-      time: "08:00-10:00",
-      status: Math.random() > 0.5 ? "จอง" : "ว่าง",
+      user: Math.random() > 0.5
+        ? mockUsers[Math.floor(Math.random() * mockUsers.length)]
+        : "-", // กำหนดให้ "-" หากไม่มีการจอง
+      time: Math.random() > 0.5 ? "08:00-10:00" : "-", // กำหนดเวลาเป็น "-" หากไม่มีการจอง
+      status: Math.random() > 0.5 ? "จอง" : "ว่าง", // สถานะเริ่มต้น
       floor: Number(floor),
     }))
   )
 );
 
+
 const filteredRooms = (floor: number) => {
-  return data.value.filter((item) => item.floor === floor);
+  return data.value
+    .filter((item) => item.floor === floor)
+    .map((item) => ({
+      ...item,
+      user: item.user === "-" ? "-" : item.user, // หากไม่มีการจอง ผู้จอง = "-"
+      time: item.time === "-" ? "-" : item.time, // หากไม่มีการจอง เวลา = "-"
+      status: item.status || "ว่าง", // หากไม่มีสถานะ ให้สถานะ = "ว่าง"
+    }));
 };
+
 
 const dialog = ref(false);
 const selectedItem = ref<any>(null);
