@@ -71,7 +71,7 @@
           v-model="startTime"
           :items="timeOptions"
           outlined
-          label=""
+          label="เวลาเริ่มต้น"
           class="width-formtime1 text-field-rounded"
         />
       </span>
@@ -125,9 +125,9 @@
         <h1 class="mg-time2 head1-title">เวลา</h1>
         <v-select
           v-model="endTime"
-          :items="filteredEndTimes"
+          :items="filteredEndTimes()"
           outlined
-          label=""
+          label="เวลา"
           class="width-formtime2 text-field-rounded"
         />
       </span>
@@ -139,15 +139,15 @@
           v-model="floor"
           :items="[3, 4, 5, 6]"
           outlined
-          label=""
+          label="ชั้น"
           class="width-formfloor text-field-rounded"
         />
         <h1 class="mg-room head1-title">ห้อง</h1>
         <v-select
-          v-model="room"
+          v-model="roomName"
           :items="availableRooms"
           outlined
-          label=""
+          label="ห้อง"
           class="width-formroom text-field-rounded"
         />
       </span>
@@ -224,11 +224,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
 
 const numPeople = ref("");
 const phoneNumber = ref("");
-const menu = ref(false); 
+const menu = ref(false);
 const startMenu = ref(false);
 const endMenu = ref(false);
 const startDate = ref(null);
@@ -259,9 +260,6 @@ const timeOptions = ref([
   "15:30",
   "16:00",
   "16:30",
-  "17:00",
-  "17:30",
-  "18:00",
 ]);
 
 const floorRooms = ref({
@@ -303,6 +301,65 @@ const floorRooms = ref({
   ],
 });
 export default defineComponent({
+  setup() {
+    const route = useRoute();
+
+    // ดึงค่าจาก query string
+    const floor = ref(parseInt((route.query.floor as string) || "3"));
+    const roomIndex = ref(parseInt((route.query.room as string) || "1") - 1); // แปลง room=5 เป็น index 4
+    const startTime = ref(route.query.time || "08:00");
+
+    const floorRooms = {
+      3: [
+        "ศึกษากลุ่ม 1",
+        "ศึกษากลุ่ม 2",
+        "ศึกษากลุ่ม 3",
+        "ศึกษากลุ่ม 4",
+        "ศึกษากลุ่ม 5",
+        "ศึกษากลุ่ม 6",
+      ],
+      4: [
+        "ศึกษากลุ่ม 1",
+        "ศึกษากลุ่ม 2",
+        "ศึกษากลุ่ม 3",
+        "ศึกษากลุ่ม 4",
+        "ศึกษากลุ่ม 5",
+      ],
+      5: [
+        "ศึกษากลุ่ม 1",
+        "ศึกษากลุ่ม 2",
+        "ศึกษากลุ่ม 3",
+        "ศึกษากลุ่ม 4",
+        "ศึกษากลุ่ม 5",
+      ],
+      6: [
+        "STV 1",
+        "STV 2",
+        "STV 3",
+        "STV 4",
+        "STV 5",
+        "STV 6",
+        "STV 7",
+        "STV 8",
+        "STV 9",
+        "LIBRA OKE 1",
+        "LIBRA OKE 2",
+        "MINI THEATER",
+      ],
+    };
+
+    const roomName = computed(() => {
+      const rooms = floorRooms[floor.value] || [];
+      return rooms[roomIndex.value] || `ห้อง ${roomIndex.value + 1}`; // fallback ถ้า index ไม่อยู่ใน array
+    });
+
+    return {
+      floor,
+      roomIndex,
+      roomName,
+      startTime,
+    };
+  },
   data() {
     return {
       numPeople: "",
@@ -337,10 +394,6 @@ export default defineComponent({
         "15:00",
         "15:30",
         "16:00",
-        "16:30",
-        "17:00",
-        "17:30",
-        "18:00",
       ],
       floorRooms: {
         3: [
@@ -393,6 +446,31 @@ export default defineComponent({
   },
 
   computed: {
+    availableRooms() {
+      if (this.floor in this.floorRooms) {
+        return this.floorRooms[this.floor as keyof typeof this.floorRooms];
+      } else {
+        return [];
+      }
+    },
+  },
+
+  watch: {
+    startTime(newStartTime) {
+      // คำนวณเวลาที่มีให้เลือก
+      const availableTimes = this.filteredEndTimes();
+      // ตั้งค่า endTime เป็นค่าตัวเลือกแรกที่ถูกต้อง
+      this.endTime = availableTimes.length > 0 ? availableTimes[0] : "";
+    },
+    floor(newFloor: keyof typeof this.floorRooms) {
+      const firstRoom = this.floorRooms[newFloor]
+        ? this.floorRooms[newFloor][0]
+        : "";
+      this.room = firstRoom;
+    },
+  },
+
+  methods: {
     filteredEndTimes() {
       if (this.startTime === "08:00") {
         return ["08:30", "09:00", "09:30", "10:00"];
@@ -437,52 +515,18 @@ export default defineComponent({
         return ["15:00", "15:30", "16:00", "16:30"];
       }
       if (this.startTime === "15:00") {
-        return ["15:30", "16:00", "16:30", "17:00"];
+        return ["15:30", "16:00", "16:30"];
       }
       if (this.startTime === "15:30") {
-        return ["16:00", "16:30", "17:00", "17:30"];
+        return ["16:00", "16:30"];
       }
       if (this.startTime === "16:00") {
-        return ["16:30", "17:00", "17:30", "18:00"];
-      }
-      if (this.startTime === "16:30") {
-        return ["17:00", "17:30", "18:00", "18:30"];
-      }
-      if (this.startTime === "17:00") {
-        return ["17:30", "18:00", "18:30"];
-      }
-      if (this.startTime === "17:30") {
-        return ["18:00", "18:30"];
-      }
-      if (this.startTime === "18:00") {
-        return ["18:30"];
+        return ["16:30"];
       }
 
-      return this.timeOptions.filter((time) => time !== "08:30");
+      return []; // ถ้า startTime ไม่มีใน timeOptions
     },
-    availableRooms() {
-      if (this.floor in this.floorRooms) {
-        return this.floorRooms[this.floor as keyof typeof this.floorRooms];
-      } else {
-        return [];
-      }
-    },
-  },
 
-  watch: {
-    startTime(newStartTime) {
-      const availableTimes = this.filteredEndTimes;
-      this.endTime = availableTimes[0] || "08:30";
-    },
-    floor(newFloor: keyof typeof this.floorRooms) {
-      const firstRoom = this.floorRooms[newFloor]
-        ? this.floorRooms[newFloor][0]
-        : "";
-      this.room = firstRoom;
-    },
-  },
-
-  methods: {
     validateNumber() {
       this.numPeople = this.numPeople.replace(/\D/g, "");
     },
@@ -543,7 +587,10 @@ export default defineComponent({
 
   async mounted() {
     await this.fetchHolidays();
-  }
+
+    const availableTimes = this.filteredEndTimes();
+    this.endTime = availableTimes.length > 0 ? availableTimes[0] : "";
+  },
 });
 
 const showDatePicker = ref(false);
@@ -603,7 +650,6 @@ const getDayClass = (day: { date: Date }) => {
   ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
   const isHoliday = holidays.value.includes(formattedDay);
-
 };
 
 const handleDateSelect = (date: string | null) => {
@@ -781,7 +827,6 @@ getCurrentDate();
   margin-left: 20px;
   margin-right: 20px;
   margin-top: -10px;
-
   color: #493628;
 }
 

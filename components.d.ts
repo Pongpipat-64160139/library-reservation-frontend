@@ -23,11 +23,13 @@ declare module 'vue' {
     Login_page: typeof import('./src/components/home/login_page.vue')['default']
     Manage_room: typeof import('./src/components/status/manage_room.vue')['default']
     Manage_status: typeof import('./src/components/status/manage_status.vue')['default']
+    Room_selector: typeof import('./src/components/form/room_selector.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Status_page: typeof import('./src/components/status/status_page.vue')['default']
     Table_entertain: typeof import('./src/components/table/table_entertain.vue')['default']
     Table_meeting: typeof import('./src/components/table/table_meeting.vue')['default']
     Table_study: typeof import('./src/components/table/table_study.vue')['default']
+    'Time_picker.vue': typeof import('./src/components/form/time_picker.vue.vue')['default']
   }
 }

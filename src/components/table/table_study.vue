@@ -331,17 +331,12 @@ const onSelectChange = (value: string) => {
 const goToFormStudy = () => {
   router.push("/booking_study");
 };
-const generateBookingLink = (
-  roomIndex: number,
-  time: string,
-  floor: number
-) => {
-  const date = selectedDate.value || new Date();
-  const formattedDate = (date as Date).toISOString().split("T")[0];
-  return `/booking_study?floor=${floor}&room=${
-    roomIndex + 1
-  }&time=${time}&date=${formattedDate}`;
+const generateBookingLink = (roomIndex: number, time: string, floor: number) => {
+  return `/booking_study?floor=${floor}&room=${roomIndex + 1}&time=${time}`;
 };
+
+
+
 </script>
 
 <style scoped>
