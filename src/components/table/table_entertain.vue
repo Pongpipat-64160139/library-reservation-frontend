@@ -293,11 +293,12 @@ const generateBookingLink = (roomIndex: number, time: string, floor: number, roo
           roomName = oke[roomIndex];
           break;
       case 'minitheater':
-          roomName = minitheater[0];
+          roomName = minitheater[roomIndex];
           break;
   }
 
-  return `/booking_study?floor=${floor}&room=${roomName}&time=${time}`;
+  // เพิ่ม encodeURIComponent และปรับปรุง query parameters
+  return `/booking_study?floor=${floor}&roomName=${encodeURIComponent(roomName)}&time=${time}`;
 };
 </script>-
 

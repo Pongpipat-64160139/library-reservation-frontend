@@ -343,17 +343,19 @@ const mockUsers = [
 
 const data = ref(
   Object.entries(floorRooms).flatMap(([floor, rooms]) =>
-    rooms.map((room) => ({
-      room,
-      user: Math.random() > 0.5
-        ? mockUsers[Math.floor(Math.random() * mockUsers.length)]
-        : "-", // กำหนดให้ "-" หากไม่มีการจอง
-      time: Math.random() > 0.5 ? "08:00-10:00" : "-", // กำหนดเวลาเป็น "-" หากไม่มีการจอง
-      status: Math.random() > 0.5 ? "จอง" : "ว่าง", // สถานะเริ่มต้น
-      floor: Number(floor),
-    }))
+    rooms.map((room) => {
+      const hasUser = Math.random() > 0.5; // สุ่มว่ามีผู้จองหรือไม่
+      return {
+        room,
+        user: hasUser ? mockUsers[Math.floor(Math.random() * mockUsers.length)] : "-", // ถ้าไม่มี ให้เป็น "-"
+        time: hasUser ? "08:00-10:00" : "-", // ถ้าไม่มี ให้เป็น "-"
+        status: hasUser ? (Math.random() > 0.5 ? "ไม่ว่าง" : "จอง") : "ว่าง", // ถ้าไม่มี ให้เป็น "ว่าง"
+        floor: Number(floor),
+      };
+    })
   )
 );
+
 
 
 const filteredRooms = (floor: number) => {

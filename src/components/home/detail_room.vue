@@ -67,7 +67,7 @@ const floorRooms = {
 };
 
 const roomDetails: { [key: string]: string } = {
-  "201": "4-6",
+  "201": "20-50",
   "ศึกษากลุ่ม ": "3-5",
   ศึกษากลุ่ม: "3-5",
   "Lecturer's Room": "3-5",
