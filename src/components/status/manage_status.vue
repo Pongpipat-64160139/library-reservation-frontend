@@ -20,22 +20,29 @@
       </template>
     </v-breadcrumbs>
 
+    <!-- Tabs for Floors -->
+    <v-tabs v-model="selectedFloor" background-color="#cdbba7">
+      <v-tab class="text-col" v-for="floor in [2, 3, 4, 5, 6, 7]" :key="floor" :value="floor">
+        ชั้น {{ floor }}
+      </v-tab>
+    </v-tabs>
+
     <!-- Data Table -->
     <v-data-table
       v-model:sort-by="sortBy"
       :headers="headers"
-      :items="sortedData"
+      :items="filteredData"
       style="background-color: #cdbba7"
-      class="rd-test"
+      class="rd-test text-col"
     >
       <template v-slot:item="{ item, index }">
         <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
-          <td>{{ item.index }}</td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.floor }}</td>
-          <td>{{ item.room }}</td>
-          <td>{{ item.date }}</td>
-          <td>{{ item.time }}</td>
+          <td class="text-col">{{ item.index }}</td>
+          <td class="text-col">{{ item.name }}</td>
+          <td class="text-col">{{ item.floor }}</td>
+          <td class="text-col">{{ item.room }}</td>
+          <td class="text-col">{{ item.date }}</td>
+          <td class="text-col">{{ item.time }}</td>
           <td class="align-center justify-center">
             <v-select
               v-model="item.status"
@@ -55,14 +62,6 @@
               height="40"
               class="rd-btndetail ms-1"
             ></v-btn>
-          </td>
-          <td>
-            <v-checkbox
-              v-model="item.keyReceived"
-              density="compact"
-              hide-details
-              class="custom-checkbox"
-            ></v-checkbox>
           </td>
         </tr>
       </template>
@@ -221,7 +220,6 @@ const headers = ref([
   { title: "เวลา", key: "time" },
   { title: "สถานะ", key: "status" },
   { title: "เพิ่มเติม", key: "more" },
-  { title: "รับกุญแจ", key: "keyReceived" },
 ]);
 
 const data = ref([
@@ -234,7 +232,6 @@ const data = ref([
     date: formatDate("2024-12-17"),
     time: "08:00-10:00",
     status: "รอ",
-    keyReceived: false,
   },
   {
     index: 2,
@@ -245,7 +242,6 @@ const data = ref([
     date: formatDate("2024-12-12"),
     time: "09:00-11:00",
     status: "อนุมัติ",
-    keyReceived: true,
   },
   {
     index: 3,
@@ -256,7 +252,6 @@ const data = ref([
     date: formatDate("2024-12-13"),
     time: "10:00-12:00",
     status: "ยกเลิก",
-    keyReceived: false,
   },
   {
     index: 4,
@@ -267,7 +262,6 @@ const data = ref([
     date: formatDate("2024-12-17"),
     time: "11:00-13:00",
     status: "รอ",
-    keyReceived: false,
   },
   {
     index: 5,
@@ -278,7 +272,6 @@ const data = ref([
     date: formatDate("2024-12-15"),
     time: "12:00-14:00",
     status: "อนุมัติ",
-    keyReceived: true,
   },
   {
     index: 6,
@@ -289,7 +282,6 @@ const data = ref([
     date: formatDate("2024-12-17"),
     time: "13:00-15:00",
     status: "รอ",
-    keyReceived: false,
   },
   {
     index: 7,
@@ -300,7 +292,6 @@ const data = ref([
     date: formatDate("2024-12-17"),
     time: "14:00-16:00",
     status: "ยกเลิก",
-    keyReceived: false,
   },
   {
     index: 8,
@@ -311,7 +302,6 @@ const data = ref([
     date: formatDate("2024-12-18"),
     time: "15:00-17:00",
     status: "อนุมัติ",
-    keyReceived: true,
   },
   {
     index: 9,
@@ -322,7 +312,6 @@ const data = ref([
     date: formatDate("2024-12-17"),
     time: "16:00-18:00",
     status: "รอ",
-    keyReceived: false,
   },
   {
     index: 10,
@@ -333,7 +322,6 @@ const data = ref([
     date: formatDate("2024-12-20"),
     time: "08:00-16:00",
     status: "อนุมัติ",
-    keyReceived: true,
   },
 ]);
 
@@ -342,8 +330,14 @@ const items = [
   { title: "สถานะห้อง", disabled: false, href: "/manage_room" },
 ];
 
+const selectedFloor = ref(2); // ค่าเริ่มต้นให้ตรงกับชั้นแรกที่มีในแท็บ
+
+const filteredData = computed(() => {
+  return data.value.filter((item) => item.floor === selectedFloor.value);
+});
+
 const sortedData = computed(() => {
-  let sortedItems = [...data.value];
+  let sortedItems = [...filteredData.value];
 
   sortedItems.sort((a, b) => {
     if (a.status === "รอ" && b.status !== "รอ") return -1;
@@ -360,59 +354,6 @@ const sortedData = computed(() => {
     index: idx + 1,
   }));
 });
-
-interface FloorRooms {
-  [key: string]: string[];
-}
-
-const floorRooms: FloorRooms = {
-  2: ["201"],
-  3: [
-    "ศึกษากลุ่ม 1",
-    "ศึกษากลุ่ม 2",
-    "ศึกษากลุ่ม 3",
-    "ศึกษากลุ่ม 4",
-    "ศึกษากลุ่ม 5",
-    "ศึกษากลุ่ม 6",
-  ],
-  4: [
-    "ศึกษากลุ่ม 1",
-    "ศึกษากลุ่ม 2",
-    "ศึกษากลุ่ม 3",
-    "ศึกษากลุ่ม 4",
-    "ศึกษากลุ่ม 5",
-  ],
-  5: [
-    "ศึกษากลุ่ม 1",
-    "ศึกษากลุ่ม 2",
-    "ศึกษากลุ่ม 3",
-    "ศึกษากลุ่ม 4",
-    "ศึกษากลุ่ม 5",
-    "Lecturer's Room 1",
-    "Lecturer's Room 2",
-    "Lecturer's Room 3",
-  ],
-  6: [
-    "STV 1",
-    "STV 2",
-    "STV 3",
-    "STV 4",
-    "STV 5",
-    "STV 6",
-    "STV 7",
-    "STV 8",
-    "STV 9",
-    "LIBRA OKE 1",
-    "LIBRA OKE 2",
-    "MINI THEATER",
-    "604 Smart Board",
-    "Mini Studio",
-    "Cyber Zone 1",
-    "Cyber Zone 2",
-    "Live for Life",
-  ],
-  7: ["706", "707"],
-};
 
 const dialog = ref(false);
 const selectedItem = ref<any>(null);
@@ -641,5 +582,9 @@ th {
   border-radius: 10px;
   border: 1px solid #cdbba7; /* กำหนดกรอบของตาราง */
   border-collapse: collapse; /* ให้กรอบรวมกัน */
+}
+.text-col {
+  font-weight: 400;
+  font-size: 18px;
 }
 </style>
