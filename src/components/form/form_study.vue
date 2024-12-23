@@ -395,11 +395,11 @@ export default defineComponent({
 
   watch: {
     startTime(newStartTime) {
-      // คำนวณเวลาที่มีให้เลือก
-      const availableTimes = this.filteredEndTimes();
-      // ตั้งค่า endTime เป็นค่าตัวเลือกแรกที่ถูกต้อง
-      this.endTime = availableTimes.length > 0 ? availableTimes[0] : "";
-    },
+    console.log('Start Time:', newStartTime); // สำหรับการดีบัก
+    const availableTimes = this.filteredEndTimes();
+    console.log('Available End Times:', availableTimes); // ตรวจสอบรายการที่กรองแล้ว
+    this.endTime = availableTimes.length > 0 ? availableTimes[0] : ""; // ตั้งค่า endTime เป็นค่าแรก
+  },
     floor(newFloor: keyof typeof this.floorRooms) {
       const firstRoom = this.floorRooms[newFloor]
         ? this.floorRooms[newFloor][0]
@@ -546,10 +546,9 @@ export default defineComponent({
   },
 
   async mounted() {
-    await this.fetchHolidays();
-
-    const availableTimes = this.filteredEndTimes();
-    this.endTime = availableTimes.length > 0 ? availableTimes[0] : "";
+    console.log("Initial startTime:", this.startTime);
+  const availableTimes = this.filteredEndTimes();
+  this.endTime = availableTimes.length > 0 ? availableTimes[0] : "";
 
     if (this.startTime === "20:00") {
       this.startTime = "19:30";
