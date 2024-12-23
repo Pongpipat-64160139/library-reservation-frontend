@@ -31,7 +31,7 @@
     <v-data-table
       v-model:sort-by="sortBy"
       :headers="headers"
-      :items="filteredData"
+      :items="sortedData"
       style="background-color: #cdbba7"
       class="rd-test text-col"
     >
@@ -340,12 +340,15 @@ const sortedData = computed(() => {
   let sortedItems = [...filteredData.value];
 
   sortedItems.sort((a, b) => {
+    // ให้ "รอ" อยู่ข้างบนสุด
     if (a.status === "รอ" && b.status !== "รอ") return -1;
     if (a.status !== "รอ" && b.status === "รอ") return 1;
 
+    // จัดเรียงตามลำดับต่อไป
     if (a.status === "อนุมัติ" && b.status !== "อนุมัติ") return 1;
     if (a.status !== "อนุมัติ" && b.status === "อนุมัติ") return -1;
 
+    // กรณีสถานะเหมือนกัน ใช้ index ในการจัดลำดับ
     return a.index - b.index;
   });
 
@@ -354,6 +357,7 @@ const sortedData = computed(() => {
     index: idx + 1,
   }));
 });
+
 
 const dialog = ref(false);
 const selectedItem = ref<any>(null);
