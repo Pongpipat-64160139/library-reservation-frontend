@@ -1,11 +1,15 @@
 {
+  "compilerOptions": {
+    "typeRoots": ["node_modules/@types"], // เพิ่ม Type Definitions ของ Node.js
+    "types": ["node"], // บอกให้รองรับ Buffer และโมดูล Node.js
+    "moduleResolution": "node", // ใช้ Node.js Module Resolution
+    "module": "commonjs", // หรือ ESNext หากต้องการ
+    "target": "ES2017", // ตั้งเป้าหมายของ JavaScript
+    "strict": true // เปิดการตรวจสอบ TypeScript แบบเข้มงวด
+  },
   "files": [],
   "references": [
-    {
-      "path": "./tsconfig.node.json"
-    },
-    {
-      "path": "./tsconfig.app.json"
-    }
+    { "path": "./tsconfig.node.json" },
+    { "path": "./tsconfig.app.json" }
   ]
 }

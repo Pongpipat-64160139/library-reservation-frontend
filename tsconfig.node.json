@@ -1,19 +1,20 @@
 {
-  "extends": "@tsconfig/node22/tsconfig.json",
+  "extends": "@tsconfig/node22/tsconfig.json", // ยังคงอ้างอิงการตั้งค่าเดิม
   "include": [
     "vite.config.*",
     "vitest.config.*",
     "cypress.config.*",
     "nightwatch.conf.*",
-    "playwright.config.*"
+    "playwright.config.*",
+    "src/**/*.ts" // เพิ่มให้รวมไฟล์ใน src ด้วย
   ],
   "compilerOptions": {
     "composite": true,
     "noEmit": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "types": ["node"]
+    "module": "ESNext", // ยังคง ESNext สำหรับโมดูล ES6
+    "moduleResolution": "node", // เปลี่ยนเป็น Node.js Resolution เพื่อรองรับโมดูลแบบ Node.js
+    "types": ["node"], // เพิ่ม Type Definitions ของ Node.js
+    "typeRoots": ["node_modules/@types"] // ชี้ไปยัง Type Definitions
   }
 }
