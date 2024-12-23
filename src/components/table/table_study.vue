@@ -345,7 +345,16 @@ const goToFormStudy = () => {
   router.push("/booking_study");
 };
 const generateBookingLink = (roomIndex: number, time: string, floor: number) => {
-  return `/booking_study?floor=${floor}&room=${roomIndex + 1}&time=${time}`;
+  let roomName = '';
+  if (floor === 3) {
+    roomName = rooms3[roomIndex];
+  } else if (floor === 4) {
+    roomName = rooms4[roomIndex];
+  } else if (floor === 5) {
+    roomName = rooms5[roomIndex];
+  }
+  
+  return `/booking_study?floor=${floor}&room=${roomIndex + 1}&time=${time}&roomName=${encodeURIComponent(roomName)}`;
 };
 
 
