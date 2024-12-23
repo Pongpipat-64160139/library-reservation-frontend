@@ -310,22 +310,28 @@ const typeroom = [
   },
 ];
 
-const rooms3 = [ "ศึกษากลุ่ม 1",
-    "ศึกษากลุ่ม 2",
-    "ศึกษากลุ่ม 3",
-    "ศึกษากลุ่ม 4",
-    "ศึกษากลุ่ม 5",
-    "ศึกษากลุ่ม 6",];
-const rooms4 = ["ศึกษากลุ่ม 1",
-    "ศึกษากลุ่ม 2",
-    "ศึกษากลุ่ม 3",
-    "ศึกษากลุ่ม 4",
-    "ศึกษากลุ่ม 5",];
-const rooms5 = ["ศึกษากลุ่ม 1",
-    "ศึกษากลุ่ม 2",
-    "ศึกษากลุ่ม 3",
-    "ศึกษากลุ่ม 4",
-    "ศึกษากลุ่ม 5",];
+const rooms3 = [
+  "ศึกษากลุ่ม 1",
+  "ศึกษากลุ่ม 2",
+  "ศึกษากลุ่ม 3",
+  "ศึกษากลุ่ม 4",
+  "ศึกษากลุ่ม 5",
+  "ศึกษากลุ่ม 6",
+];
+const rooms4 = [
+  "ศึกษากลุ่ม 1",
+  "ศึกษากลุ่ม 2",
+  "ศึกษากลุ่ม 3",
+  "ศึกษากลุ่ม 4",
+  "ศึกษากลุ่ม 5",
+];
+const rooms5 = [
+  "ศึกษากลุ่ม 1",
+  "ศึกษากลุ่ม 2",
+  "ศึกษากลุ่ม 3",
+  "ศึกษากลุ่ม 4",
+  "ศึกษากลุ่ม 5",
+];
 
 const onSelectChange = (value: string) => {
   console.log("Selected value:", value);
@@ -344,8 +350,12 @@ const onSelectChange = (value: string) => {
 const goToFormStudy = () => {
   router.push("/booking_study");
 };
-const generateBookingLink = (roomIndex: number, time: string, floor: number) => {
-  let roomName = '';
+const generateBookingLink = (
+  roomIndex: number,
+  time: string,
+  floor: number
+) => {
+  let roomName = "";
   if (floor === 3) {
     roomName = rooms3[roomIndex];
   } else if (floor === 4) {
@@ -353,12 +363,11 @@ const generateBookingLink = (roomIndex: number, time: string, floor: number) => 
   } else if (floor === 5) {
     roomName = rooms5[roomIndex];
   }
-  
-  return `/booking_study?floor=${floor}&room=${roomIndex + 1}&time=${time}&roomName=${encodeURIComponent(roomName)}`;
+
+  return `/booking_study?floor=${floor}&room=${
+    roomIndex + 1
+  }&time=${time}&roomName=${encodeURIComponent(roomName)}`;
 };
-
-
-
 </script>
 
 <style scoped>
