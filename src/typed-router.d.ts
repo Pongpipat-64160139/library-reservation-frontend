@@ -51,5 +51,7 @@ declare module 'vue-router/auto-routes' {
     '/table_entertain': RouteRecordInfo<'/table_entertain', '/table_entertain', Record<never, never>, Record<never, never>>,
     '/table_meeting': RouteRecordInfo<'/table_meeting', '/table_meeting', Record<never, never>, Record<never, never>>,
     '/table_study': RouteRecordInfo<'/table_study', '/table_study', Record<never, never>, Record<never, never>>,
+    '/testAPI/testAPIVue': RouteRecordInfo<'/testAPI/testAPIVue', '/testAPI/testAPIVue', Record<never, never>, Record<never, never>>,
+    '/testAPIVue': RouteRecordInfo<'/testAPIVue', '/testAPIVue', Record<never, never>, Record<never, never>>,
   }
 }

@@ -18,3 +18,10 @@ export function updateUser(id: string, users: User) {
 export function deleteUser(id: string) {
   return http.delete(`/users/${id}`);
 }
+export default {
+  getAllUsers,
+  createUser,
+  getbyOneUser,
+  updateUser,
+  deleteUser,
+};
