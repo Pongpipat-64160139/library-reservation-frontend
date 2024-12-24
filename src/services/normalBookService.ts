@@ -4,7 +4,7 @@ import { NormalRoomBooking } from "../types/normalRoomBooking";
 export function getAllRNB() {
   return http.get("/normal-room-booking");
 }
-export function getByOneNRB(id: number) {
+export function getNRBById(id: number) {
   return http.get(`/normal-room-booking/${id}`);
 }
 
@@ -20,7 +20,7 @@ export function deleteNRB(id: number) {
 }
 export default {
   getAllRNB,
-  getByOneNRB,
+  getNRBById,
   createNRB,
   updateNRB,
   deleteNRB,

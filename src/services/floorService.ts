@@ -4,7 +4,7 @@ import { Floor } from "../types/floor";
 export function getAllFlors() {
   return http.get("/floors");
 }
-export function getByOneFloor(id: number) {
+export function getFloorById(id: number) {
   return http.get(`/floors/${id}`);
 }
 export function updateFloors(id: number, floors: Floor) {
@@ -19,7 +19,7 @@ export function createFloor(floor: Floor) {
 }
 export default {
   getAllFlors,
-  getByOneFloor,
+  getFloorById,
   updateFloors,
   deleteFloors,
   createFloor,

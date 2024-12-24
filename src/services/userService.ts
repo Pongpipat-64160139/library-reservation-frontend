@@ -3,7 +3,7 @@ import { User } from "../types/user";
 export function getAllUsers() {
   return http.get("/users");
 }
-export function getbyOneUser(id: string) {
+export function getUserById(id: string) {
   return http.get(`/users/${id}`);
 }
 
@@ -21,7 +21,7 @@ export function deleteUser(id: string) {
 export default {
   getAllUsers,
   createUser,
-  getbyOneUser,
+  getUserById,
   updateUser,
   deleteUser,
 };

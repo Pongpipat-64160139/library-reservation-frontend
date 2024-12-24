@@ -4,7 +4,7 @@ import { RoleAssignment } from "../types/roleAssignment";
 export function getAllRoleAssginment() {
   return http.get("/role-assignments");
 }
-export function getByOneRoleAssignment(id: number) {
+export function getRoleAssignmentById(id: number) {
   return http.get(`/role-assignments/${id}`);
 }
 
@@ -17,7 +17,7 @@ export function deleteRoleAssignment(id: number) {
 }
 export default {
   getAllRoleAssginment,
-  getByOneRoleAssignment,
+  getRoleAssignmentById,
   createRoleAssignment,
   deleteRoleAssignment,
 };

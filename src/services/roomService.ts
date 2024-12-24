@@ -4,7 +4,7 @@ import { Room } from "../types/room";
 export function getAllRooms() {
   return http.get("/rooms");
 }
-export function getByOneRoom(id: number) {
+export function getRoomById(id: number) {
   return http.get(`/rooms/${id}`);
 }
 
@@ -20,7 +20,7 @@ export function deleteRoom(id: number) {
 }
 export default {
   getAllRooms,
-  getByOneRoom,
+  getRoomById,
   createRoom,
   updateRoom,
   deleteRoom,

@@ -13,11 +13,11 @@ export const useNormalRoomBookStore = defineStore("normal-room-booking", () => {
     return await nrbService.getAllRNB();
   }
   async function findOneReserve(id: number) {
-    return await nrbService.getByOneNRB(id);
+    return await nrbService.getNRBById(id);
   }
   async function updateReserve(id: number, nrb: NormalRoomBooking) {
     try {
-      const findNRB = await nrbService.getByOneNRB(id);
+      const findNRB = await nrbService.getNRBById(id);
       if (!findNRB) {
         throw new Error("Not found");
       }
