@@ -1,19 +1,22 @@
 /**
  * plugins/vuetify.ts
  *
- * Framework documentation: https://vuetifyjs.com`
+ * Framework documentation: https://vuetifyjs.com
  */
 
 // Styles
-import '@mdi/font/css/materialdesignicons.css'
-import 'vuetify/styles'
+import "@mdi/font/css/materialdesignicons.css"; // Import Material Design Icons
+import "vuetify/styles"; // Import Vuetify styles
 
 // Composables
-import { createVuetify } from 'vuetify'
+import { createVuetify } from "vuetify";
 
-// https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
+// Vuetify Configuration
 export default createVuetify({
-  theme: {
-    defaultTheme: 'light',
+  icons: {
+    defaultSet: "mdi", // Set Material Design Icons as default
   },
-})
+  theme: {
+    defaultTheme: "light", // Set the default theme to light
+  },
+});

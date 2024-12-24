@@ -1,7 +1,7 @@
 /**
  * main.ts
  *
- * Bootstraps Vuetify, Pinia, and other plugins, then mounts the App
+ * Bootstraps Vuetify, Pinia, MDI icons, and other plugins, then mounts the App
  */
 
 // Plugins
@@ -16,6 +16,9 @@ import { createPinia } from 'pinia' // Import Pinia
 
 // Router
 import router from './router'
+
+// Material Design Icons (MDI)
+import '@mdi/font/css/materialdesignicons.css' // Import MDI CSS
 
 const app = createApp(App)
 

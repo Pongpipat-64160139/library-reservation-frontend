@@ -184,12 +184,12 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Footer_page from "../footer/footer_page.vue";
-
+import { useRoomStore } from "@/stores/roomStore";
 const showDatePicker = ref(false);
 const currentDate = ref("");
 const selectedDate = ref<string | null>(null);
 const holidays = ref<string[]>([]);
-
+const roomStore = useRoomStore();
 const fetchHolidays = async (year: string) => {
   const response = await fetch(
     `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=2024`,
@@ -340,16 +340,24 @@ const rooms5 = [
   "ศึกษากลุ่ม 5",
 ];
 
+async function selectByType(type: string) {
+  const findRoomType = await roomStore.selectRoomByType(type);
+  console.log(findRoomType.data);
+  return findRoomType.data;
+}
 const onSelectChange = (value: string) => {
   console.log("Selected value:", value);
   if (value === "Group Study Room") {
     console.log("Navigating to HelloWorld");
+    selectByType("Group study");
     router.push("/table_study");
   } else if (value === "Entertain Room") {
     console.log("Navigating to page2");
+    selectByType("Entertain");
     router.push("/table_entertain");
   } else if (value === "Meeting Room") {
     console.log("Navigating to page2");
+    selectByType("Meeting");
     router.push("/table_meeting");
   }
 };

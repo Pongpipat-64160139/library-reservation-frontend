@@ -8,7 +8,12 @@ export const useRoomStore = defineStore("room", () => {
     console.log(rooms.data);
     return rooms;
   }
+  async function selectRoomByType(type: string) {
+    const room = await roomservice.getRoomTypes(type);
+    return room.data;
+  }
   return {
     getAllRooms,
+    selectRoomByType,
   };
 });
