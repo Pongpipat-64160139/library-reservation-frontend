@@ -50,15 +50,16 @@
           <td class="text-col">{{ item.time }}</td>
           <td class="align-center justify-center">
             <v-select
-              v-model="item.status"
+              :model-value="item.status"
               :items="['รอ', 'อนุมัติ', 'ยกเลิก']"
               variant="outlined"
               density="compact"
               class="cl-dropd mt-6"
+              @update:modelValue="(val) => handleStatusChange(item, val)"
             ></v-select>
           </td>
           <td class="text-col">
-            {{ getDetailMessage(item.status) }}
+            {{ getDetailMessage(item.status, item) }}
           </td>
 
           <td>
@@ -196,22 +197,35 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog v-model="cancelDialog" max-width="500px">
+  <v-dialog v-model="statusChangeDialog" max-width="500px">
     <v-card>
-      <v-card-title>กรุณาระบุเหตุผลที่ยกเลิก</v-card-title>
       <v-card-text>
-        <v-form ref="cancelForm">
-          <v-textarea
-            label="เหตุผล"
-            v-model="cancelReason"
-            rows="4"
-            required
-          ></v-textarea>
-        </v-form>
+        <div class="text-center">
+          คุณต้องการเปลี่ยนสถานะเป็น "{{ newStatus }}" ใช่หรือไม่ ?
+        </div>
+
+        <v-text-field
+          v-if="newStatus === 'ยกเลิก'"
+          v-model="cancelReason"
+          label="กรุณากรอกเหตุผลในการยกเลิก"
+          variant="outlined"
+          :rules="[(v) => !!v || 'กรุณากรอกเหตุผล']"
+          class="mt-4"
+        ></v-text-field>
       </v-card-text>
       <v-card-actions>
-        <v-btn text @click="cancelDialog = false">ปิด</v-btn>
-        <v-btn color="primary" @click="confirmCancellation">ยืนยัน</v-btn>
+        <v-card-actions class="d-flex justify-center mb-3">
+          <v-btn class="rd-btncancel" text @click="clearCancelReason">
+            ยกเลิก
+          </v-btn>
+          <v-btn
+            class="rd-btnconfirm"
+            @click="confirmStatusChange"
+            :disabled="newStatus === 'ยกเลิก' && !cancelReason"
+          >
+            ยืนยัน
+          </v-btn>
+        </v-card-actions>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -251,11 +265,13 @@ const headers = ref([
   { title: "เพิ่มเติม", key: "more" },
 ]);
 
-const getDetailMessage = (status: string) => {
+const getDetailMessage = (status: string, currentItem: any) => {
   if (status === "รอ") {
     return "รอดำเนินการ";
   } else if (status === "อนุมัติ") {
     return "กำลังใช้งาน";
+  } else if (status === "ยกเลิก") {
+    return currentItem.cancelReason || "ยกเลิกการจอง";
   }
   return "-";
 };
@@ -270,6 +286,7 @@ const data = ref([
     date: formatDate("2024-12-17"),
     time: "08:00-10:00",
     status: "รอ",
+    cancelReason: "",
   },
   {
     index: 2,
@@ -280,6 +297,7 @@ const data = ref([
     date: formatDate("2024-12-12"),
     time: "09:00-11:00",
     status: "อนุมัติ",
+    cancelReason: "",
   },
   {
     index: 3,
@@ -290,6 +308,7 @@ const data = ref([
     date: formatDate("2024-12-13"),
     time: "10:00-12:00",
     status: "ยกเลิก",
+    cancelReason: "",
   },
   {
     index: 4,
@@ -300,6 +319,7 @@ const data = ref([
     date: formatDate("2024-12-17"),
     time: "11:00-13:00",
     status: "รอ",
+    cancelReason: "",
   },
   {
     index: 5,
@@ -310,6 +330,7 @@ const data = ref([
     date: formatDate("2024-12-15"),
     time: "12:00-14:00",
     status: "อนุมัติ",
+    cancelReason: "",
   },
   {
     index: 6,
@@ -320,6 +341,7 @@ const data = ref([
     date: formatDate("2024-12-17"),
     time: "13:00-15:00",
     status: "รอ",
+    cancelReason: "",
   },
   {
     index: 7,
@@ -330,6 +352,7 @@ const data = ref([
     date: formatDate("2024-12-17"),
     time: "14:00-16:00",
     status: "ยกเลิก",
+    cancelReason: "",
   },
   {
     index: 8,
@@ -340,6 +363,7 @@ const data = ref([
     date: formatDate("2024-12-18"),
     time: "15:00-17:00",
     status: "อนุมัติ",
+    cancelReason: "",
   },
   {
     index: 9,
@@ -350,6 +374,7 @@ const data = ref([
     date: formatDate("2024-12-17"),
     time: "16:00-18:00",
     status: "รอ",
+    cancelReason: "",
   },
   {
     index: 10,
@@ -360,6 +385,7 @@ const data = ref([
     date: formatDate("2024-12-20"),
     time: "08:00-16:00",
     status: "อนุมัติ",
+    cancelReason: "",
   },
 ]);
 
@@ -399,6 +425,38 @@ const sortedData = computed(() => {
 const dialog = ref(false);
 const selectedItem = ref<any>(null);
 const editMode = ref(false);
+
+// Add these refs after other ref declarations
+const statusChangeDialog = ref(false);
+const newStatus = ref("");
+const itemToUpdate = ref<any>(null);
+const cancelReason = ref("");
+
+const clearCancelReason = () => {
+  cancelReason.value = "";
+  statusChangeDialog.value = false;
+};
+
+const handleStatusChange = (item: any, newStatusValue: string) => {
+  itemToUpdate.value = item;
+  newStatus.value = newStatusValue;
+  statusChangeDialog.value = true;
+  // Revert the v-select value until confirmed
+  item.status = item.status;
+};
+
+const confirmStatusChange = () => {
+  if (itemToUpdate.value) {
+    if (newStatus.value === "ยกเลิก" && !cancelReason.value.trim()) {
+      alert("กรุณากรอกเหตุผลในการยกเลิก");
+      return;
+    }
+    itemToUpdate.value.status = newStatus.value;
+    itemToUpdate.value.cancelReason = cancelReason.value; // Store reason if needed
+  }
+  statusChangeDialog.value = false;
+  cancelReason.value = ""; // Reset reason
+};
 
 const editedFloor = ref<number>(0);
 const editedRoom = ref("");
@@ -624,6 +682,7 @@ th {
 .wth-btnedit {
   width: 200px;
 }
+
 .back-ground {
   background-color: #f9f3ea;
 }
@@ -644,6 +703,7 @@ th {
   background-color: #f5eded;
   border-radius: 20px;
 }
+
 .rd-btncancel {
   font-weight: 400;
   font-size: 16px;
@@ -654,6 +714,17 @@ th {
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
   margin-right: 30px;
 }
+
+.rd-btnconfirm {
+  font-weight: 400;
+  font-size: 16px;
+  color: #493628;
+  background-color: #b5cfb7;
+  width: 100px;
+  border-radius: 10px;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+}
+
 .rd-btnclose {
   font-weight: 400;
   font-size: 16px;
@@ -666,9 +737,12 @@ th {
 .rd-test {
   background-color: #f5eded;
   border-radius: 10px;
-  border: 1px solid #cdbba7; /* กำหนดกรอบของตาราง */
-  border-collapse: collapse; /* ให้กรอบรวมกัน */
+  border: 1px solid #cdbba7;
+  /* กำหนดกรอบของตาราง */
+  border-collapse: collapse;
+  /* ให้กรอบรวมกัน */
 }
+
 .text-col {
   font-weight: 400;
   font-size: 18px;
