@@ -376,7 +376,7 @@ const allowedDates = (date: unknown) => {
 onMounted(() => {
   const currentYear = new Date().getFullYear().toString();
   fetchHolidays(currentYear).then(() => {
-    console.log("Holidays fetched:", holidays.value);
+    // console.log("Holidays fetched:", holidays.value);
   });
 });
 

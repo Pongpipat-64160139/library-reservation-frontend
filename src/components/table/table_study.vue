@@ -185,6 +185,7 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Footer_page from "../footer/footer_page.vue";
 import { useRoomStore } from "@/stores/roomStore";
+import type { GetRoomType } from "@/types/getRoomType";
 const showDatePicker = ref(false);
 const currentDate = ref("");
 const selectedDate = ref<string | null>(null);
@@ -231,7 +232,7 @@ const allowedDates = (date: unknown) => {
 onMounted(() => {
   const currentYear = new Date().getFullYear().toString();
   fetchHolidays(currentYear).then(() => {
-    console.log("Holidays fetched:", holidays.value);
+    // console.log("Holidays fetched:", holidays.value);
   });
 });
 
@@ -339,26 +340,51 @@ const rooms5 = [
   "ศึกษากลุ่ม 4",
   "ศึกษากลุ่ม 5",
 ];
+async function showData() {}
 
-async function selectByType(type: string) {
-  const findRoomType = await roomStore.selectRoomByType(type);
-  console.log(findRoomType.data);
-  return findRoomType.data;
+async function selectByType(nameType: string): Promise<GetRoomType[]> {
+  try {
+    const response = await roomStore.selectRoomByType(nameType); // response จะเป็น AxiosResponse
+    const rooms: GetRoomType[] = response.data; // ดึงข้อมูลจาก response.data และกำหนด Type
+    roomStore.setRoom(rooms);
+    console.log("Show data : ", roomStore.newRooms);
+    return rooms;
+  } catch (error) {
+    console.error("Error fetching room type:", error);
+    throw new Error("Could not find room");
+  }
 }
-const onSelectChange = (value: string) => {
+
+const onSelectChange = async (value: string) => {
+  const groupType = ref<string>("Group study");
+  const meetingType = ref<string>("Meeting");
+  const entertainType = ref<string>("Entertain");
   console.log("Selected value:", value);
   if (value === "Group Study Room") {
-    console.log("Navigating to HelloWorld");
-    selectByType("Group study");
-    router.push("/table_study");
+    try {
+      const groupStudyRoom = await selectByType(groupType.value);
+      router.push("/table_study");
+    } catch (error) {
+      console.error("Error fetching entertain room:", error);
+    }
   } else if (value === "Entertain Room") {
-    console.log("Navigating to page2");
-    selectByType("Entertain");
-    router.push("/table_entertain");
+    console.log("NameType being passed:", entertainType.value);
+    try {
+      // console.log("Navigating to page2");
+      const entertainRoom = await selectByType(entertainType.value);
+
+      router.push("/table_entertain");
+    } catch (error) {
+      console.error("Error fetching entertain room:", error);
+    }
   } else if (value === "Meeting Room") {
-    console.log("Navigating to page2");
-    selectByType("Meeting");
-    router.push("/table_meeting");
+    // console.log("Navigating to page2");
+    try {
+      const meetingRoom = await selectByType(meetingType.value);
+      router.push("/table_meeting");
+    } catch (error) {
+      console.error("Error fetching entertain room:", error);
+    }
   }
 };
 
