@@ -22,7 +22,12 @@
 
     <!-- Tabs for Floors -->
     <v-tabs v-model="selectedFloor" background-color="#cdbba7">
-      <v-tab class="text-col" v-for="floor in [2, 3, 4, 5, 6, 7]" :key="floor" :value="floor">
+      <v-tab
+        class="text-col"
+        v-for="floor in [2, 3, 4, 5, 6, 7]"
+        :key="floor"
+        :value="floor"
+      >
         ชั้น {{ floor }}
       </v-tab>
     </v-tabs>
@@ -52,6 +57,9 @@
               class="cl-dropd mt-6"
             ></v-select>
           </td>
+          <td class="text-col">
+            {{ getDetailMessage(item.status) }}
+          </td>
 
           <td>
             <v-btn
@@ -68,7 +76,7 @@
     </v-data-table>
   </v-container>
 
-  <v-dialog v-model="dialog" max-width="500px" max-height="600px">
+  <v-dialog v-model="dialog" max-width="550px" max-height="600px">
     <v-card class="rd-dialog">
       <span class="head-detailuser">
         <div class="head-detail">
@@ -112,7 +120,7 @@
 
       <span class="d-flex head-detailfloor">
         <v-row>
-          <v-col>
+          <v-col cols="5">
             <div class="head-detail wth-btnedit">
               <strong class="me-1">ชั้น</strong>
               <v-select
@@ -127,7 +135,7 @@
             </div>
           </v-col>
           <v-col>
-            <div class="head-detail wth-btnedit">
+            <div class="head-detail wth-btnedit ms-10">
               <strong class="me-1">ห้อง</strong>
               <v-select
                 v-if="editMode"
@@ -187,6 +195,26 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <v-dialog v-model="cancelDialog" max-width="500px">
+    <v-card>
+      <v-card-title>กรุณาระบุเหตุผลที่ยกเลิก</v-card-title>
+      <v-card-text>
+        <v-form ref="cancelForm">
+          <v-textarea
+            label="เหตุผล"
+            v-model="cancelReason"
+            rows="4"
+            required
+          ></v-textarea>
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn text @click="cancelDialog = false">ปิด</v-btn>
+        <v-btn color="primary" @click="confirmCancellation">ยืนยัน</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -219,8 +247,18 @@ const headers = ref([
   { title: "วันที่", key: "date" },
   { title: "เวลา", key: "time" },
   { title: "สถานะ", key: "status" },
+  { title: "รายละเอียด", key: "details" },
   { title: "เพิ่มเติม", key: "more" },
 ]);
+
+const getDetailMessage = (status: string) => {
+  if (status === "รอ") {
+    return "รอดำเนินการ";
+  } else if (status === "อนุมัติ") {
+    return "กำลังใช้งาน";
+  }
+  return "-";
+};
 
 const data = ref([
   {
@@ -358,7 +396,6 @@ const sortedData = computed(() => {
   }));
 });
 
-
 const dialog = ref(false);
 const selectedItem = ref<any>(null);
 const editMode = ref(false);
@@ -387,8 +424,57 @@ const showDialog = (item: any) => {
 };
 
 const updateAvailableRooms = () => {
-  const rooms = floorRooms.value[editedFloor.value];
+  const rooms = floorRooms[editedFloor.value];
   editedRoom.value = rooms ? rooms[0] : "";
+};
+
+const floorRooms = {
+  2: ["201 (20-50)"],
+  3: [
+    "ศึกษากลุ่ม 1 (3-5)",
+    "ศึกษากลุ่ม 2 (3-5)",
+    "ศึกษากลุ่ม 3 (3-5)",
+    "ศึกษากลุ่ม 4 (3-5)",
+    "ศึกษากลุ่ม 5 (3-5)",
+    "ศึกษากลุ่ม 6 (3-5)",
+  ],
+  4: [
+    "ศึกษากลุ่ม 1 (3-5)",
+    "ศึกษากลุ่ม 2 (3-5)",
+    "ศึกษากลุ่ม 3 (3-5)",
+    "ศึกษากลุ่ม 4 (3-5)",
+    "ศึกษากลุ่ม 5 (3-5)",
+  ],
+  5: [
+    "ศึกษากลุ่ม 1 (3-5)",
+    "ศึกษากลุ่ม 2 (3-5)",
+    "ศึกษากลุ่ม 3 (3-5)",
+    "ศึกษากลุ่ม 4 (3-5)",
+    "ศึกษากลุ่ม 5 (3-5)",
+    "Lecturer's Room 1 (3-5)",
+    "Lecturer's Room 2 (3-5)",
+    "Lecturer's Room 3 (3-5)",
+  ],
+  6: [
+    "STV 1 (3-5)",
+    "STV 2 (3-5)",
+    "STV 3 (3-5)",
+    "STV 4 (3-5)",
+    "STV 5 (3-5)",
+    "STV 6 (3-5)",
+    "STV 7 (3-5)",
+    "STV 8 (3-5)",
+    "STV 9 (3-5)",
+    "LIBRA OKE 1 (3-5)",
+    "LIBRA OKE 2 (3-5)",
+    "MINI THEATER (10-30)",
+    "604 Smart Board (8-10)",
+    "Mini Studio",
+    "Cyber Zone 1 (ไม่เกิน 70)",
+    "Cyber Zone 2 (ไม่เกิน 30)",
+    "Live for Life (มากกว่า 3)",
+  ],
+  7: ["706", "707"],
 };
 
 const toggleEditMode = () => {
@@ -530,13 +616,13 @@ th {
 
 .head-detail {
   font-weight: 300;
-  font-size: 18px;
+  font-size: 16px;
   margin-top: 20px;
   margin-left: 25px;
 }
 
 .wth-btnedit {
-  width: 150px;
+  width: 200px;
 }
 .back-ground {
   background-color: #f9f3ea;
@@ -576,11 +662,7 @@ th {
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
 }
-.head-detail {
-  font-weight: 300;
-  font-size: 18px;
-  margin: 10px 0;
-}
+
 .rd-test {
   background-color: #f5eded;
   border-radius: 10px;
