@@ -7,10 +7,16 @@
           :key="index"
           class="breadcrumb-item"
         >
-          <v-icon v-if="item.icon" class="breadcrumb-icon">
+          <v-icon
+            v-if="item.icon"
+            class="breadcrumb-icon"
+          >
             {{ item.icon }}
           </v-icon>
-          <a :href="item.href" class="breadcrumb-link">
+          <a
+            :href="item.href"
+            class="breadcrumb-link"
+          >
             {{ item.title }}
           </a>
           <span

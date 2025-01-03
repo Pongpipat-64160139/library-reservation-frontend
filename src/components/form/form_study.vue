@@ -1,5 +1,8 @@
 <template class="back-ground">
-  <v-container fluid class="back-ground ms-kob">
+  <v-container
+    fluid
+    class="back-ground ms-kob"
+  >
     <!-- Sheet1 จองห้อง -->
     <v-sheet
       class="mx-auto mt-1"
@@ -7,7 +10,9 @@
       max-width="700"
       style="background-color: #dfd3c3; border-radius: 16px"
     >
-      <h1 class="pt-5 head-title text-center pb-5">จองห้อง</h1>
+      <h1 class="pt-5 head-title text-center pb-5">
+        จองห้อง
+      </h1>
 
       <!-- span1 -->
       <span class="d-flex">
@@ -27,8 +32,8 @@
 
         <v-menu
           v-model="startMenu"
+          v-model:return-value="startDate"
           :close-on-content-click="false"
-          :return-value.sync="startDate"
           transition="scale-transition"
           offset-y
         >
@@ -43,17 +48,17 @@
               :value="
                 startDate
                   ? new Date(startDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
                   : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
               "
               readonly
             />
@@ -78,10 +83,10 @@
       <span class="d-flex">
         <h1 class="mg-date2 head1-title">วันที่จบ</h1>
         <v-menu
-          class="width-formdate2 text-field-rounded"
           v-model="endMenu"
+          v-model:return-value="endDate"
+          class="width-formdate2 text-field-rounded"
           :close-on-content-click="false"
-          :return-value.sync="endDate"
           transition="scale-transition"
           offset-y
         >
@@ -96,17 +101,17 @@
               :value="
                 endDate
                   ? new Date(endDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
                   : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
               "
               readonly
               :disabled="true"
@@ -163,8 +168,8 @@
         <h1 class="mg-date3 head1-title">สิ้นสุด</h1>
         <v-menu
           v-model="endRepeatMenu"
+          v-model:return-value="endRepeatDate"
           :close-on-content-click="false"
-          :return-value.sync="endRepeatDate"
           transition="scale-transition"
           offset-y
         >
@@ -175,17 +180,17 @@
               :value="
                 endRepeatDate
                   ? new Date(endRepeatDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
                   : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
               "
               readonly
               :disabled="repeatOption === 'ไม่'"
@@ -213,10 +218,16 @@
           rows="3"
           outlined
           class="width-detail text-field-rounded"
-        ></v-textarea>
+        />
       </span>
-      <v-btn to="/table_study" type="submit" class="save-btn custom-btn">
-        <v-icon left>mdi-content-save</v-icon>
+      <v-btn
+        to="/table_study"
+        type="submit"
+        class="save-btn custom-btn"
+      >
+        <v-icon left>
+          mdi-content-save
+        </v-icon>
         จองห้อง
       </v-btn>
     </v-sheet>
@@ -408,6 +419,16 @@ export default defineComponent({
     },
   },
 
+  async mounted() {
+    console.log("Initial startTime:", this.startTime);
+  const availableTimes = this.filteredEndTimes();
+  this.endTime = availableTimes.length > 0 ? availableTimes[0] : "";
+
+    if (this.startTime === "20:00") {
+      this.startTime = "19:30";
+    }
+  },
+
   methods: {
     filteredEndTimes() {
       if (this.startTime === "08:00") {
@@ -543,16 +564,6 @@ export default defineComponent({
         console.error("Failed to fetch holidays:", error);
       }
     },
-  },
-
-  async mounted() {
-    console.log("Initial startTime:", this.startTime);
-  const availableTimes = this.filteredEndTimes();
-  this.endTime = availableTimes.length > 0 ? availableTimes[0] : "";
-
-    if (this.startTime === "20:00") {
-      this.startTime = "19:30";
-    }
   },
   
 });

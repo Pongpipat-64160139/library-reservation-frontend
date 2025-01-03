@@ -1,123 +1,211 @@
 <template>
   <Header_page />
-  <v-container fluid class="back-ground ms-kob">
-      <v-container>
-          <v-row justify="center" align="center">
-              <!-- Dropdown เลือกประเภทห้อง -->
-              <v-col class="d-flex justify-center" cols="auto" style="margin-right: 100px">
-                  <v-select class="width-dd v-selectcolor" label="ประเภทห้อง" :items="typeroom" v-model="selectedPage"
-                      @update:modelValue="onSelectChange">
-                  </v-select>
-              </v-col>
+  <v-container
+    fluid
+    class="back-ground ms-kob"
+  >
+    <v-container>
+      <v-row
+        justify="center"
+        align="center"
+      >
+        <!-- Dropdown เลือกประเภทห้อง -->
+        <v-col
+          class="d-flex justify-center"
+          cols="auto"
+          style="margin-right: 100px"
+        >
+          <v-select
+            v-model="selectedPage"
+            class="width-dd v-selectcolor"
+            label="ประเภทห้อง"
+            :items="typeroom"
+            @update:model-value="onSelectChange"
+          />
+        </v-col>
 
-              <!-- ช่องสำหรับปุ่มแสดงวันที่ -->
-              <v-col class="d-flex justify-center" cols="auto">
-                  <v-btn class="btn-date" @click="showDatePicker = !showDatePicker">
-                      {{
-                          selectedDate
-                              ? new Date(selectedDate).toLocaleDateString("th-TH", {
-                                  weekday: "long",
-                                  year: "numeric",
-                                  month: "long",
-                                  day: "numeric",
-                              })
-                              : new Date().toLocaleDateString("th-TH", {
-                                  weekday: "long",
-                                  year: "numeric",
-                                  month: "long",
-                                  day: "numeric",
-                      })
-                      }}
-                      <v-icon class="calendar-icon">mdi-calendar</v-icon>
-                  </v-btn>
+        <!-- ช่องสำหรับปุ่มแสดงวันที่ -->
+        <v-col
+          class="d-flex justify-center"
+          cols="auto"
+        >
+          <v-btn
+            class="btn-date"
+            @click="showDatePicker = !showDatePicker"
+          >
+            {{
+              selectedDate
+                ? new Date(selectedDate).toLocaleDateString("th-TH", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+                : new Date().toLocaleDateString("th-TH", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+            }}
+            <v-icon class="calendar-icon">
+              mdi-calendar
+            </v-icon>
+          </v-btn>
 
-                  <v-date-picker v-if="showDatePicker" class="date-picker-position" v-model="selectedDate"
-                      @update:model-value="handleDateSelect" @click:clear="selectedDate = null"
-                      :allowed-dates="allowedDates" :day-class="getDayClass"></v-date-picker>
-              </v-col>
-          </v-row>
-      </v-container>
-      <!-- ตารางสำหรับชั้น 6 ห้อง ศึกษากลุ่มมัลติมีเดีย (STV) -->
-      <h1 class="pt-5 head-title pb-10 ml-left">
-          ชั้น 6 ห้อง ศึกษากลุ่มมัลติมีเดีย (STV)
-          <v-icon class="mb-1 ms-2">mdi-multimedia</v-icon>
-      </h1>
-      <v-container class="ms-minustop">
-          <v-simple-table class="table-bordered">
-              <thead>
-                  <tr>
-                      <th class="font-table">เวลา</th>
-                      <th class="room-column font-table" v-for="room in stv" :key="room">
-                          {{ room }}
-                      </th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr v-for="(time, timeIndex) in timeSlots" :key="time"
-                      :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
-                      <td class="time-column font-table">{{ time }}</td>
-                      <td class="room9-column" v-for="(room, roomIndex) in stv" :key="roomIndex">
-                          <a :href="generateBookingLink(roomIndex, time, 6, 'stv')" class="table-link"></a>
-                      </td>
-                  </tr>
-              </tbody>
-          </v-simple-table>
-      </v-container>
+          <v-date-picker
+            v-if="showDatePicker"
+            v-model="selectedDate"
+            class="date-picker-position"
+            :allowed-dates="allowedDates"
+            :day-class="getDayClass"
+            @update:model-value="handleDateSelect"
+            @click:clear="selectedDate = null"
+          />
+        </v-col>
+      </v-row>
+    </v-container>
+    <!-- ตารางสำหรับชั้น 6 ห้อง ศึกษากลุ่มมัลติมีเดีย (STV) -->
+    <h1 class="pt-5 head-title pb-10 ml-left">
+      ชั้น 6 ห้อง ศึกษากลุ่มมัลติมีเดีย (STV)
+      <v-icon class="mb-1 ms-2">
+        mdi-multimedia
+      </v-icon>
+    </h1>
+    <v-container class="ms-minustop">
+      <v-simple-table class="table-bordered">
+        <thead>
+          <tr>
+            <th class="font-table">
+              เวลา
+            </th>
+            <th
+              v-for="room in stv"
+              :key="room"
+              class="room-column font-table"
+            >
+              {{ room }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(time, timeIndex) in timeSlots"
+            :key="time"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
+          >
+            <td class="time-column font-table">
+              {{ time }}
+            </td>
+            <td
+              v-for="(room, roomIndex) in stv"
+              :key="roomIndex"
+              class="room9-column"
+            >
+              <a
+                :href="generateBookingLink(roomIndex, time, 6, 'stv')"
+                class="table-link"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </v-simple-table>
+    </v-container>
 
-      <!-- ตารางสำหรับชั้น 6 ห้อง LIBRA OKE -->
-      <h1 class="pt-5 head-title pb-10 ml-left">
-          ชั้น 6 ห้อง LIBRA OKE
-          <v-icon class="mb-1 ms-2">mdi-microphone-variant</v-icon>
-      </h1>
-      <v-container class="ms-minustop">
-          <v-simple-table class="table-bordered">
-              <thead>
-                  <tr>
-                      <th class="time-column font-table">เวลา</th>
-                      <th class="font-table" v-for="room in oke" :key="room">
-                          {{ room }}
-                      </th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr v-for="(time, timeIndex) in timeSlots" :key="time"
-                      :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
-                      <td class="time-column font-table">{{ time }}</td>
-                      <td class="room2-column" v-for="(room, roomIndex) in oke" :key="roomIndex">
-                          <a :href="generateBookingLink(roomIndex, time, 6, 'oke')" class="table-link"></a>
-                      </td>
-                  </tr>
-              </tbody>
-          </v-simple-table>
-      </v-container>
+    <!-- ตารางสำหรับชั้น 6 ห้อง LIBRA OKE -->
+    <h1 class="pt-5 head-title pb-10 ml-left">
+      ชั้น 6 ห้อง LIBRA OKE
+      <v-icon class="mb-1 ms-2">
+        mdi-microphone-variant
+      </v-icon>
+    </h1>
+    <v-container class="ms-minustop">
+      <v-simple-table class="table-bordered">
+        <thead>
+          <tr>
+            <th class="time-column font-table">
+              เวลา
+            </th>
+            <th
+              v-for="room in oke"
+              :key="room"
+              class="font-table"
+            >
+              {{ room }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(time, timeIndex) in timeSlots"
+            :key="time"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
+          >
+            <td class="time-column font-table">
+              {{ time }}
+            </td>
+            <td
+              v-for="(room, roomIndex) in oke"
+              :key="roomIndex"
+              class="room2-column"
+            >
+              <a
+                :href="generateBookingLink(roomIndex, time, 6, 'oke')"
+                class="table-link"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </v-simple-table>
+    </v-container>
 
-      <!-- ตารางสำหรับชั้น 6 ห้อง Mini Theater -->
-      <h1 class="pt-5 head-title pb-10 ml-left">
-          ชั้น 6 ห้อง MINI THEATER
-          <v-icon class="mb-1 ms-2">mdi-theater</v-icon>
-      </h1>
+    <!-- ตารางสำหรับชั้น 6 ห้อง Mini Theater -->
+    <h1 class="pt-5 head-title pb-10 ml-left">
+      ชั้น 6 ห้อง MINI THEATER
+      <v-icon class="mb-1 ms-2">
+        mdi-theater
+      </v-icon>
+    </h1>
 
-      <v-container class="ms-minustop">
-          <v-simple-table class="table-bordered">
-              <thead>
-                  <tr>
-                      <th class="time-column font-table">เวลา</th>
-                      <th class="font-table" v-for="room in minitheater" :key="room">
-                          {{ room }}
-                      </th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr v-for="(time, timeIndex) in timeSlots" :key="time"
-                      :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
-                      <td class="time-column font-table">{{ time }}</td>
-                      <td class="room1-column" v-for="(room, roomIndex) in minitheater" :key="roomIndex">
-                          <a :href="generateBookingLink(roomIndex, time, 6, 'minitheater')" class="table-link"></a>
-                      </td>
-                  </tr>
-              </tbody>
-          </v-simple-table>
-      </v-container>
+    <v-container class="ms-minustop">
+      <v-simple-table class="table-bordered">
+        <thead>
+          <tr>
+            <th class="time-column font-table">
+              เวลา
+            </th>
+            <th
+              v-for="room in minitheater"
+              :key="room"
+              class="font-table"
+            >
+              {{ room }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(time, timeIndex) in timeSlots"
+            :key="time"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
+          >
+            <td class="time-column font-table">
+              {{ time }}
+            </td>
+            <td
+              v-for="(room, roomIndex) in minitheater"
+              :key="roomIndex"
+              class="room1-column"
+            >
+              <a
+                :href="generateBookingLink(roomIndex, time, 6, 'minitheater')"
+                class="table-link"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </v-simple-table>
+    </v-container>
   </v-container>
   <Footer_page />
 </template>

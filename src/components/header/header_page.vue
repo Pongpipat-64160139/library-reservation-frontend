@@ -9,24 +9,39 @@
         to="/home_page"
         class="d-flex align-items-center ms-10 custom-router-link"
       >
-        <v-img :src="logobuu" width="54" height="54" class="mr-3 mt-3"></v-img>
+        <v-img
+          :src="logobuu"
+          width="54"
+          height="54"
+          class="mr-3 mt-3"
+        />
         <div class="mt-5">
-          <div class="buu-font">BUU Library</div>
-          <div class="buu-font">ระบบจองห้องสมุด</div>
+          <div class="buu-font">
+            BUU Library
+          </div>
+          <div class="buu-font">
+            ระบบจองห้องสมุด
+          </div>
         </div>
       </router-link>
 
       <div class="d-flex mt-11 ms-136 buu-font">
         <div>
-          <v-breadcrumbs :items="items" divider="|"></v-breadcrumbs>
+          <v-breadcrumbs
+            :items="items"
+            divider="|"
+          />
         </div>
       </div>
 
       <div class="ms-020 mt-4 text-center">
         <div>64160136</div>
-        <router-link to="/login_page" class="custom-router-link buu-font"
-          >ออกจากระบบ</router-link
+        <router-link
+          to="/login_page"
+          class="custom-router-link buu-font"
         >
+          ออกจากระบบ
+        </router-link>
       </div>
     </v-app-bar>
   </v-app>

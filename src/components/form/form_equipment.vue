@@ -1,5 +1,8 @@
 <template class="back-ground">
-  <v-container fluid class="back-ground ms-kob">
+  <v-container
+    fluid
+    class="back-ground ms-kob"
+  >
     <!-- Sheet1 จองห้อง -->
     <v-sheet
       class="mx-auto mt-10"
@@ -7,55 +10,59 @@
       max-width="1200"
       style="background-color: #dfd3c3; border-radius: 16px"
     >
-      <h1 class="pt-7 head-equipment ms-10">อุปกรณ์ที่ต้องการ</h1>
-      <h1 class="head-plsselect ms-10 pb-5">กรุณาเลือกอุปกรณ์ที่ต้องการ</h1>
+      <h1 class="pt-7 head-equipment ms-10">
+        อุปกรณ์ที่ต้องการ
+      </h1>
+      <h1 class="head-plsselect ms-10 pb-5">
+        กรุณาเลือกอุปกรณ์ที่ต้องการ
+      </h1>
 
       <span class="d-flex">
         <v-checkbox
-          class="head-selectequipment width-formcheckbox"
           v-model="selected"
+          class="head-selectequipment width-formcheckbox"
           label="โปรเจคเตอร์"
           value="1"
-        ></v-checkbox>
+        />
         <v-checkbox
-          class="head-selectequipment width-formcheckbox"
           v-model="selected"
+          class="head-selectequipment width-formcheckbox"
           label="เครื่องคอมพิวเตอร์ (วิทยากร)"
           value="2"
-        ></v-checkbox>
+        />
         <v-checkbox
-          class="head-selectequipment width-formcheckbox"
           v-model="selected"
+          class="head-selectequipment width-formcheckbox"
           label="โต๊ะลงทะเบียน"
           value="3"
-        ></v-checkbox>
+        />
         <v-checkbox
-          class="head-selectequipment width-formcheckbox"
           v-model="selected"
+          class="head-selectequipment width-formcheckbox"
           label="ระบบเครื่องเสียง"
           value="4"
-        ></v-checkbox>
+        />
       </span>
       <span class="d-flex">
         <v-checkbox
-          class="head-selectequipment width-formcheckbox"
           v-model="selected"
+          class="head-selectequipment width-formcheckbox"
           label="ระบบ ZOOM Meeting"
           value="5"
-        ></v-checkbox>
+        />
         <v-checkbox
-          class="head-selectequipment width-formcheckbox"
           v-model="selected"
+          class="head-selectequipment width-formcheckbox"
           label="ระบบถ่ายทอดการประชุม"
           value="6"
-        ></v-checkbox>
+        />
         <v-checkbox
-          class="head-selectequipment width-formcheckbox"
           v-model="selected"
+          class="head-selectequipment width-formcheckbox"
           label="ห้องอาหาร ชั้น 3 ตึกใหม่"
           value="7"
-        ></v-checkbox>
-        <h1 class="head-selectequipment width-formcheckbox"></h1>
+        />
+        <h1 class="head-selectequipment width-formcheckbox" />
       </span>
       <span>
         <h1 class="head-another ms-10">อื่น ๆ</h1>
@@ -64,7 +71,7 @@
           rows="3"
           outlined
           class="ms-13 text-field-rounded me-7 mt-2"
-        ></v-textarea>
+        />
       </span>
       <span>
         <Form_restaurant />
@@ -76,8 +83,7 @@
           label="เพิ่มไฟล์"
           single-line
           outlined
-        >
-        </v-file-input>
+        />
       </span>
     </v-sheet>
   </v-container>

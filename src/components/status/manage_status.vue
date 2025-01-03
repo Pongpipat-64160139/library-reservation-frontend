@@ -1,9 +1,19 @@
 <template>
   <Header_page />
-  <v-container fluid class="back-ground ms-kob">
+  <v-container
+    fluid
+    class="back-ground ms-kob"
+  >
     <!-- Breadcrumbs -->
-    <v-breadcrumbs :items="items" divider=">" class="head-title mg-table">
-      <template v-slot:item="{ item }" class="head-title">
+    <v-breadcrumbs
+      :items="items"
+      divider=">"
+      class="head-title mg-table"
+    >
+      <template
+        #item="{ item }"
+        class="head-title"
+      >
         <!-- ลิงก์ที่สามารถคลิกได้ -->
         <router-link
           v-if="!item.disabled && item.href"
@@ -14,18 +24,24 @@
         </router-link>
 
         <!-- ลิงก์ที่ไม่สามารถคลิกได้ -->
-        <span v-else class="breadcrumb-disabled head-title">
+        <span
+          v-else
+          class="breadcrumb-disabled head-title"
+        >
           {{ item.title }}
         </span>
       </template>
     </v-breadcrumbs>
 
     <!-- Tabs for Floors -->
-    <v-tabs v-model="selectedFloor" background-color="#cdbba7">
+    <v-tabs
+      v-model="selectedFloor"
+      background-color="#cdbba7"
+    >
       <v-tab
-        class="text-col"
         v-for="floor in [2, 3, 4, 5, 6, 7]"
         :key="floor"
+        class="text-col"
         :value="floor"
       >
         ชั้น {{ floor }}
@@ -40,14 +56,26 @@
       style="background-color: #cdbba7"
       class="rd-test text-col"
     >
-      <template v-slot:item="{ item, index }">
+      <template #item="{ item, index }">
         <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
-          <td class="text-col">{{ item.index }}</td>
-          <td class="text-col">{{ item.name }}</td>
-          <td class="text-col">{{ item.floor }}</td>
-          <td class="text-col">{{ item.room }}</td>
-          <td class="text-col">{{ item.date }}</td>
-          <td class="text-col">{{ item.time }}</td>
+          <td class="text-col">
+            {{ item.index }}
+          </td>
+          <td class="text-col">
+            {{ item.name }}
+          </td>
+          <td class="text-col">
+            {{ item.floor }}
+          </td>
+          <td class="text-col">
+            {{ item.room }}
+          </td>
+          <td class="text-col">
+            {{ item.date }}
+          </td>
+          <td class="text-col">
+            {{ item.time }}
+          </td>
           <td class="align-center justify-center">
             <v-select
               :model-value="item.status"
@@ -55,8 +83,8 @@
               variant="outlined"
               density="compact"
               class="cl-dropd mt-6"
-              @update:modelValue="(val) => handleStatusChange(item, val)"
-            ></v-select>
+              @update:model-value="(val) => handleStatusChange(item, val)"
+            />
           </td>
           <td class="text-col">
             {{ getDetailMessage(item.status, item) }}
@@ -65,19 +93,23 @@
           <td>
             <v-btn
               color="#F5EDED"
-              @click="showDialog(item)"
               icon="mdi-magnify"
               width="40"
               height="40"
               class="rd-btndetail ms-1"
-            ></v-btn>
+              @click="showDialog(item)"
+            />
           </td>
         </tr>
       </template>
     </v-data-table>
   </v-container>
 
-  <v-dialog v-model="dialog" max-width="550px" max-height="600px">
+  <v-dialog
+    v-model="dialog"
+    max-width="550px"
+    max-height="600px"
+  >
     <v-card class="rd-dialog">
       <span class="head-detailuser">
         <div class="head-detail">
@@ -130,8 +162,8 @@
                 :items="Object.keys(floorRooms)"
                 density="compact"
                 variant="outlined"
-                @update:modelValue="updateAvailableRooms"
-              ></v-select>
+                @update:model-value="updateAvailableRooms"
+              />
               <span v-else>{{ selectedItem?.floor }}</span>
             </div>
           </v-col>
@@ -144,7 +176,7 @@
                 :items="availableRooms"
                 density="compact"
                 variant="outlined"
-              ></v-select>
+              />
               <span v-else>{{ selectedItem?.room }}</span>
             </div>
           </v-col>
@@ -170,7 +202,7 @@
         </div>
       </span>
 
-      <v-card-text> </v-card-text>
+      <v-card-text />
       <v-card-actions class="d-flex justify-center mb-8">
         <v-btn
           class="rd-btncancel"
@@ -197,7 +229,10 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog v-model="statusChangeDialog" max-width="500px">
+  <v-dialog
+    v-model="statusChangeDialog"
+    max-width="500px"
+  >
     <v-card>
       <v-card-text>
         <div class="text-center">
@@ -211,17 +246,21 @@
           variant="outlined"
           :rules="[(v) => !!v || 'กรุณากรอกเหตุผล']"
           class="mt-4"
-        ></v-text-field>
+        />
       </v-card-text>
       <v-card-actions>
         <v-card-actions class="d-flex justify-center mb-3">
-          <v-btn class="rd-btncancel" text @click="clearCancelReason">
+          <v-btn
+            class="rd-btncancel"
+            text
+            @click="clearCancelReason"
+          >
             ยกเลิก
           </v-btn>
           <v-btn
             class="rd-btnconfirm"
-            @click="confirmStatusChange"
             :disabled="newStatus === 'ยกเลิก' && !cancelReason"
+            @click="confirmStatusChange"
           >
             ยืนยัน
           </v-btn>
@@ -401,7 +440,7 @@ const filteredData = computed(() => {
 });
 
 const sortedData = computed(() => {
-  let sortedItems = [...filteredData.value];
+  const sortedItems = [...filteredData.value];
 
   sortedItems.sort((a, b) => {
     // ให้ "รอ" อยู่ข้างบนสุด

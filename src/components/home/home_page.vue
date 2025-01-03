@@ -1,8 +1,13 @@
 <template class="back-ground">
   <Header_page />
 
-  <v-container fluid class="back-ground ms-kob">
-    <h1 class="pt-5 head-title text-center pb-10">ประเภทห้อง</h1>
+  <v-container
+    fluid
+    class="back-ground ms-kob"
+  >
+    <h1 class="pt-5 head-title text-center pb-10">
+      ประเภทห้อง
+    </h1>
 
     <!-- Sheet1 Group Study Room -->
     <v-sheet class="mx-auto study_box">
@@ -16,13 +21,23 @@
         </router-link>
       </span>
 
-      <v-slide-group show-arrows class="ps-13">
-        <v-slide-group-item v-for="(room, index) in studys" :key="index">
+      <v-slide-group
+        show-arrows
+        class="ps-13"
+      >
+        <v-slide-group-item
+          v-for="(room, index) in studys"
+          :key="index"
+        >
           <div
             class="ma-4 d-flex flex-column align-center"
             @click="openDialog(room)"
           >
-            <img :src="room.src" :alt="room.alt" class="slide-image" />
+            <img
+              :src="room.src"
+              :alt="room.alt"
+              class="slide-image"
+            >
             <span class="mt-2 text-center room-caption">{{
               room.caption
             }}</span>
@@ -43,13 +58,23 @@
         </router-link>
       </span>
 
-      <v-slide-group show-arrows class="ps-13">
-        <v-slide-group-item v-for="(room, index) in entertainment" :key="index">
+      <v-slide-group
+        show-arrows
+        class="ps-13"
+      >
+        <v-slide-group-item
+          v-for="(room, index) in entertainment"
+          :key="index"
+        >
           <div
             class="ma-4 d-flex flex-column align-center"
             @click="openDialog(room)"
           >
-            <img :src="room.src" :alt="room.alt" class="slide-image" />
+            <img
+              :src="room.src"
+              :alt="room.alt"
+              class="slide-image"
+            >
             <span class="mt-2 text-center room-caption">
               {{ room.caption }}
             </span>
@@ -70,13 +95,23 @@
         </router-link>
       </span>
 
-      <v-slide-group show-arrows class="">
-        <v-slide-group-item v-for="(room, index) in meeting" :key="index">
+      <v-slide-group
+        show-arrows
+        class=""
+      >
+        <v-slide-group-item
+          v-for="(room, index) in meeting"
+          :key="index"
+        >
           <div
             class="ma-4 d-flex flex-column align-center"
             @click="openDialog(room)"
           >
-            <img :src="room.src" :alt="room.alt" class="slide-image" />
+            <img
+              :src="room.src"
+              :alt="room.alt"
+              class="slide-image"
+            >
             <span class="mt-2 text-center room-caption">
               {{ room.caption }}
             </span>
@@ -85,11 +120,17 @@
       </v-slide-group>
     </v-sheet>
 
-    <v-dialog v-model="dialog" overlay max-width="900px">
+    <v-dialog
+      v-model="dialog"
+      overlay
+      max-width="900px"
+    >
       <v-card class="style_dialog">
-        <v-card-title class="headline text-center text-bold mt-8">{{
-          selectedRoom.caption
-        }}</v-card-title>
+        <v-card-title class="headline text-center text-bold mt-8">
+          {{
+            selectedRoom.caption
+          }}
+        </v-card-title>
         <v-card-text>
           <div class="d-flex">
             <!-- ซ้าย -->
@@ -101,7 +142,7 @@
                   :src="selectedRoom.gifRoom"
                   alt="Room GIF"
                   class="icon-gif me-2"
-                />
+                >
               </div>
               <div class="align-center mt-16">
                 <p>จำนวน {{ selectedRoom.seats }} ที่นั่ง</p>
@@ -109,7 +150,7 @@
                   :src="selectedRoom.gifSeat"
                   alt="Room GIF"
                   class="icon-gif me-2"
-                />
+                >
               </div>
             </div>
 
@@ -118,13 +159,17 @@
               :src="selectedRoom.src"
               :alt="selectedRoom.alt"
               class="dialog-image mx-auto"
-            />
+            >
 
             <!-- ขวา -->
             <div class="text-left me-4">
               <div class="align-center mb-16 mt-16">
                 <p>รับกุญแจชั้น {{ selectedRoom.key }}</p>
-                <img :src="key_gif" alt="Dressing Room Icon" class="icon-gif" />
+                <img
+                  :src="key_gif"
+                  alt="Dressing Room Icon"
+                  class="icon-gif"
+                >
               </div>
               <div class="align-center mt-16">
                 <p>ผู้มีสิทธิ์จอง</p>
@@ -132,12 +177,12 @@
                   :src="selectedRoom.gifRole"
                   alt="Room GIF"
                   class="icon-gif me-2"
-                />
+                >
               </div>
             </div>
           </div>
         </v-card-text>
-        <v-card-actions> </v-card-actions>
+        <v-card-actions />
       </v-card>
     </v-dialog>
   </v-container>

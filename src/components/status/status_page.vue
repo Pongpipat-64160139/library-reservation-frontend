@@ -1,8 +1,13 @@
 <template>
   <Header_page />
 
-  <v-container fluid class="back-ground ms-kob">
-    <h1 class="pt-5 head-title text-center pb-10">สถานะการจอง</h1>
+  <v-container
+    fluid
+    class="back-ground ms-kob"
+  >
+    <h1 class="pt-5 head-title text-center pb-10">
+      สถานะการจอง
+    </h1>
 
     <v-data-table
       v-model:sort-by="sortBy"
@@ -11,7 +16,7 @@
       style="background-color: #cdbba7"
       class="rd-test"
     >
-      <template v-slot:item="{ item, index }">
+      <template #item="{ item, index }">
         <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
           <td>{{ item.index }}</td>
           <td>{{ item.name }}</td>
@@ -23,19 +28,22 @@
           <td>
             <v-btn
               color="#F5EDED"
-              @click="showDialog(item)"
               icon="mdi-magnify"
               width="40"
               height="40"
               class="rd-btndetail"
-            ></v-btn>
+              @click="showDialog(item)"
+            />
           </td>
         </tr>
       </template>
     </v-data-table>
   </v-container>
 
-  <v-dialog v-model="dialog" max-width="500px">
+  <v-dialog
+    v-model="dialog"
+    max-width="500px"
+  >
     <v-card class="rd-dialog">
       <span class="head-detailuser">
         <div class="head-detail">
@@ -111,14 +119,22 @@
         </div>
       </span>
 
-      <v-card-text> </v-card-text>
+      <v-card-text />
       <v-card-actions class="d-flex justify-center mb-8">
-        <v-btn class="rd-btncancel" text="ยกเลิกจอง" @click="dialog = false"
-          >ยกเลิกจอง</v-btn
+        <v-btn
+          class="rd-btncancel"
+          text="ยกเลิกจอง"
+          @click="dialog = false"
         >
-        <v-btn class="rd-btnclose" text="ปิด" @click="dialog = false"
-          >ปิด</v-btn
+          ยกเลิกจอง
+        </v-btn>
+        <v-btn
+          class="rd-btnclose"
+          text="ปิด"
+          @click="dialog = false"
         >
+          ปิด
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

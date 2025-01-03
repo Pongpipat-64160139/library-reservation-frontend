@@ -10,13 +10,12 @@
           style="margin-right: 100px"
         >
           <v-select
+            v-model="selectedPage"
             class="width-dd v-selectcolor"
             label="ประเภทห้อง"
             :items="typeroom"
-            v-model="selectedPage"
-            @update:modelValue="onSelectChange"
-          >
-          </v-select>
+            @update:model-value="onSelectChange"
+          />
         </v-col>
 
         <!-- ช่องสำหรับปุ่มแสดงวันที่ -->
@@ -37,25 +36,25 @@
                     day: "numeric",
                   })
             }}
-            <v-icon class="calendar-icon">mdi-calendar</v-icon>
+            <v-icon class="calendar-icon"> mdi-calendar </v-icon>
           </v-btn>
 
           <v-date-picker
             v-if="showDatePicker"
-            class="date-picker-position"
             v-model="selectedDate"
-            @update:model-value="handleDateSelect"
-            @click:clear="selectedDate = null"
+            class="date-picker-position"
             :allowed-dates="allowedDates"
             :day-class="getDayClass"
-          ></v-date-picker>
+            @update:model-value="handleDateSelect"
+            @click:clear="selectedDate = null"
+          />
         </v-col>
       </v-row>
     </v-container>
     <!-- ตารางสำหรับชั้น 3 -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 3 ห้อง ศึกษากลุ่ม
-      <v-icon class="mb-1 ms-2">mdi-account-group</v-icon>
+      <v-icon class="mb-1 ms-2"> mdi-account-group </v-icon>
     </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
@@ -63,12 +62,12 @@
           <tr>
             <th class="font-table">เวลา</th>
             <th
-              class="room-column font-table"
               v-for="(room, index) in rooms3"
-              :key="room"
+              :key="room.roomId"
+              class="room-column font-table"
             >
-              {{ room }}
-              <v-icon class="ms-2">mdi-television</v-icon>
+              {{ room.roomName }}
+              <v-icon class="ms-2"> mdi-television </v-icon>
             </th>
           </tr>
         </thead>
@@ -78,17 +77,18 @@
             :key="time"
             :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
           >
-            <td class="time-column font-table">{{ time }}</td>
+            <td class="time-column font-table">
+              {{ time }}
+            </td>
             <td
-              class="room6-column"
               v-for="(room, roomIndex) in rooms3"
               :key="roomIndex"
+              class="room5-column"
             >
               <a
                 :href="generateBookingLink(roomIndex, time, 3)"
                 class="table-link"
-              >
-              </a>
+              />
             </td>
           </tr>
         </tbody>
@@ -98,18 +98,22 @@
     <!-- ตารางสำหรับชั้น 4 -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 4 ห้อง ศึกษากลุ่ม
-      <v-icon class="mb-1 ms-2">mdi-account-group</v-icon>
+      <v-icon class="mb-1 ms-2"> mdi-account-group </v-icon>
     </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th class="font-table" v-for="(room, index) in rooms4" :key="room">
-              {{ room }}
-              <v-icon v-if="index === 3 || index === 4" class="ms-2"
-                >mdi-television</v-icon
-              >
+            <th
+              v-for="(room, index) in rooms4"
+              :key="room.roomId"
+              class="font-table"
+            >
+              {{ room.roomName }}
+              <v-icon v-if="index === 3 || index === 4" class="ms-2">
+                mdi-television
+              </v-icon>
             </th>
           </tr>
         </thead>
@@ -119,17 +123,18 @@
             :key="time"
             :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
           >
-            <td class="time-column font-table">{{ time }}</td>
+            <td class="time-column font-table">
+              {{ time }}
+            </td>
             <td
-              class="room5-column"
               v-for="(room, roomIndex) in rooms4"
               :key="roomIndex"
+              class="room5-column"
             >
               <a
                 :href="generateBookingLink(roomIndex, time, 4)"
                 class="table-link"
-              >
-              </a>
+              />
             </td>
           </tr>
         </tbody>
@@ -139,18 +144,22 @@
     <!-- ตารางสำหรับชั้น 5 -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 5 ห้อง ศึกษากลุ่ม
-      <v-icon class="mb-1 ms-2">mdi-account-group</v-icon>
+      <v-icon class="mb-1 ms-2"> mdi-account-group </v-icon>
     </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th class="font-table" v-for="(room, index) in rooms5" :key="room">
-              {{ room }}
-              <v-icon v-if="index === 3 || index === 4" class="ms-2"
-                >mdi-television</v-icon
-              >
+            <th
+              v-for="(room, index) in rooms5"
+              :key="room.roomId"
+              class="font-table"
+            >
+              {{ room.roomName }}
+              <v-icon v-if="index === 3 || index === 4" class="ms-2">
+                mdi-television
+              </v-icon>
             </th>
           </tr>
         </thead>
@@ -160,17 +169,18 @@
             :key="time"
             :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
           >
-            <td class="time-column font-table">{{ time }}</td>
+            <td class="time-column font-table">
+              {{ time }}
+            </td>
             <td
-              class="room5-column"
               v-for="(room, roomIndex) in rooms5"
               :key="roomIndex"
+              class="room5-column"
             >
               <a
                 :href="generateBookingLink(roomIndex, time, 5)"
                 class="table-link"
-              >
-              </a>
+              />
             </td>
           </tr>
         </tbody>
@@ -181,11 +191,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { ref, onMounted, computed } from "vue";
+import { useRouter } from "vue-router";
 import Footer_page from "../footer/footer_page.vue";
 import { useRoomStore } from "@/stores/roomStore";
-import type { GetRoomType } from "@/types/getRoomType";
 const showDatePicker = ref(false);
 const currentDate = ref("");
 const selectedDate = ref<string | null>(null);
@@ -229,11 +238,22 @@ const allowedDates = (date: unknown) => {
   return !isHoliday;
 };
 
-onMounted(() => {
-  const currentYear = new Date().getFullYear().toString();
-  fetchHolidays(currentYear).then(() => {
-    // console.log("Holidays fetched:", holidays.value);
-  });
+onMounted(async () => {
+  try {
+    const currentYear = new Date().getFullYear().toString();
+
+    // ใช้ Promise.all เพื่อโหลดข้อมูลพร้อมกัน
+    await Promise.all([
+      await roomStore.getRoomGroupStudy(),
+      fetchHolidays(currentYear),
+    ]);
+    console.log("All data loaded:");
+    console.log("Floor 3 Rooms:", roomStore.studyFloor3); // ตรวจสอบข้อมูล
+    console.log("Floor 3 Rooms:", roomStore.studyFloor4); // ตรวจสอบข้อมูล
+    console.log("Floor 3 Rooms:", roomStore.studyFloor5); // ตรวจสอบข้อมูล
+  } catch (error) {
+    console.error("Error loading data:", error);
+  }
 });
 
 const getDayClass = (day: { date: Date }) => {
@@ -318,76 +338,25 @@ const typeroom = [
   },
 ];
 
-const rooms3 = [
-  "ศึกษากลุ่ม 1",
-  "ศึกษากลุ่ม 2",
-  "ศึกษากลุ่ม 3",
-  "ศึกษากลุ่ม 4",
-  "ศึกษากลุ่ม 5",
-  "ศึกษากลุ่ม 6",
-];
-const rooms4 = [
-  "ศึกษากลุ่ม 1",
-  "ศึกษากลุ่ม 2",
-  "ศึกษากลุ่ม 3",
-  "ศึกษากลุ่ม 4",
-  "ศึกษากลุ่ม 5",
-];
-const rooms5 = [
-  "ศึกษากลุ่ม 1",
-  "ศึกษากลุ่ม 2",
-  "ศึกษากลุ่ม 3",
-  "ศึกษากลุ่ม 4",
-  "ศึกษากลุ่ม 5",
-];
-async function showData() {}
+const rooms3 = computed(() => roomStore.studyFloor3);
+const rooms4 = computed(() => roomStore.studyFloor4);
+const rooms5 = computed(() => roomStore.studyFloor5);
 
-async function selectByType(nameType: string): Promise<GetRoomType[]> {
-  try {
-    const response = await roomStore.selectRoomByType(nameType); // response จะเป็น AxiosResponse
-    const rooms: GetRoomType[] = response.data; // ดึงข้อมูลจาก response.data และกำหนด Type
-    roomStore.setRoom(rooms);
-    console.log("Show data : ", roomStore.newRooms);
-    return rooms;
-  } catch (error) {
-    console.error("Error fetching room type:", error);
-    throw new Error("Could not find room");
-  }
-}
-
-const onSelectChange = async (value: string) => {
-  const groupType = ref<string>("Group study");
-  const meetingType = ref<string>("Meeting");
-  const entertainType = ref<string>("Entertain");
+const onSelectChange = (value: string) => {
   console.log("Selected value:", value);
   if (value === "Group Study Room") {
-    try {
-      const groupStudyRoom = await selectByType(groupType.value);
-      router.push("/table_study");
-    } catch (error) {
-      console.error("Error fetching entertain room:", error);
-    }
+    console.log("Navigating to HelloWorld");
+    router.push("/table_study");
   } else if (value === "Entertain Room") {
-    console.log("NameType being passed:", entertainType.value);
-    try {
-      // console.log("Navigating to page2");
-      const entertainRoom = await selectByType(entertainType.value);
-
-      router.push("/table_entertain");
-    } catch (error) {
-      console.error("Error fetching entertain room:", error);
-    }
+    console.log("Navigating to page2");
+    router.push("/table_entertain");
   } else if (value === "Meeting Room") {
-    // console.log("Navigating to page2");
-    try {
-      const meetingRoom = await selectByType(meetingType.value);
-      router.push("/table_meeting");
-    } catch (error) {
-      console.error("Error fetching entertain room:", error);
-    }
+    console.log("Navigating to page2");
+    router.push("/table_meeting");
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const goToFormStudy = () => {
   router.push("/booking_study");
 };

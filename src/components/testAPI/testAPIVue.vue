@@ -26,6 +26,8 @@ async function getData(name: string) {
 <template>
   <div>
     <!-- ปุ่มที่ส่งค่าผ่าน data.value -->
-    <v-btn @click="getData(data)">Test</v-btn>
+    <v-btn @click="getData(data)">
+      Test
+    </v-btn>
   </div>
 </template>

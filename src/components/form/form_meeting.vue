@@ -1,5 +1,8 @@
 <template class="back-ground">
-  <v-container fluid class="back-ground ms-kob">
+  <v-container
+    fluid
+    class="back-ground ms-kob"
+  >
     <!-- Sheet1 จองห้อง -->
     <v-sheet
       class="mx-auto mt-10"
@@ -7,7 +10,9 @@
       max-width="1200"
       style="background-color: #dfd3c3; border-radius: 16px"
     >
-      <h1 class="pt-5 head-title text-center pb-10">จองห้องประชุม</h1>
+      <h1 class="pt-5 head-title text-center pb-10">
+        จองห้องประชุม
+      </h1>
 
       <!-- span1 -->
       <span class="d-flex">
@@ -21,20 +26,20 @@
         />
         <h1 class="ps-15 pt-5 head1-title">จำนวนคน</h1>
         <v-text-field
+          v-model="numPeople"
           class="width-formamount text-field-rounded"
           single-line
           label=""
-          v-model="numPeople"
           :rules="[(v) => /^\d+$/.test(v) || '', (v) => v > 0 || '']"
           @input="validateNumber"
         />
 
         <h1 class="ps-15 pt-5 head1-title">เบอร์โทรติดต่อ</h1>
         <v-text-field
+          v-model="phoneNumber"
           class="width-formtell text-field-rounded pe-7"
           single-line
           label=""
-          v-model="phoneNumber"
           :rules="[(v) => /^\d{10}$/.test(v) || '']"
         />
       </span>
@@ -71,10 +76,10 @@
         <h1 class="mg-date pt-5 head1-title">วันที่เริ่ม</h1>
 
         <v-menu
-          class="width-formdate text-field-rounded"
           v-model="startMenu"
+          v-model:return-value="startDate"
+          class="width-formdate text-field-rounded"
           :close-on-content-click="false"
-          :return-value.sync="startDate"
           transition="scale-transition"
           offset-y
         >
@@ -88,17 +93,17 @@
               :value="
                 startDate
                   ? new Date(startDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
                   : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
               "
               readonly
             />
@@ -128,10 +133,10 @@
         />
         <h1 class="pt-5 head1-title">วันที่จบ</h1>
         <v-menu
-          class="width-formdate text-field-rounded"
           v-model="endMenu"
+          v-model:return-value="endDate"
+          class="width-formdate text-field-rounded"
           :close-on-content-click="false"
-          :return-value.sync="endDate"
           transition="scale-transition"
           offset-y
         >
@@ -145,17 +150,17 @@
               :value="
                 endDate
                   ? new Date(endDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
                   : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
               "
               readonly
               :disabled="true"
@@ -194,10 +199,10 @@
         />
         <h1 class="ps-12 pt-5 head1-title">สิ้นสุด</h1>
         <v-menu
-          class="width-formdate text-field-rounded"
           v-model="endRepeatMenu"
+          v-model:return-value="endRepeatDate"
+          class="width-formdate text-field-rounded"
           :close-on-content-click="false"
-          :return-value.sync="endRepeatDate"
           transition="scale-transition"
           offset-y
         >
@@ -208,17 +213,17 @@
               :value="
                 endRepeatDate
                   ? new Date(endRepeatDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
                   : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
               "
               readonly
               :disabled="repeatOption === 'ไม่'"
@@ -236,7 +241,7 @@
             "
           />
         </v-menu>
-        <h1 class="ps-15 width-formblank1"></h1>
+        <h1 class="ps-15 width-formblank1" />
       </span>
     </v-sheet>
   </v-container>
@@ -615,6 +620,12 @@ export default defineComponent({
     },
   },
 
+  mounted() {
+    const currentYear = new Date().getFullYear().toString();
+    this.fetchHolidays(currentYear);
+    this.currentDate = this.formatDate(new Date());
+  },
+
   methods: {
     async fetchHolidays(year: string) {
       try {
@@ -675,12 +686,6 @@ export default defineComponent({
         this.endRepeatDate = null;
       }
     },
-  },
-
-  mounted() {
-    const currentYear = new Date().getFullYear().toString();
-    this.fetchHolidays(currentYear);
-    this.currentDate = this.formatDate(new Date());
   },
 });
 </script>

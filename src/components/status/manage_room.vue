@@ -1,9 +1,19 @@
 <template>
   <Header_page />
-  <v-container fluid class="back-ground ms-kob">
+  <v-container
+    fluid
+    class="back-ground ms-kob"
+  >
     <!-- Breadcrumbs -->
-    <v-breadcrumbs :items="items" divider=">" class="head-title mg-table">
-      <template v-slot:item="{ item }" class="head-title">
+    <v-breadcrumbs
+      :items="items"
+      divider=">"
+      class="head-title mg-table"
+    >
+      <template
+        #item="{ item }"
+        class="head-title"
+      >
         <!-- ลิงก์ที่สามารถคลิกได้ -->
         <router-link
           v-if="!item.disabled && item.href"
@@ -14,14 +24,17 @@
         </router-link>
 
         <!-- ลิงก์ที่ไม่สามารถคลิกได้ -->
-        <span v-else class="breadcrumb-disabled head-title">
+        <span
+          v-else
+          class="breadcrumb-disabled head-title"
+        >
           {{ item.title }}
         </span>
       </template>
     </v-breadcrumbs>
 
     <v-row>
-      <v-col cols="10"> </v-col>
+      <v-col cols="10" />
       <v-col cols="2">
         <v-btn
           class="close-service-btn ms-5 mb-5"
@@ -29,14 +42,22 @@
           large
           @click="closeServiceDialog = true"
         >
-          <v-icon left>mdi-close</v-icon>
+          <v-icon left>
+            mdi-close
+          </v-icon>
           ปิดบริการ
         </v-btn>
       </v-col>
     </v-row>
 
-    <div v-for="floor in 6" :key="floor" class="mb-10">
-      <h2 class="text-h5 font-weight-bold ms-5 mb-2">ชั้น {{ floor + 1 }}</h2>
+    <div
+      v-for="floor in 6"
+      :key="floor"
+      class="mb-10"
+    >
+      <h2 class="text-h5 font-weight-bold ms-5 mb-2">
+        ชั้น {{ floor + 1 }}
+      </h2>
       <v-data-table
         :headers="headers"
         :items="filteredRooms(floor + 1)"
@@ -44,101 +65,114 @@
         style="table-layout: fixed; width: 100%"
         hide-default-footer
       >
-        <template v-slot:headers>
+        <template #headers>
           <tr>
-            <th style="width: 20%">ห้อง</th>
-            <th style="width: 20%">ผู้จอง</th>
-            <th style="width: 20%">เวลา</th>
-            <th style="width: 20%">สถานะ</th>
-            <th style="width: 20%">จัดการ</th>
+            <th style="width: 20%">
+              ห้อง
+            </th>
+            <th style="width: 20%">
+              ผู้จอง
+            </th>
+            <th style="width: 20%">
+              เวลา
+            </th>
+            <th style="width: 20%">
+              สถานะ
+            </th>
+            <th style="width: 20%">
+              จัดการ
+            </th>
           </tr>
         </template>
-        <template v-slot:item="{ item, index }">
-  <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
-    <td>{{ item.room }}</td>
-    <td>{{ item.user }}</td>
-    <td>{{ item.time }}</td>
-    <td>{{ item.status }}</td>
-    <td>
-      <v-btn
-        icon
-        class="rd-btndetail"
-        width="40"
-        height="40"
-        @click="showDialog(item)"
-      >
-        <v-icon>mdi-cog</v-icon>
-      </v-btn>
-    </td>
-  </tr>
-</template>
-
+        <template #item="{ item, index }">
+          <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
+            <td>{{ item.room }}</td>
+            <td>{{ item.user }}</td>
+            <td>{{ item.time }}</td>
+            <td>{{ item.status }}</td>
+            <td>
+              <v-btn
+                icon
+                class="rd-btndetail"
+                width="40"
+                height="40"
+                @click="showDialog(item)"
+              >
+                <v-icon>mdi-cog</v-icon>
+              </v-btn>
+            </td>
+          </tr>
+        </template>
       </v-data-table>
     </div>
 
-    <v-dialog v-model="dialog" max-width="500px" max-height="600px">
+    <v-dialog
+      v-model="dialog"
+      max-width="500px"
+      max-height="600px"
+    >
       <v-card>
-        <v-card-title class="head-dialog text-center mt-5"
-          >ปิดให้บริการจองห้อง (รายห้อง)</v-card-title
-        >
+        <v-card-title class="head-dialog text-center mt-5">
+          ปิดให้บริการจองห้อง (รายห้อง)
+        </v-card-title>
         <v-card-text>
           <!-- หมายเหตุ -->
           <v-text-field
-            label="หมายเหตุ"
             v-model="remark"
+            label="หมายเหตุ"
             density="compact"
             variant="outlined"
-          ></v-text-field>
+          />
 
           <!-- Dropdown เปิด-ปิด -->
           <v-select
+            v-model="status"
             label="สถานะ"
             :items="['เปิด', 'ปิด']"
-            v-model="status"
             density="compact"
             variant="outlined"
-          ></v-select>
+          />
 
           <!-- วันที่และเวลา -->
           <v-row>
             <v-col cols="6">
               <v-text-field
-                label="วันที่เริ่ม"
                 v-model="startDate"
+                label="วันที่เริ่ม"
                 type="date"
                 density="compact"
                 variant="outlined"
-              ></v-text-field>
+              />
             </v-col>
             <v-col cols="6">
               <v-text-field
-                label="เวลา"
                 v-model="startTime"
+                label="เวลา"
                 type="time"
                 density="compact"
                 variant="outlined"
-              ></v-text-field>
+              />
             </v-col>
           </v-row>
 
           <v-row>
             <v-col cols="6">
               <v-text-field
-                label="ถึงวันที่"
                 v-model="endDate"
+                label="ถึงวันที่"
                 type="date"
                 density="compact"
                 variant="outlined"
-              ></v-text-field>
+              />
             </v-col>
             <v-col cols="6">
               <v-text-field
-                label="เวลา"
                 v-model="endTime"
+                label="เวลา"
                 type="time"
                 density="compact"
                 variant="outlined"
-              ></v-text-field>
+              />
             </v-col>
           </v-row>
 
@@ -146,96 +180,108 @@
           <v-row>
             <v-col cols="6">
               <v-select
-                label="ชั้น"
                 v-model="selectedFloor"
+                label="ชั้น"
                 :items="Object.keys(floorRooms)"
                 density="compact"
                 variant="outlined"
-                @update:modelValue="updateRoomOptions"
-              ></v-select>
+                @update:model-value="updateRoomOptions"
+              />
             </v-col>
             <v-col cols="6">
               <v-select
-                label="ห้อง"
                 v-model="selectedRoom"
+                label="ห้อง"
                 :items="roomOptions"
                 density="compact"
                 variant="outlined"
-              ></v-select>
+              />
             </v-col>
           </v-row>
         </v-card-text>
 
         <v-card-actions class="d-flex justify-center mb-5">
-          <v-btn class="rd-btncancel" variant="flat" @click="dialog = false"
-            >ยกเลิก</v-btn
+          <v-btn
+            class="rd-btncancel"
+            variant="flat"
+            @click="dialog = false"
           >
-          <v-btn class="rd-btnclose" variant="flat" @click="saveChanges"
-            >ตกลง</v-btn
+            ยกเลิก
+          </v-btn>
+          <v-btn
+            class="rd-btnclose"
+            variant="flat"
+            @click="saveChanges"
           >
+            ตกลง
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="closeServiceDialog" max-width="500px" max-height="600px">
+    <v-dialog
+      v-model="closeServiceDialog"
+      max-width="500px"
+      max-height="600px"
+    >
       <v-card>
         <v-card-title class="head-dialog text-center mt-5">
           ยืนยันการปิดให้บริการ
         </v-card-title>
         <v-card-text>
           <v-text-field
-            label="หมายเหตุ"
             v-model="remark"
+            label="หมายเหตุ"
             density="compact"
             variant="outlined"
-          ></v-text-field>
+          />
 
           <v-select
+            v-model="status"
             label="สถานะ"
             :items="['เปิด', 'ปิด']"
-            v-model="status"
             density="compact"
             variant="outlined"
-          ></v-select>
+          />
 
           <v-row>
             <v-col cols="6">
               <v-text-field
-                label="วันที่เริ่ม"
                 v-model="startDate"
+                label="วันที่เริ่ม"
                 type="date"
                 density="compact"
                 variant="outlined"
-              ></v-text-field>
+              />
             </v-col>
             <v-col cols="6">
               <v-text-field
-                label="เวลา"
                 v-model="startTime"
+                label="เวลา"
                 type="time"
                 density="compact"
                 variant="outlined"
-              ></v-text-field>
+              />
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="6">
               <v-text-field
-                label="ถึงวันที่"
                 v-model="endDate"
+                label="ถึงวันที่"
                 type="date"
                 density="compact"
                 variant="outlined"
-              ></v-text-field>
+              />
             </v-col>
             <v-col cols="6">
               <v-text-field
-                label="เวลา"
                 v-model="endTime"
+                label="เวลา"
                 type="time"
                 density="compact"
                 variant="outlined"
-              ></v-text-field>
+              />
             </v-col>
           </v-row>
         </v-card-text>
@@ -247,7 +293,11 @@
           >
             ยกเลิก
           </v-btn>
-          <v-btn class="rd-btnclose" variant="flat" @click="saveCloseService">
+          <v-btn
+            class="rd-btnclose"
+            variant="flat"
+            @click="saveCloseService"
+          >
             ตกลง
           </v-btn>
         </v-card-actions>

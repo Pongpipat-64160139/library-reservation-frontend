@@ -4,7 +4,10 @@ import Form_study from "../form/form_study.vue";
 
 <template>
   <Header_page />
-  <v-container fluid class="back-ground ms-kob">
+  <v-container
+    fluid
+    class="back-ground ms-kob"
+  >
     <Form_study />
   </v-container>
 </template>

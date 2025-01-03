@@ -1,38 +1,42 @@
 <template>
-  <h1 class="head-more ms-10 mt-5">ตัวเลือกเพิ่มเติม</h1>
+  <h1 class="head-more ms-10 mt-5">
+    ตัวเลือกเพิ่มเติม
+  </h1>
   <v-expansion-panels class="pd-more ms-16 me-1">
     <v-expansion-panel
       class="me-7 head-inmore ps-1 mb-5"
       title="ต้องการอาหารว่าง/กลางวัน (กรุณาแจ้งล่วงหน้า 2 วันทำการ)"
     >
-      <template v-slot:text>
+      <template #text>
         <div class="cl-div">
           <!-- อาหารว่าง -->
-          <h4 class="ms-10 head-more">อาหารว่าง</h4>
+          <h4 class="ms-10 head-more">
+            อาหารว่าง
+          </h4>
           <v-checkbox
             class="d-flex flex-wrap ms-8 mg-break"
             label="Break เช้า"
           />
           <div class="d-flex flex-wrap">
             <v-select
+              v-model="breakMorning.time"
               label="เวลา"
               :items="times"
               class="me-4 text-field-rounded width-time"
               :menu-props="{ maxHeight: 200 }"
-              v-model="breakMorning.time"
-            ></v-select>
+            />
             <v-text-field
+              v-model="breakMorning.people"
               label="จำนวนคน"
               type="number"
               class="me-4 text-field-rounded width-amount"
-              v-model="breakMorning.people"
-            ></v-text-field>
+            />
             <v-text-field
+              v-model="breakMorning.budget"
               class="text-field-rounded width-money"
               label="งบประมาณต่อคน"
               type="number"
-              v-model="breakMorning.budget"
-            ></v-text-field>
+            />
           </div>
 
           <v-checkbox
@@ -41,24 +45,24 @@
           />
           <div class="d-flex flex-wrap">
             <v-select
+              v-model="breakLunch.time"
               label="เวลา"
               :items="times"
               class="me-4 text-field-rounded width-time"
               :menu-props="{ maxHeight: 200 }"
-              v-model="breakLunch.time"
-            ></v-select>
+            />
             <v-text-field
+              v-model="breakLunch.people"
               label="จำนวนคน"
               type="number"
               class="me-4 text-field-rounded width-amount"
-              v-model="breakLunch.people"
-            ></v-text-field>
+            />
             <v-text-field
+              v-model="breakLunch.budget"
               class="text-field-rounded width-money"
               label="งบประมาณต่อคน"
               type="number"
-              v-model="breakLunch.budget"
-            ></v-text-field>
+            />
           </div>
 
           <v-checkbox
@@ -67,57 +71,61 @@
           />
           <div class="d-flex flex-wrap">
             <v-select
+              v-model="breakAfternoon.time"
               label="เวลา"
               :items="times"
               class="me-4 text-field-rounded width-time"
               :menu-props="{ maxHeight: 200 }"
-              v-model="breakAfternoon.time"
-            ></v-select>
+            />
             <v-text-field
+              v-model="breakAfternoon.people"
               label="จำนวนคน"
               type="number"
               class="me-4 text-field-rounded width-amount"
-              v-model="breakAfternoon.people"
-            ></v-text-field>
+            />
             <v-text-field
+              v-model="breakAfternoon.budget"
               class="text-field-rounded width-money"
               label="งบประมาณต่อคน"
               type="number"
-              v-model="breakAfternoon.budget"
-            ></v-text-field>
+            />
           </div>
 
           <!-- อาหารกลางวัน -->
-          <h4 class="ms-10 head-more mg-lunch">อาหารกลางวัน</h4>
+          <h4 class="ms-10 head-more mg-lunch">
+            อาหารกลางวัน
+          </h4>
           <div class="d-flex flex-wrap">
             <v-select
+              v-model="lunch.time"
               label="เวลา"
               :items="times"
               class="me-4 text-field-rounded width-time mt-2"
               :menu-props="{ maxHeight: 200 }"
-              v-model="lunch.time"
-            ></v-select>
+            />
             <v-text-field
+              v-model="lunch.people"
               label="จำนวนคน"
               type="number"
               class="me-4 text-field-rounded width-amount mt-2"
-              v-model="lunch.people"
-            ></v-text-field>
+            />
             <v-text-field
+              v-model="lunch.budget"
               class="text-field-rounded width-money mt-2"
               label="งบประมาณต่อคน"
               type="number"
-              v-model="lunch.budget"
-            ></v-text-field>
+            />
           </div>
           <div>
-            <h1 class="head-more ms-10">รายละเอียดเพิ่มเติม</h1>
+            <h1 class="head-more ms-10">
+              รายละเอียดเพิ่มเติม
+            </h1>
             <v-textarea
               label=""
               rows="3"
               outlined
               class="ms-10 text-field-rounded me-7 mt-2"
-            ></v-textarea>
+            />
           </div>
         </div>
       </template>
