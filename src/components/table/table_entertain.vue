@@ -1,14 +1,8 @@
 <template>
   <Header_page />
-  <v-container
-    fluid
-    class="back-ground ms-kob"
-  >
+  <v-container fluid class="back-ground ms-kob">
     <v-container>
-      <v-row
-        justify="center"
-        align="center"
-      >
+      <v-row justify="center" align="center">
         <!-- Dropdown เลือกประเภทห้อง -->
         <v-col
           class="d-flex justify-center"
@@ -25,32 +19,24 @@
         </v-col>
 
         <!-- ช่องสำหรับปุ่มแสดงวันที่ -->
-        <v-col
-          class="d-flex justify-center"
-          cols="auto"
-        >
-          <v-btn
-            class="btn-date"
-            @click="showDatePicker = !showDatePicker"
-          >
+        <v-col class="d-flex justify-center" cols="auto">
+          <v-btn class="btn-date" @click="showDatePicker = !showDatePicker">
             {{
               selectedDate
                 ? new Date(selectedDate).toLocaleDateString("th-TH", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
                 : new Date().toLocaleDateString("th-TH", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
             }}
-            <v-icon class="calendar-icon">
-              mdi-calendar
-            </v-icon>
+            <v-icon class="calendar-icon"> mdi-calendar </v-icon>
           </v-btn>
 
           <v-date-picker
@@ -68,23 +54,15 @@
     <!-- ตารางสำหรับชั้น 6 ห้อง ศึกษากลุ่มมัลติมีเดีย (STV) -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 6 ห้อง ศึกษากลุ่มมัลติมีเดีย (STV)
-      <v-icon class="mb-1 ms-2">
-        mdi-multimedia
-      </v-icon>
+      <v-icon class="mb-1 ms-2"> mdi-multimedia </v-icon>
     </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="font-table">
-              เวลา
-            </th>
-            <th
-              v-for="room in stv"
-              :key="room"
-              class="room-column font-table"
-            >
-              {{ room }}
+            <th class="font-table">เวลา</th>
+            <th v-for="room in stv" :key="room.roomId" class="room-column font-table">
+              {{ room.roomName }}
             </th>
           </tr>
         </thead>
@@ -115,23 +93,15 @@
     <!-- ตารางสำหรับชั้น 6 ห้อง LIBRA OKE -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 6 ห้อง LIBRA OKE
-      <v-icon class="mb-1 ms-2">
-        mdi-microphone-variant
-      </v-icon>
+      <v-icon class="mb-1 ms-2"> mdi-microphone-variant </v-icon>
     </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="time-column font-table">
-              เวลา
-            </th>
-            <th
-              v-for="room in oke"
-              :key="room"
-              class="font-table"
-            >
-              {{ room }}
+            <th class="time-column font-table">เวลา</th>
+            <th v-for="room in oke" :key="room.roomId" class="font-table">
+              {{ room.roomName }}
             </th>
           </tr>
         </thead>
@@ -162,24 +132,16 @@
     <!-- ตารางสำหรับชั้น 6 ห้อง Mini Theater -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 6 ห้อง MINI THEATER
-      <v-icon class="mb-1 ms-2">
-        mdi-theater
-      </v-icon>
+      <v-icon class="mb-1 ms-2"> mdi-theater </v-icon>
     </h1>
 
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="time-column font-table">
-              เวลา
-            </th>
-            <th
-              v-for="room in minitheater"
-              :key="room"
-              class="font-table"
-            >
-              {{ room }}
+            <th class="time-column font-table">เวลา</th>
+            <th v-for="room in minitheater" :key="room.roomId" class="font-table">
+              {{ room.roomName }}
             </th>
           </tr>
         </thead>
@@ -211,34 +173,36 @@
 </template>
 
 <script lang="ts" setup>
+import { useRoomStore } from "@/stores/roomStore";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 const showDatePicker = ref(false);
 const currentDate = ref("");
 const selectedDate = ref<string | null>(null);
 const holidays = ref<string[]>([]);
+const roomStore = useRoomStore();
 const fetchHolidays = async (year: string) => {
   const response = await fetch(
-      `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=2024`,
-      {
-          headers: {
-              "X-IBM-Client-Id": "516eaa15-07e4-428c-b4bf-84def4ea69ab",
-              accept: "application/json",
-          },
-      }
+    `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=2024`,
+    {
+      headers: {
+        "X-IBM-Client-Id": "516eaa15-07e4-428c-b4bf-84def4ea69ab",
+        accept: "application/json",
+      },
+    }
   );
 
   if (response.ok) {
-      const responseData = await response.json();
-      if (responseData.result && Array.isArray(responseData.result.data)) {
-          holidays.value = responseData.result.data.map(
-              (holiday: { Date: string }) => holiday.Date
-          );
-      } else {
-          console.error("Invalid data structure:", responseData);
-      }
+    const responseData = await response.json();
+    if (responseData.result && Array.isArray(responseData.result.data)) {
+      holidays.value = responseData.result.data.map(
+        (holiday: { Date: string }) => holiday.Date
+      );
+    } else {
+      console.error("Invalid data structure:", responseData);
+    }
   } else {
-      console.error("Failed to fetch holidays");
+    console.error("Failed to fetch holidays");
   }
 };
 
@@ -255,17 +219,22 @@ const allowedDates = (date: unknown) => {
   return !isHoliday;
 };
 
-onMounted(() => {
-  const currentYear = new Date().getFullYear().toString();
-  fetchHolidays(currentYear).then(() => {
-      // console.log("Holidays fetched:", holidays.value);
-  });
+onMounted(async () => {
+  try {
+    const currentYear = new Date().getFullYear().toString();
+    await Promise.all([
+      fetchHolidays(currentYear),
+      roomStore.filteredEntertainRooms(),
+    ]);
+  } catch (error) {
+    console.error("Error loading data:", error);
+  }
 });
 
 const getDayClass = (day: { date: Date }) => {
   const date = new Date(day.date);
   const formattedDay = `${date.getFullYear()}-${String(
-      date.getMonth() + 1
+    date.getMonth() + 1
   ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
   const isHoliday = holidays.value.includes(formattedDay);
@@ -283,10 +252,10 @@ const getCurrentDate = () => {
   const date = new Date();
 
   const options: Intl.DateTimeFormatOptions = {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
   };
 
   const formatter = new Intl.DateTimeFormat("th-TH", options);
@@ -328,47 +297,37 @@ const timeSlots = [
 
 const typeroom = [
   {
-      title: "Group Study Room",
-      icon: "mdi-account-group",
-      to: "/table_study",
+    title: "Group Study Room",
+    icon: "mdi-account-group",
+    to: "/table_study",
   },
   {
-      title: "Entertain Room",
-      icon: "mdi-movie-roll",
-      link: "/table_entertain",
+    title: "Entertain Room",
+    icon: "mdi-movie-roll",
+    link: "/table_entertain",
   },
   {
-      title: "Meeting Room",
-      icon: "mdi-laptop-account",
-      link: "/table_meeting",
+    title: "Meeting Room",
+    icon: "mdi-laptop-account",
+    link: "/table_meeting",
   },
 ];
 
-const stv = [
-  "STV 1",
-  "STV 2",
-  "STV 3",
-  "STV 4",
-  "STV 5",
-  "STV 6",
-  "STV 7",
-  "STV 8",
-  "STV 9",
-];
-const oke = ["LIBRA OKE 1", "LIBRA OKE 2"];
-const minitheater = ["MINI THEATER"];
+const stv = roomStore.stvRooms;
+const oke = roomStore.okeRooms;
+const minitheater = roomStore.miniTheater;
 
 const onSelectChange = (value: string) => {
   console.log("Selected value:", value);
   if (value === "Group Study Room") {
-      console.log("Navigating to HelloWorld");
-      router.push("/table_study");
+    console.log("Navigating to HelloWorld");
+    router.push("/table_study");
   } else if (value === "Entertain Room") {
-      console.log("Navigating to page2");
-      router.push("/table_entertain");
+    console.log("Navigating to page2");
+    router.push("/table_entertain");
   } else if (value === "Meeting Room") {
-      console.log("Navigating to page2");
-      router.push("/table_meeting");
+    console.log("Navigating to page2");
+    router.push("/table_meeting");
   }
 };
 
@@ -376,26 +335,34 @@ const goToFormStudy = () => {
   router.push("/booking_study");
 };
 
-const generateBookingLink = (roomIndex: number, time: string, floor: number, roomType: 'stv' | 'oke' | 'minitheater') => {
-  let roomName = '';
+const generateBookingLink = (
+  roomIndex: number,
+  time: string,
+  floor: number,
+  roomType: "stv" | "oke" | "minitheater"
+) => {
+  let roomName = "";
 
   // เลือกชื่อห้องตามประเภท
   switch (roomType) {
-      case 'stv':
-          roomName = stv[roomIndex];
-          break;
-      case 'oke':
-          roomName = oke[roomIndex];
-          break;
-      case 'minitheater':
-          roomName = minitheater[roomIndex];
-          break;
+    case "stv":
+      roomName = stv[roomIndex];
+      break;
+    case "oke":
+      roomName = oke[roomIndex];
+      break;
+    case "minitheater":
+      roomName = minitheater[roomIndex];
+      break;
   }
 
   // เพิ่ม encodeURIComponent และปรับปรุง query parameters
-  return `/booking_study?floor=${floor}&roomName=${encodeURIComponent(roomName)}&time=${time}`;
+  return `/booking_study?floor=${floor}&roomName=${encodeURIComponent(
+    roomName
+  )}&time=${time}`;
 };
-</script>-
+</script>
+-
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
@@ -451,7 +418,6 @@ const generateBookingLink = (roomIndex: number, time: string, floor: number, roo
 .room9-column {
   width: calc(100% / 9);
 }
-
 
 .table-bordered td {
   height: 20px;

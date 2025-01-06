@@ -383,7 +383,7 @@ const allowedDates = (date: unknown) => {
 onMounted(async () => {
   try {
     const currentYear = new Date().getFullYear().toString();
-    await Promise.all([fetchHolidays(currentYear), roomStore.filteredRooms()]);
+    await Promise.all([fetchHolidays(currentYear), roomStore.filteredMeetingRooms()]);
   } catch (error) {
     console.error("Error loading data:", error);
   }

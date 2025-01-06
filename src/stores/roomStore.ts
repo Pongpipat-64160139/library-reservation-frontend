@@ -5,9 +5,6 @@ import { GetRoomType } from "../types/getRoomType";
 
 export const useRoomStore = defineStore("room", () => {
   const roomservice = roomService;
-  const meetingRoom = ref<GetRoomType[]>([]);
-  const entertainRoom = ref<GetRoomType[]>([]);
-
   const groupStudyRooms = ref<GetRoomType[]>([]);
   const studyFloor3 = ref<GetRoomType[]>([]);
   const studyFloor4 = ref<GetRoomType[]>([]);
@@ -19,7 +16,10 @@ export const useRoomStore = defineStore("room", () => {
   const miniStudioRoom = ref<GetRoomType[]>([]);
   const liveForLifeRoom = ref<GetRoomType[]>([]);
   const meetingRoomFloor7 = ref<GetRoomType[]>([]);
-  async function filteredRooms() {
+  const okeRooms = ref<GetRoomType[]>([]);
+  const stvRooms = ref<GetRoomType[]>([]);
+  const miniTheater = ref<GetRoomType[]>([]);
+  async function filteredMeetingRooms() {
     // ดึงข้อมูลจาก Service
     const response = await roomservice.getRoomTypes("Meeting");
 
@@ -51,7 +51,6 @@ export const useRoomStore = defineStore("room", () => {
       (room: { roomName: string }) =>
         room.roomName === "ห้อง 706" || room.roomName === "ห้อง 707"
     );
-    
 
     console.log("Filtered Rooms:", cyberZoneRooms.value);
     console.log("Filtered Rooms:", room201.value);
@@ -82,23 +81,40 @@ export const useRoomStore = defineStore("room", () => {
     );
     return { studyFloor3, studyFloor4, studyFloor5 };
   }
-
+  async function filteredEntertainRooms() {
+    const response = await roomservice.getRoomTypes("Entertain");
+    const rooms = response.data;
+    okeRooms.value = rooms.filter((room: { roomName: string | string[] }) =>
+      room.roomName.includes("คาราโอเกะ")
+    );
+    stvRooms.value = rooms.filter((room: { roomName: string | string[] }) =>
+      room.roomName.includes("Room STV")
+    );
+    miniTheater.value = rooms.filter((room: { roomName: string | string[] }) =>
+      room.roomName.includes("Mimi theater")
+    );
+    console.log("Filtered Rooms:", okeRooms.value);
+    console.log("Filtered Rooms:", stvRooms.value);
+    console.log("Filtered Rooms:", miniTheater.value);
+  }
   return {
     getAllRooms,
     groupStudyRooms,
-    meetingRoom,
-    entertainRoom,
     getRoomGroupStudy,
     studyFloor3,
     studyFloor4,
     studyFloor5,
     cyberZoneRooms,
-    filteredRooms,
+    filteredMeetingRooms,
     room201,
     lectureRooms,
     smartRooms,
     miniStudioRoom,
     liveForLifeRoom,
     meetingRoomFloor7,
+    filteredEntertainRooms,
+    okeRooms,
+    stvRooms,
+    miniTheater,
   };
 });
