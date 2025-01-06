@@ -1,8 +1,5 @@
 <template class="back-ground">
-  <v-container
-    fluid
-    class="back-ground ms-kob"
-  >
+  <v-container fluid class="back-ground ms-kob">
     <!-- Sheet1 จองห้อง -->
     <v-sheet
       class="mx-auto mt-1"
@@ -10,9 +7,7 @@
       max-width="700"
       style="background-color: #dfd3c3; border-radius: 16px"
     >
-      <h1 class="pt-5 head-title text-center pb-5">
-        จองห้อง
-      </h1>
+      <h1 class="pt-5 head-title text-center pb-5">จองห้อง</h1>
 
       <!-- span1 -->
       <span class="d-flex">
@@ -48,17 +43,17 @@
               :value="
                 startDate
                   ? new Date(startDate).toLocaleDateString('th-TH', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
                   : new Date().toLocaleDateString('th-TH', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
               "
               readonly
             />
@@ -101,17 +96,17 @@
               :value="
                 endDate
                   ? new Date(endDate).toLocaleDateString('th-TH', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
                   : new Date().toLocaleDateString('th-TH', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
               "
               readonly
               :disabled="true"
@@ -180,17 +175,17 @@
               :value="
                 endRepeatDate
                   ? new Date(endRepeatDate).toLocaleDateString('th-TH', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
                   : new Date().toLocaleDateString('th-TH', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
               "
               readonly
               :disabled="repeatOption === 'ไม่'"
@@ -220,14 +215,8 @@
           class="width-detail text-field-rounded"
         />
       </span>
-      <v-btn
-        to="/table_study"
-        type="submit"
-        class="save-btn custom-btn"
-      >
-        <v-icon left>
-          mdi-content-save
-        </v-icon>
+      <v-btn to="/table_study" type="submit" class="save-btn custom-btn">
+        <v-icon left> mdi-content-save </v-icon>
         จองห้อง
       </v-btn>
     </v-sheet>
@@ -237,6 +226,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import { useRoomStore } from "@/stores/roomStore";
 
 const numPeople = ref("");
 const phoneNumber = ref("");
@@ -282,57 +272,66 @@ const timeOptions = ref([
 export default defineComponent({
   setup() {
     const route = useRoute();
+    const roomStore = useRoomStore();
 
-    // ดึงค่าจาก query string
+    const roomType = ref(
+      (route.query.roomType as string) || "Group Study Room"
+    );
     const floor = ref(parseInt((route.query.floor as string) || "3"));
     const roomName = ref(
-      decodeURIComponent(route.query.roomName as string) || "ศึกษากลุ่ม 1"
+      decodeURIComponent(route.query.roomName as string) || ""
     );
     const startTime = ref(route.query.time || "08:00");
 
-    const floorRooms = {
-      3: [
-        "ศึกษากลุ่ม 1",
-        "ศึกษากลุ่ม 2",
-        "ศึกษากลุ่ม 3",
-        "ศึกษากลุ่ม 4",
-        "ศึกษากลุ่ม 5",
-        "ศึกษากลุ่ม 6",
-      ],
-      4: [
-        "ศึกษากลุ่ม 1",
-        "ศึกษากลุ่ม 2",
-        "ศึกษากลุ่ม 3",
-        "ศึกษากลุ่ม 4",
-        "ศึกษากลุ่ม 5",
-      ],
-      5: [
-        "ศึกษากลุ่ม 1",
-        "ศึกษากลุ่ม 2",
-        "ศึกษากลุ่ม 3",
-        "ศึกษากลุ่ม 4",
-        "ศึกษากลุ่ม 5",
-      ],
-    };
-
-    // computed property สำหรับห้องที่มีในแต่ละชั้น
+    // กำหนดห้องตามชั้น
     const availableRooms = computed(() => {
-      return floorRooms[floor.value as keyof typeof floorRooms] || [];
+      if (roomType.value === "Group Study Room") {
+        if (floor.value === 3)
+          return roomStore.studyFloor3.map((r) => r.roomName);
+        if (floor.value === 4)
+          return roomStore.studyFloor4.map((r) => r.roomName);
+        if (floor.value === 5)
+          return roomStore.studyFloor5.map((r) => r.roomName);
+      } else if (roomType.value === "Entertain Room") {
+        // รวมทุกประเภทของ Entertain Room
+        return [
+          ...roomStore.okeRooms.map((r) => r.roomName),
+          ...roomStore.stvRooms.map((r) => r.roomName),
+          ...roomStore.miniTheater.map((r) => r.roomName),
+        ];
+      }
+      return [];
     });
 
-    // watch การเปลี่ยนแปลงของ floor
-    watch(floor, (newFloor) => {
-      const rooms = floorRooms[newFloor as keyof typeof floorRooms] || [];
-      // เมื่อเปลี่ยนชั้น ให้เลือกห้องแรกของชั้นนั้นโดยอัตโนมัติ
-      roomName.value = rooms[0] || "";
+    watch(floor, () => {
+  roomName.value = availableRooms.value[0] || ""; // อัปเดตห้องแรกที่สามารถเลือกได้
+});
+
+
+    onMounted(async () => {
+      console.log("Room Type:", roomType.value);
+      console.log("Room Name:", roomName.value);
+      console.log("Floor:", floor.value);
+      console.log("Start Time:", startTime.value);
+
+      if (roomType.value === "Group Study Room") {
+        await roomStore.getRoomGroupStudy();
+      } else if (["stv", "oke", "minitheater"].includes(roomType.value)) {
+        await roomStore.filteredEntertainRooms();
+      }
+
+      // ตั้งค่า roomName ให้แสดงห้องแรกใน availableRooms (ถ้าไม่มีค่าจาก URL)
+      if (!roomName.value) {
+        roomName.value = availableRooms.value[0] || "";
+      }
     });
 
     return {
       floor,
       roomName,
       startTime,
+      roomType,
       availableRooms,
-      floorRooms,
     };
   },
   data() {
@@ -392,11 +391,11 @@ export default defineComponent({
 
   watch: {
     startTime(newStartTime) {
-    console.log('Start Time:', newStartTime); // สำหรับการดีบัก
-    const availableTimes = this.filteredEndTimes();
-    console.log('Available End Times:', availableTimes); // ตรวจสอบรายการที่กรองแล้ว
-    this.endTime = availableTimes.length > 0 ? availableTimes[0] : ""; // ตั้งค่า endTime เป็นค่าแรก
-  },
+      console.log("Start Time:", newStartTime); // สำหรับการดีบัก
+      const availableTimes = this.filteredEndTimes();
+      console.log("Available End Times:", availableTimes); // ตรวจสอบรายการที่กรองแล้ว
+      this.endTime = availableTimes.length > 0 ? availableTimes[0] : ""; // ตั้งค่า endTime เป็นค่าแรก
+    },
     floor(newFloor: keyof typeof this.floorRooms) {
       const firstRoom = this.floorRooms[newFloor]
         ? this.floorRooms[newFloor][0]
@@ -407,8 +406,8 @@ export default defineComponent({
 
   async mounted() {
     console.log("Initial startTime:", this.startTime);
-  const availableTimes = this.filteredEndTimes();
-  this.endTime = availableTimes.length > 0 ? availableTimes[0] : "";
+    const availableTimes = this.filteredEndTimes();
+    this.endTime = availableTimes.length > 0 ? availableTimes[0] : "";
 
     if (this.startTime === "20:00") {
       this.startTime = "19:30";
@@ -469,27 +468,26 @@ export default defineComponent({
         return ["16:30", "17:00", "17:30", "18:00"];
       }
       if (this.startTime === "16:30") {
-          return ["17:00", "17:30", "18:00", "18:30"];
+        return ["17:00", "17:30", "18:00", "18:30"];
       }
       if (this.startTime === "17:00") {
-          return ["17:30", "18:00", "18:30", "19:00"];
+        return ["17:30", "18:00", "18:30", "19:00"];
       }
       if (this.startTime === "17:30") {
-          return ["18:00", "18:30", "19:00", "19:30"];
+        return ["18:00", "18:30", "19:00", "19:30"];
       }
       if (this.startTime === "18:00") {
-          return ["18:30", "19:00", "19:30", "20:00"];
+        return ["18:30", "19:00", "19:30", "20:00"];
       }
       if (this.startTime === "18:30") {
-          return ["19:00", "19:30", "20:00"];
+        return ["19:00", "19:30", "20:00"];
       }
       if (this.startTime === "19:00") {
-          return ["19:30", "20:00"];
+        return ["19:30", "20:00"];
       }
       if (this.startTime === "19:30") {
-          return ["20:00"];
+        return ["20:00"];
       }
-      
 
       return []; // ถ้า startTime ไม่มีใน timeOptions
     },
@@ -551,7 +549,6 @@ export default defineComponent({
       }
     },
   },
-  
 });
 
 const showDatePicker = ref(false);
@@ -571,8 +568,6 @@ const allowedDates = (date: unknown) => {
 
   return !isHoliday;
 };
-
-
 
 const getCurrentDate = () => {
   const date = new Date();

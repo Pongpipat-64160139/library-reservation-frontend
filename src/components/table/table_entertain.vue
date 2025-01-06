@@ -87,7 +87,7 @@
               <a
                 :href="generateBookingLink(roomIndex, time, 6, 'stv')"
                 class="table-link"
-              />
+              ></a>
             </td>
           </tr>
         </tbody>
@@ -123,10 +123,10 @@
               :key="roomIndex"
               class="room2-column"
             >
-              <a
-                :href="generateBookingLink(roomIndex, time, 6, 'oke')"
-                class="table-link"
-              />
+            <a
+    :href="generateBookingLink(roomIndex, time, 6, 'oke')"
+    class="table-link"
+  ></a>
             </td>
           </tr>
         </tbody>
@@ -167,10 +167,10 @@
               :key="roomIndex"
               class="room1-column"
             >
-              <a
-                :href="generateBookingLink(roomIndex, time, 6, 'minitheater')"
-                class="table-link"
-              />
+            <a
+    :href="generateBookingLink(roomIndex, time, 6, 'minitheater')"
+    class="table-link"
+  ></a>
             </td>
           </tr>
         </tbody>
@@ -347,27 +347,31 @@ const generateBookingLink = (
   roomIndex: number,
   time: string,
   floor: number,
-  roomType: "stv" | "oke" | "minitheater"
+  roomType: string
 ) => {
   let roomName = "";
 
-  // เลือกชื่อห้องตามประเภท
-  switch (roomType) {
-    case "stv":
-      roomName = stv[roomIndex];
-      break;
-    case "oke":
-      roomName = oke[roomIndex];
-      break;
-    case "minitheater":
-      roomName = minitheater[roomIndex];
-      break;
+  const rooms =
+    roomType === "stv"
+      ? stv.value
+      : roomType === "oke"
+      ? oke.value
+      : roomType === "minitheater"
+      ? minitheater.value
+      : [];
+
+  if (rooms[roomIndex]?.roomName) {
+    roomName = rooms[roomIndex].roomName;
+  } else {
+    console.error(
+      `Invalid room data for roomType=${roomType}, index=${roomIndex}`
+    );
+    roomName = "Unknown Room";
   }
 
-  // เพิ่ม encodeURIComponent และปรับปรุง query parameters
-  return `/booking_study?floor=${floor}&roomName=${encodeURIComponent(
+  return `/form_study?floor=${floor}&roomName=${encodeURIComponent(
     roomName
-  )}&time=${time}`;
+  )}&time=${time}&roomType=${roomType}`;
 };
 </script>
 -
