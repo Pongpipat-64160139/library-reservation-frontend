@@ -1,19 +1,9 @@
 <template>
   <Header_page />
-  <v-container
-    fluid
-    class="back-ground ms-kob"
-  >
+  <v-container fluid class="back-ground ms-kob">
     <!-- Breadcrumbs -->
-    <v-breadcrumbs
-      :items="items"
-      divider=">"
-      class="head-title mg-table"
-    >
-      <template
-        #item="{ item }"
-        class="head-title"
-      >
+    <v-breadcrumbs :items="items" divider=">" class="head-title mg-table">
+      <template #item="{ item }" class="head-title">
         <!-- ลิงก์ที่สามารถคลิกได้ -->
         <router-link
           v-if="!item.disabled && item.href"
@@ -24,20 +14,14 @@
         </router-link>
 
         <!-- ลิงก์ที่ไม่สามารถคลิกได้ -->
-        <span
-          v-else
-          class="breadcrumb-disabled head-title"
-        >
+        <span v-else class="breadcrumb-disabled head-title">
           {{ item.title }}
         </span>
       </template>
     </v-breadcrumbs>
 
     <!-- Tabs for Floors -->
-    <v-tabs
-      v-model="selectedFloor"
-      background-color="#cdbba7"
-    >
+    <v-tabs v-model="selectedFloor" background-color="#cdbba7">
       <v-tab
         v-for="floor in [2, 3, 4, 5, 6, 7]"
         :key="floor"
@@ -105,11 +89,7 @@
     </v-data-table>
   </v-container>
 
-  <v-dialog
-    v-model="dialog"
-    max-width="550px"
-    max-height="600px"
-  >
+  <v-dialog v-model="dialog" max-width="620px" max-height="600px">
     <v-card class="rd-dialog">
       <span class="head-detailuser">
         <div class="head-detail">
@@ -125,14 +105,23 @@
 
       <span class="d-flex head-detaildate1">
         <v-row>
-          <v-col cols="5">
+          <v-col cols="6">
             <div class="head-detail">
               <strong>วันที่เริ่ม</strong> {{ selectedItem?.date }}
             </div>
           </v-col>
           <v-col>
-            <div class="head-detail ms-10">
-              <strong>เวลา</strong> {{ selectedItem?.time }}
+            <div class="head-detail wth-btnedittime d-flex ms-10">
+              <strong class="me-1">เวลาเริ่ม</strong>
+              <v-select
+                v-if="editMode"
+                v-model="editedStartTime"
+                :items="startTimeOptions"
+                variant="outlined"
+                density="compact"
+                class="time-select"
+              />
+              <span v-else>{{ selectedItem?.startTime }}</span>
             </div>
           </v-col>
         </v-row>
@@ -140,20 +129,32 @@
 
       <span class="d-flex head-detaildate2">
         <v-row>
-          <v-col cols="5">
+          <v-col cols="6">
             <div class="head-detail">
               <strong>วันที่จบ</strong> {{ selectedItem?.date }}
             </div>
           </v-col>
           <v-col>
-            <div class="head-detail ms-10"><strong>เวลา</strong> 08.30</div>
+            <div class="head-detail d-flex wth-btnedittime ms-10">
+              <strong class="me-1">เวลาจบ</strong>
+              <v-select
+                v-if="editMode"
+                v-model="editedEndTime"
+                :items="endTimeOptions"
+                density="compact"
+                variant="outlined"
+                class="time-select"
+
+              />
+              <span v-else>{{ selectedItem?.endTime }}</span>
+            </div>
           </v-col>
         </v-row>
       </span>
 
       <span class="d-flex head-detailfloor">
         <v-row>
-          <v-col cols="5">
+          <v-col cols="6">
             <div class="head-detail wth-btnedit">
               <strong class="me-1">ชั้น</strong>
               <v-select
@@ -185,7 +186,7 @@
 
       <span class="d-flex head-detailrepeat">
         <v-row>
-          <v-col cols="5">
+          <v-col cols="6">
             <div class="head-detail"><strong>ทำซ้ำ</strong> ไม่</div>
           </v-col>
           <v-col>
@@ -202,10 +203,20 @@
         </div>
       </span>
 
+      <span
+        v-if="selectedItem?.status === 'ยกเลิก'"
+        class="d-flex head-detail ms-6"
+      >
+        <div class="head-detail">
+          <strong>เหตุผลการยกเลิก</strong>
+          {{ selectedItem?.cancelReason || "ยกเลิกการจอง" }}
+        </div>
+      </span>
+
       <v-card-text />
       <v-card-actions class="d-flex justify-center mb-8">
         <v-btn
-          class="rd-btncancel"
+          class="rd-btncanceldia"
           :style="{
             backgroundColor: editMode ? '#ea8a8a' : '#dad0c2',
             color: '#493628',
@@ -229,42 +240,33 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog
-    v-model="statusChangeDialog"
-    max-width="500px"
-  >
+  <v-dialog v-model="statusChangeDialog" max-width="500px">
     <v-card>
       <v-card-text>
-        <div class="text-center">
-          คุณต้องการเปลี่ยนสถานะเป็น "{{ newStatus }}" ใช่หรือไม่ ?
+        <div class="text-center mt-5">
+          ต้องการเปลี่ยนสถานะเป็น "{{ newStatus }}" ใช่หรือไม่ ?
         </div>
 
         <v-text-field
           v-if="newStatus === 'ยกเลิก'"
           v-model="cancelReason"
-          label="กรุณากรอกเหตุผลในการยกเลิก"
+          label="กรอกเหตุผลในการยกเลิก"
           variant="outlined"
           :rules="[(v) => !!v || 'กรุณากรอกเหตุผล']"
-          class="mt-4"
+          class="mt-5"
         />
       </v-card-text>
-      <v-card-actions>
-        <v-card-actions class="d-flex justify-center mb-3">
-          <v-btn
-            class="rd-btncancel"
-            text
-            @click="clearCancelReason"
-          >
-            ยกเลิก
-          </v-btn>
-          <v-btn
-            class="rd-btnconfirm"
-            :disabled="newStatus === 'ยกเลิก' && !cancelReason"
-            @click="confirmStatusChange"
-          >
-            ยืนยัน
-          </v-btn>
-        </v-card-actions>
+      <v-card-actions class="d-flex justify-center mt-2">
+        <v-btn class="rd-btncancel" text @click="clearCancelReason">
+          ยกเลิก
+        </v-btn>
+        <v-btn
+          class="rd-btnconfirm"
+          :disabled="newStatus === 'ยกเลิก' && !cancelReason"
+          @click="confirmStatusChange"
+        >
+          ยืนยัน
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -310,9 +312,44 @@ const getDetailMessage = (status: string, currentItem: any) => {
   } else if (status === "อนุมัติ") {
     return "กำลังใช้งาน";
   } else if (status === "ยกเลิก") {
-    return currentItem.cancelReason || "ยกเลิกการจอง";
+    return "ยกเลิกการจอง";
   }
+
   return "-";
+};
+
+const formatThaiDate = (dateString) => {
+  const dateObj = new Date(dateString);
+  const days = [
+    "อาทิตย์",
+    "จันทร์",
+    "อังคาร",
+    "พุธ",
+    "พฤหัสบดี",
+    "ศุกร์",
+    "เสาร์",
+  ];
+  const months = [
+    "มกราคม",
+    "กุมภาพันธ์",
+    "มีนาคม",
+    "เมษายน",
+    "พฤษภาคม",
+    "มิถุนายน",
+    "กรกฎาคม",
+    "สิงหาคม",
+    "กันยายน",
+    "ตุลาคม",
+    "พฤศจิกายน",
+    "ธันวาคม",
+  ];
+
+  const day = days[dateObj.getDay()];
+  const date = dateObj.getDate();
+  const month = months[dateObj.getMonth()];
+  const year = dateObj.getFullYear() + 543; // แปลงเป็น พ.ศ.
+
+  return `${day} ${date} ${month} ${year}`;
 };
 
 const data = ref([
@@ -322,8 +359,9 @@ const data = ref([
     name: "นวพรรษ สีหาบุตร",
     floor: 3,
     room: "ศึกษากลุ่ม 1",
-    date: formatDate("2024-12-17"),
-    time: "08:00-10:00",
+    date: formatThaiDate("2024-12-17"),
+    startTime: "08:00",
+    endTime: "10:00",
     status: "รอ",
     cancelReason: "",
   },
@@ -333,8 +371,9 @@ const data = ref([
     name: "สมคิด ธรรมวงศ์",
     floor: 4,
     room: "ศึกษากลุ่ม 2",
-    date: formatDate("2024-12-12"),
-    time: "09:00-11:00",
+    date: formatThaiDate("2024-12-12"),
+    startTime: "08:00",
+    endTime: "10:00",
     status: "อนุมัติ",
     cancelReason: "",
   },
@@ -344,8 +383,9 @@ const data = ref([
     name: "กนกพร พันธ์นุช",
     floor: 5,
     room: "ศึกษากลุ่ม 3",
-    date: formatDate("2024-12-13"),
-    time: "10:00-12:00",
+    date: formatThaiDate("2024-12-13"),
+    startTime: "08:00",
+    endTime: "10:00",
     status: "ยกเลิก",
     cancelReason: "",
   },
@@ -355,8 +395,9 @@ const data = ref([
     name: "พรพรรณ ศรีธนู",
     floor: 3,
     room: "ศึกษากลุ่ม 4",
-    date: formatDate("2024-12-17"),
-    time: "11:00-13:00",
+    date: formatThaiDate("2024-12-17"),
+    startTime: "08:00",
+    endTime: "10:00",
     status: "รอ",
     cancelReason: "",
   },
@@ -366,8 +407,9 @@ const data = ref([
     name: "ณัฐวุฒิ ประเสริฐศักดิ์",
     floor: 6,
     room: "STV 1",
-    date: formatDate("2024-12-15"),
-    time: "12:00-14:00",
+    date: formatThaiDate("2024-12-15"),
+    startTime: "08:00",
+    endTime: "10:00",
     status: "อนุมัติ",
     cancelReason: "",
   },
@@ -377,8 +419,9 @@ const data = ref([
     name: "อรอุมา คงสมบูรณ์",
     floor: 4,
     room: "ศึกษากลุ่ม 3",
-    date: formatDate("2024-12-17"),
-    time: "13:00-15:00",
+    date: formatThaiDate("2024-12-17"),
+    startTime: "08:00",
+    endTime: "10:00",
     status: "รอ",
     cancelReason: "",
   },
@@ -388,8 +431,9 @@ const data = ref([
     name: "ธนชัย ศรีวิวัฒน์",
     floor: 5,
     room: "ศึกษากลุ่ม 1",
-    date: formatDate("2024-12-17"),
-    time: "14:00-16:00",
+    date: formatThaiDate("2024-12-17"),
+    startTime: "08:00",
+    endTime: "10:00",
     status: "ยกเลิก",
     cancelReason: "",
   },
@@ -399,8 +443,9 @@ const data = ref([
     name: "ภัทรา สุขสว่าง",
     floor: 3,
     room: "ศึกษากลุ่ม 4",
-    date: formatDate("2024-12-18"),
-    time: "15:00-17:00",
+    date: formatThaiDate("2024-12-18"),
+    startTime: "08:00",
+    endTime: "10:00",
     status: "อนุมัติ",
     cancelReason: "",
   },
@@ -410,8 +455,9 @@ const data = ref([
     name: "วรัญญา สร้างเจริญ",
     floor: 6,
     room: "LIBRA OKE I",
-    date: formatDate("2024-12-17"),
-    time: "16:00-18:00",
+    date: formatThaiDate("2024-12-17"),
+    startTime: "08:00",
+    endTime: "10:00",
     status: "รอ",
     cancelReason: "",
   },
@@ -421,8 +467,9 @@ const data = ref([
     name: "สุทธิชัย วัฒนากร",
     floor: 6,
     room: "Mini Studio",
-    date: formatDate("2024-12-20"),
-    time: "08:00-16:00",
+    date: formatThaiDate("2024-12-20"),
+    startTime: "08:00",
+    endTime: "10:00",
     status: "อนุมัติ",
     cancelReason: "",
   },
@@ -499,6 +546,62 @@ const confirmStatusChange = () => {
 
 const editedFloor = ref<number>(0);
 const editedRoom = ref("");
+const editedStartTime = ref("");
+const editedEndTime = ref("");
+
+const startTimeOptions = ref([
+  "08:00",
+  "08:30",
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11:30",
+  "12:00",
+  "12:30",
+  "13:00",
+  "13:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+  "16:00",
+  "16:30",
+  "17:00",
+  "17:30",
+  "18:00",
+  "18:30",
+  "19:00",
+  "19:30",
+]);
+
+const endTimeOptions = ref([
+  "08:30",
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11:30",
+  "12:00",
+  "12:30",
+  "13:00",
+  "13:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+  "16:00",
+  "16:30",
+  "17:00",
+  "17:30",
+  "18:00",
+  "18:30",
+  "19:00",
+  "19:30",
+  "20:00",
+]);
 
 const availableRooms = computed(() => {
   return floorRooms[editedFloor.value as keyof typeof floorRooms] || [];
@@ -516,6 +619,8 @@ const showDialog = (item: any) => {
   selectedItem.value = { ...item };
   editedFloor.value = item.floor;
   editedRoom.value = item.room;
+  editedStartTime.value = item.startTime; // เวลาเริ่ม
+  editedEndTime.value = item.endTime; // เวลาจบ
   dialog.value = true;
   editMode.value = false;
 };
@@ -576,8 +681,18 @@ const floorRooms = {
 
 const toggleEditMode = () => {
   if (editMode.value) {
-    selectedItem.value.floor = editedFloor.value;
-    selectedItem.value.room = editedRoom.value;
+    // ตรวจสอบความถูกต้องของเวลา
+    const startIndex = startTimeOptions.value.indexOf(editedStartTime.value);
+    const endIndex = endTimeOptions.value.indexOf(editedEndTime.value);
+
+    if (startIndex >= endIndex) {
+      alert("เวลาเริ่มต้องน้อยกว่าเวลาจบ");
+      return;
+    }
+
+    // บันทึกการแก้ไข
+    selectedItem.value.startTime = editedStartTime.value;
+    selectedItem.value.endTime = editedEndTime.value;
     editMode.value = false;
   } else {
     editMode.value = true;
@@ -722,6 +837,14 @@ th {
   width: 200px;
 }
 
+.wth-btnedittime {
+  width: 170px;
+}
+
+.time-select {
+  margin-top: -5px;
+}
+
 .back-ground {
   background-color: #f9f3ea;
 }
@@ -752,6 +875,18 @@ th {
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
   margin-right: 30px;
+  margin-top: -40px;
+}
+
+.rd-btncanceldia {
+  font-weight: 400;
+  font-size: 16px;
+  color: #493628;
+  background-color: #dad0c2;
+  width: 100px;
+  border-radius: 10px;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+  margin-right: 30px;
 }
 
 .rd-btnconfirm {
@@ -761,6 +896,7 @@ th {
   background-color: #b5cfb7;
   width: 100px;
   border-radius: 10px;
+  margin-top: -40px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
 }
 
