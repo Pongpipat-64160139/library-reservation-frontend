@@ -1,14 +1,8 @@
 <template>
   <Header_page />
-  <v-container
-    fluid
-    class="back-ground ms-kob"
-  >
+  <v-container fluid class="back-ground ms-kob">
     <v-container>
-      <v-row
-        justify="center"
-        align="center"
-      >
+      <v-row justify="center" align="center">
         <!-- Dropdown เลือกประเภทห้อง -->
         <v-col
           class="d-flex justify-center"
@@ -25,32 +19,24 @@
         </v-col>
 
         <!-- ช่องสำหรับปุ่มแสดงวันที่ -->
-        <v-col
-          class="d-flex justify-center"
-          cols="auto"
-        >
-          <v-btn
-            class="btn-date"
-            @click="showDatePicker = !showDatePicker"
-          >
+        <v-col class="d-flex justify-center" cols="auto">
+          <v-btn class="btn-date" @click="showDatePicker = !showDatePicker">
             {{
               selectedDate
                 ? new Date(selectedDate).toLocaleDateString("th-TH", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
                 : new Date().toLocaleDateString("th-TH", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
             }}
-            <v-icon class="calendar-icon">
-              mdi-calendar
-            </v-icon>
+            <v-icon class="calendar-icon"> mdi-calendar </v-icon>
           </v-btn>
 
           <v-date-picker
@@ -68,23 +54,19 @@
     <!-- ตารางสำหรับชั้น 2 ห้อง 201 -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 2 ห้อง 201
-      <v-icon class="mb-1 ms-2">
-        mdi-lectern
-      </v-icon>
+      <v-icon class="mb-1 ms-2"> mdi-lectern </v-icon>
     </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="font-table">
-              เวลา
-            </th>
+            <th class="font-table">เวลา</th>
             <th
-              v-for="room in twozo"
-              :key="room"
+              v-for="(room,index) in twozo"
+              :key="room.roomId"
               class="room-column font-table"
             >
-              {{ room }}
+              {{ room.roomName }}
             </th>
           </tr>
         </thead>
@@ -116,23 +98,15 @@
     <!-- ตารางสำหรับชั้น 5 ห้อง Lecturer's Room -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 5 ห้อง Lecturer's Room
-      <v-icon class="mb-1 ms-2">
-        mdi-chair-school
-      </v-icon>
+      <v-icon class="mb-1 ms-2"> mdi-chair-school </v-icon>
     </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="time-column font-table">
-              เวลา
-            </th>
-            <th
-              v-for="room in lecture"
-              :key="room"
-              class="font-table"
-            >
-              {{ room }}
+            <th class="time-column font-table">เวลา</th>
+            <th v-for="room in lecture" :key="room.roomId" class="font-table">
+              {{ room.roomName }}
             </th>
           </tr>
         </thead>
@@ -164,23 +138,15 @@
     <!-- ตารางสำหรับชั้น 6 ห้อง 604 Smart Board -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 6 ห้อง 604 Smart Board
-      <v-icon class="mb-1 ms-2">
-        mdi-human-male-board-poll
-      </v-icon>
+      <v-icon class="mb-1 ms-2"> mdi-human-male-board-poll </v-icon>
     </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="time-column font-table">
-              เวลา
-            </th>
-            <th
-              v-for="room in smartboard"
-              :key="room"
-              class="font-table"
-            >
-              {{ room }}
+            <th class="time-column font-table">เวลา</th>
+            <th v-for="room in smartboard" :key="room.roomId" class="font-table">
+              {{ room.roomName }}
             </th>
           </tr>
         </thead>
@@ -211,23 +177,15 @@
     <!-- ตารางสำหรับชั้น 6 ห้อง Mini Studio -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 6 ห้อง Mini Studio
-      <v-icon class="mb-1 ms-2">
-        mdi-monitor-account
-      </v-icon>
+      <v-icon class="mb-1 ms-2"> mdi-monitor-account </v-icon>
     </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="time-column font-table">
-              เวลา
-            </th>
-            <th
-              v-for="room in ministudio"
-              :key="room"
-              class="font-table"
-            >
-              {{ room }}
+            <th class="time-column font-table">เวลา</th>
+            <th v-for="room in ministudio" :key="room.roomId" class="font-table">
+              {{ room.roomName }}
             </th>
           </tr>
         </thead>
@@ -258,23 +216,15 @@
     <!-- ตารางสำหรับชั้น 6 ห้อง Cyber Zone -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 6 ห้อง Cyber Zone
-      <v-icon class="mb-1 ms-2">
-        mdi-desktop-tower-monitor
-      </v-icon>
+      <v-icon class="mb-1 ms-2"> mdi-desktop-tower-monitor </v-icon>
     </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="time-column font-table">
-              เวลา
-            </th>
-            <th
-              v-for="room in cyberzone"
-              :key="room"
-              class="font-table"
-            >
-              {{ room }}
+            <th class="time-column font-table">เวลา</th>
+            <th v-for="room in cyberzone" :key="room.roomId" class="font-table">
+              {{ room.roomName }}
             </th>
           </tr>
         </thead>
@@ -305,23 +255,15 @@
     <!-- ตารางสำหรับชั้น 6 ห้อง Live for Life -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 6 ห้อง Live for Life
-      <v-icon class="mb-1 ms-2">
-        mdi-monitor-account
-      </v-icon>
+      <v-icon class="mb-1 ms-2"> mdi-monitor-account </v-icon>
     </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="time-column font-table">
-              เวลา
-            </th>
-            <th
-              v-for="room in liveforlife"
-              :key="room"
-              class="font-table"
-            >
-              {{ room }}
+            <th class="time-column font-table">เวลา</th>
+            <th v-for="room in liveforlife" :key="room.roomId" class="font-table">
+              {{ room.roomName }}
             </th>
           </tr>
         </thead>
@@ -352,23 +294,15 @@
     <!-- ตารางสำหรับชั้น 7 ห้อง ประชุมบุคลากรภายใน -->
     <h1 class="pt-5 head-title pb-10 ml-left">
       ชั้น 7 ห้อง ประชุมบุคลากรภายใน
-      <v-icon class="mb-1 ms-2">
-        mdi-lectern
-      </v-icon>
+      <v-icon class="mb-1 ms-2"> mdi-lectern </v-icon>
     </h1>
     <v-container class="ms-minustop">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="time-column font-table">
-              เวลา
-            </th>
-            <th
-              v-for="room in sevenfloor"
-              :key="room"
-              class="font-table"
-            >
-              {{ room }}
+            <th class="time-column font-table">เวลา</th>
+            <th v-for="room in sevenfloor" :key="room.roomId" class="font-table">
+              {{ room.roomName }}
             </th>
           </tr>
         </thead>
@@ -400,13 +334,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { useRoomStore } from "@/stores/roomStore";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 const showDatePicker = ref(false);
 const currentDate = ref("");
 const selectedDate = ref<string | null>(null);
 const holidays = ref<string[]>([]);
-
+const roomStore = useRoomStore();
 const fetchHolidays = async (year: string) => {
   const response = await fetch(
     `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=2024`,
@@ -445,11 +380,13 @@ const allowedDates = (date: unknown) => {
   return !isHoliday;
 };
 
-onMounted(() => {
-  const currentYear = new Date().getFullYear().toString();
-  fetchHolidays(currentYear).then(() => {
-    // console.log("Holidays fetched:", holidays.value);
-  });
+onMounted(async () => {
+  try {
+    const currentYear = new Date().getFullYear().toString();
+    await Promise.all([fetchHolidays(currentYear), roomStore.filteredRooms()]);
+  } catch (error) {
+    console.error("Error loading data:", error);
+  }
 });
 
 const getDayClass = (day: { date: Date }) => {
@@ -527,14 +464,13 @@ const typeroom = [
   },
 ];
 
-const twozo = ["ห้อง 201"];
-const lecture = ["ห้อง 1", "ห้อง 2", "ห้อง 3"];
-const smartboard = ["ห้อง 604 Smart Board"];
-const ministudio = ["ห้อง Mini Studio"];
-const cyberzone = ["ห้อง Cyber Zone |", "ห้อง Cyber Zone ||"];
-const liveforlife = ["ห้อง Live for Life"];
-const sevenfloor = ["ห้อง 706", "ห้อง 707"];
-
+const twozo = computed(() => roomStore.room201);
+const lecture = computed(() => roomStore.lectureRooms);
+const smartboard = computed(() => roomStore.smartRooms);
+const ministudio = computed(() => roomStore.miniStudioRoom);
+const cyberzone = computed(() => roomStore.cyberZoneRooms);
+const liveforlife = computed(() => roomStore.liveForLifeRoom);
+const sevenfloor = computed(() => roomStore.meetingRoomFloor7);
 const onSelectChange = (value: string) => {
   console.log("Selected value:", value);
   if (value === "Group Study Room") {
@@ -557,19 +493,26 @@ const goToFormStudy = () => {
   router.push("/booking_study");
 };
 
-const generateBookingLink = (roomIndex: number, time: string, floor: number) => {
+const generateBookingLink = (
+  roomIndex: number,
+  time: string,
+  floor: number
+) => {
   const date = selectedDate.value || new Date();
   const formattedDate = (date as Date).toISOString().split("T")[0];
-  
+
   // ถ้าห้องอยู่ในชั้น 2 หรือชั้น 7 ให้ไป booking_meeting
   if (floor === 2 || floor === 7) {
-    return `/booking_meeting?floor=${floor}&room=${roomIndex + 1}&time=${time}&date=${formattedDate}`;
+    return `/booking_meeting?floor=${floor}&room=${
+      roomIndex + 1
+    }&time=${time}&date=${formattedDate}`;
   }
 
   // ค่าเริ่มต้นสำหรับหน้า booking_study
-  return `/booking_study?floor=${floor}&room=${roomIndex + 1}&time=${time}&date=${formattedDate}`;
+  return `/booking_study?floor=${floor}&room=${
+    roomIndex + 1
+  }&time=${time}&date=${formattedDate}`;
 };
-
 </script>
 
 <style scoped>
