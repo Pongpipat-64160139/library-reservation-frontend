@@ -200,29 +200,36 @@ const currentDate = ref("");
 const selectedDate = ref<string | null>(null);
 const holidays = ref<string[]>([]);
 const roomStore = useRoomStore();
-const fetchHolidays = async (year: string) => {
-  const response = await fetch(
-    `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=2024`,
-    {
-      headers: {
-        "X-IBM-Client-Id": "516eaa15-07e4-428c-b4bf-84def4ea69ab",
-        accept: "application/json",
-      },
-    }
-  );
+const fetchHolidays = async (years: string[]) => {
+  const holidayPromises = years.map(async (year) => {
+    const response = await fetch(
+      `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=${year}`,
+      {
+        headers: {
+          "X-IBM-Client-Id": "516eaa15-07e4-428c-b4bf-84def4ea69ab",
+          accept: "application/json",
+        },
+      }
+    );
 
-  if (response.ok) {
-    const responseData = await response.json();
-    if (responseData.result && Array.isArray(responseData.result.data)) {
-      holidays.value = responseData.result.data.map(
-        (holiday: { Date: string }) => holiday.Date
-      );
+    if (response.ok) {
+      const responseData = await response.json();
+      if (responseData.result && Array.isArray(responseData.result.data)) {
+        return responseData.result.data.map(
+          (holiday: { Date: string }) => holiday.Date
+        );
+      } else {
+        console.error(`Invalid data structure for year ${year}:`, responseData);
+        return [];
+      }
     } else {
-      console.error("Invalid data structure:", responseData);
+      console.error(`Failed to fetch holidays for year ${year}`);
+      return [];
     }
-  } else {
-    console.error("Failed to fetch holidays");
-  }
+  });
+
+  const results = await Promise.all(holidayPromises);
+  holidays.value = results.flat(); // รวมวันหยุดจากทุกปี
 };
 
 const allowedDates = (date: unknown) => {
@@ -240,21 +247,24 @@ const allowedDates = (date: unknown) => {
 
 onMounted(async () => {
   try {
-    const currentYear = new Date().getFullYear().toString();
+    const currentYear = new Date().getFullYear();
+    const pastYears = 10; // จำนวนปีที่ดึงข้อมูลย้อนหลัง
+    const years = Array.from({ length: pastYears + 1 }, (_, i) => (currentYear - i).toString());
 
-    // ใช้ Promise.all เพื่อโหลดข้อมูลพร้อมกัน
-    await Promise.all([
-      await roomStore.getRoomGroupStudy(),
-      fetchHolidays(currentYear),
-    ]);
-    console.log("All data loaded:");
-    console.log("Floor 3 Rooms:", roomStore.studyFloor3); // ตรวจสอบข้อมูล
-    console.log("Floor 3 Rooms:", roomStore.studyFloor4); // ตรวจสอบข้อมูล
-    console.log("Floor 3 Rooms:", roomStore.studyFloor5); // ตรวจสอบข้อมูล
+    // เรียก API เพื่อดึงข้อมูลห้อง
+    await roomStore.getRoomGroupStudy();
+    console.log("Room data loaded:", roomStore.studyFloor3, roomStore.studyFloor4, roomStore.studyFloor5);
+
+    // เรียก API เพื่อดึงข้อมูลวันหยุดย้อนหลัง
+    await fetchHolidays(years);
+    console.log(`Holidays loaded for years ${years.join(", ")}:`, holidays.value);
+
   } catch (error) {
-    console.error("Error loading data:", error);
+    console.error("Error during onMounted:", error);
   }
 });
+
+
 
 const getDayClass = (day: { date: Date }) => {
   const date = new Date(day.date);
