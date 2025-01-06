@@ -61,7 +61,11 @@
         <thead>
           <tr>
             <th class="font-table">เวลา</th>
-            <th v-for="room in stv" :key="room.roomId" class="room-column font-table">
+            <th
+              v-for="room in stv"
+              :key="room.roomId"
+              class="room-column font-table"
+            >
               {{ room.roomName }}
             </th>
           </tr>
@@ -140,7 +144,11 @@
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th v-for="room in minitheater" :key="room.roomId" class="font-table">
+            <th
+              v-for="room in minitheater"
+              :key="room.roomId"
+              class="font-table"
+            >
               {{ room.roomName }}
             </th>
           </tr>
@@ -174,7 +182,7 @@
 
 <script lang="ts" setup>
 import { useRoomStore } from "@/stores/roomStore";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 const showDatePicker = ref(false);
 const currentDate = ref("");
@@ -313,9 +321,9 @@ const typeroom = [
   },
 ];
 
-const stv = roomStore.stvRooms;
-const oke = roomStore.okeRooms;
-const minitheater = roomStore.miniTheater;
+const stv = computed(() => roomStore.stvRooms);
+const oke = computed(() => roomStore.okeRooms);
+const minitheater = computed(() => roomStore.miniTheater);
 
 const onSelectChange = (value: string) => {
   console.log("Selected value:", value);

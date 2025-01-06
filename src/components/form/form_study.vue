@@ -142,7 +142,7 @@
         <h1 class="mg-floor head1-title">ชั้น</h1>
         <v-select
           v-model="floor"
-          :items="[3, 4, 5, 6]"
+          :items="[3, 4, 5]"
           outlined
           label="ชั้น"
           class="width-formfloor text-field-rounded"
@@ -312,20 +312,6 @@ export default defineComponent({
         "ศึกษากลุ่ม 3",
         "ศึกษากลุ่ม 4",
         "ศึกษากลุ่ม 5",
-      ],
-      6: [
-        "STV 1",
-        "STV 2",
-        "STV 3",
-        "STV 4",
-        "STV 5",
-        "STV 6",
-        "STV 7",
-        "STV 8",
-        "STV 9",
-        "LIBRA OKE 1",
-        "LIBRA OKE 2",
-        "MINI THEATER",
       ],
     };
 
