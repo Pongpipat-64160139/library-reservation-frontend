@@ -357,27 +357,36 @@ const onSelectChange = (value: string) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const goToFormStudy = () => {
-  router.push("/booking_study");
-};
+
 const generateBookingLink = (
   roomIndex: number,
   time: string,
   floor: number
 ) => {
   let roomName = "";
-  if (floor === 3) {
-    roomName = rooms3[roomIndex];
-  } else if (floor === 4) {
-    roomName = rooms4[roomIndex];
-  } else if (floor === 5) {
-    roomName = rooms5[roomIndex];
+
+  const rooms =
+    floor === 3
+      ? rooms3.value
+      : floor === 4
+      ? rooms4.value
+      : floor === 5
+      ? rooms5.value
+      : [];
+
+  if (Array.isArray(rooms) && rooms[roomIndex]?.roomName) {
+    roomName = rooms[roomIndex].roomName;
+  } else {
+    console.error(`Room data is invalid for floor=${floor}, roomIndex=${roomIndex}`);
+    roomName = "Unknown Room";
   }
 
+  // สร้างลิงก์
   return `/booking_study?floor=${floor}&room=${
     roomIndex + 1
   }&time=${time}&roomName=${encodeURIComponent(roomName)}`;
 };
+
 </script>
 
 <style scoped>
