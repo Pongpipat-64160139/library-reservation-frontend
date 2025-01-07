@@ -369,10 +369,12 @@ const generateBookingLink = (
     roomName = "Unknown Room";
   }
 
-  return `/form_study?floor=${floor}&roomName=${encodeURIComponent(
+  // ส่งข้อมูล roomType, floor และ roomName
+  return `/booking_study?floor=${floor}&roomName=${encodeURIComponent(
     roomName
-  )}&time=${time}&roomType=${roomType}`;
+  )}&time=${time}&roomType=Entertain`;
 };
+
 </script>
 -
 

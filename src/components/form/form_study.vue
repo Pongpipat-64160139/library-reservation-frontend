@@ -137,7 +137,7 @@
         <h1 class="mg-floor head1-title">ชั้น</h1>
         <v-select
           v-model="floor"
-          :items="[3, 4, 5]"
+          :items="availableFloors"
           outlined
           label="ชั้น"
           class="width-formfloor text-field-rounded"
@@ -274,37 +274,61 @@ export default defineComponent({
     const route = useRoute();
     const roomStore = useRoomStore();
 
-    const roomType = ref(
-      (route.query.roomType as string) || "Group Study Room"
-    );
+    const roomType = ref((route.query.roomType as string) || "Group Study");
     const floor = ref(parseInt((route.query.floor as string) || "3"));
     const roomName = ref(
       decodeURIComponent(route.query.roomName as string) || ""
     );
     const startTime = ref(route.query.time || "08:00");
 
-    // กำหนดห้องตามชั้น
-    const availableRooms = computed(() => {
-      if (roomStore && roomStore.studyFloor3) {
-        if (floor.value === 3)
-          return roomStore.studyFloor3.map((r) => r.roomName);
-        if (floor.value === 4)
-          return roomStore.studyFloor4.map((r) => r.roomName);
-        if (floor.value === 5)
-          return roomStore.studyFloor5.map((r) => r.roomName);
+    const availableFloors = computed(() => {
+      switch (roomType.value) {
+        case "Group Study":
+          return [3, 4, 5]; // ชั้นสำหรับ Group Study
+        case "Entertain":
+          return [6]; // ชั้นสำหรับ Entertain
+        case "Meeting":
+          return [2, 5, 6, 7]; // ชั้นสำหรับ Meeting
+        default:
+          return [];
       }
-      return [];
     });
 
-    watch(floor, () => {
-      const rooms = availableRooms.value; // โหลดรายการห้องที่อัปเดตตามชั้น
-      roomName.value = rooms[0] || ""; // เลือกห้องแรกในรายการ
+    const availableRooms = computed(() => {
+      switch (roomType.value) {
+        case "Group Study":
+          if (floor.value === 3)
+            return roomStore.studyFloor3.map((r) => r.roomName);
+          if (floor.value === 4)
+            return roomStore.studyFloor4.map((r) => r.roomName);
+          if (floor.value === 5)
+            return roomStore.studyFloor5.map((r) => r.roomName);
+          break;
+        case "Entertain":
+          // ตรวจสอบกรณีไม่มี floorId
+          return roomStore.entertainRooms
+            .filter((room) => !room.floorId || room.floorId === 6)
+            .map((r) => r.roomName);
+        case "Meeting":
+          return roomStore.meetingRooms
+            .filter((r) => r.floorId === floor.value)
+            .map((r) => r.roomName);
+        default:
+          return [];
+      }
+    });
+
+    console.log("Available Rooms:", availableRooms.value); // Debug
+
+    watch([floor, roomType], () => {
+      console.log("Current Floor:", floor.value);
+      console.log("Current Room Type:", roomType.value);
+      console.log("Filtered Rooms:", availableRooms.value);
     });
 
     onMounted(async () => {
-      await roomStore.getRoomGroupStudy();
-      console.log("Rooms for Floor 3:", roomStore.studyFloor3.value);
-      console.log("Available Rooms:", availableRooms.value);
+      await roomStore.initializeRooms();
+      console.log("Rooms Initialized:", roomStore.entertainRooms.value);
     });
 
     return {
@@ -312,6 +336,7 @@ export default defineComponent({
       roomName,
       startTime,
       roomType,
+      availableFloors,
       availableRooms,
     };
   },
