@@ -83,7 +83,7 @@
             <td
               v-for="(room, roomIndex) in rooms3"
               :key="roomIndex"
-              class="room5-column"
+              class="room6-column"
             >
               <a
                 :href="generateBookingLink(roomIndex, time, 3)"

@@ -285,45 +285,26 @@ export default defineComponent({
 
     // กำหนดห้องตามชั้น
     const availableRooms = computed(() => {
-      if (roomType.value === "Group Study Room") {
+      if (roomStore && roomStore.studyFloor3) {
         if (floor.value === 3)
           return roomStore.studyFloor3.map((r) => r.roomName);
         if (floor.value === 4)
           return roomStore.studyFloor4.map((r) => r.roomName);
         if (floor.value === 5)
           return roomStore.studyFloor5.map((r) => r.roomName);
-      } else if (roomType.value === "Entertain Room") {
-        // รวมทุกประเภทของ Entertain Room
-        return [
-          ...roomStore.okeRooms.map((r) => r.roomName),
-          ...roomStore.stvRooms.map((r) => r.roomName),
-          ...roomStore.miniTheater.map((r) => r.roomName),
-        ];
       }
       return [];
     });
 
     watch(floor, () => {
-  roomName.value = availableRooms.value[0] || ""; // อัปเดตห้องแรกที่สามารถเลือกได้
-});
-
+      const rooms = availableRooms.value; // โหลดรายการห้องที่อัปเดตตามชั้น
+      roomName.value = rooms[0] || ""; // เลือกห้องแรกในรายการ
+    });
 
     onMounted(async () => {
-      console.log("Room Type:", roomType.value);
-      console.log("Room Name:", roomName.value);
-      console.log("Floor:", floor.value);
-      console.log("Start Time:", startTime.value);
-
-      if (roomType.value === "Group Study Room") {
-        await roomStore.getRoomGroupStudy();
-      } else if (["stv", "oke", "minitheater"].includes(roomType.value)) {
-        await roomStore.filteredEntertainRooms();
-      }
-
-      // ตั้งค่า roomName ให้แสดงห้องแรกใน availableRooms (ถ้าไม่มีค่าจาก URL)
-      if (!roomName.value) {
-        roomName.value = availableRooms.value[0] || "";
-      }
+      await roomStore.getRoomGroupStudy();
+      console.log("Rooms for Floor 3:", roomStore.studyFloor3.value);
+      console.log("Available Rooms:", availableRooms.value);
     });
 
     return {
@@ -348,6 +329,11 @@ export default defineComponent({
       startTime: "08:00",
       endTime: "08:30",
       floor: 3,
+      floorRooms: {
+        3: ["Room 301", "Room 302", "Room 303"],
+        4: ["Room 401", "Room 402", "Room 403"],
+        5: ["Room 501", "Room 502", "Room 503"],
+      },
       room: "ศึกษากลุ่ม 1",
       repeatOption: "ไม่",
       timeOptions: [
@@ -397,10 +383,13 @@ export default defineComponent({
       this.endTime = availableTimes.length > 0 ? availableTimes[0] : ""; // ตั้งค่า endTime เป็นค่าแรก
     },
     floor(newFloor: keyof typeof this.floorRooms) {
-      const firstRoom = this.floorRooms[newFloor]
-        ? this.floorRooms[newFloor][0]
-        : "";
-      this.room = firstRoom;
+      if (newFloor in this.floorRooms) {
+        const firstRoom = this.floorRooms[newFloor]?.[0] || ""; // ใช้ optional chaining
+        this.room = firstRoom;
+      } else {
+        console.error(`Invalid floor: ${newFloor}`);
+        this.room = ""; // หรือค่า default
+      }
     },
   },
 
