@@ -284,11 +284,11 @@ export default defineComponent({
     const availableFloors = computed(() => {
       switch (roomType.value) {
         case "Group Study":
-          return [3, 4, 5]; // ชั้นสำหรับ Group Study
+          return [3, 4, 5];
         case "Entertain":
-          return [6]; // ชั้นสำหรับ Entertain
+          return [6];
         case "Meeting":
-          return [2, 5, 6, 7]; // ชั้นสำหรับ Meeting
+          return [2, 5, 6, 7];
         default:
           return [];
       }
@@ -305,10 +305,10 @@ export default defineComponent({
             return roomStore.studyFloor5.map((r) => r.roomName);
           break;
         case "Entertain":
-          // ตรวจสอบกรณีไม่มี floorId
-          return roomStore.entertainRooms
-            .filter((room) => !room.floorId || room.floorId === 6)
-            .map((r) => r.roomName);
+          return roomStore.okeRooms
+            .map((r) => r.roomName)
+            .concat(roomStore.stvRooms.map((r) => r.roomName))
+            .concat(roomStore.miniTheater.map((r) => r.roomName));
         case "Meeting":
           return roomStore.meetingRooms
             .filter((r) => r.floorId === floor.value)
@@ -318,17 +318,9 @@ export default defineComponent({
       }
     });
 
-    console.log("Available Rooms:", availableRooms.value); // Debug
-
-    watch([floor, roomType], () => {
-      console.log("Current Floor:", floor.value);
-      console.log("Current Room Type:", roomType.value);
-      console.log("Filtered Rooms:", availableRooms.value);
-    });
-
     onMounted(async () => {
+      await roomStore.filteredEntertainRooms();
       await roomStore.initializeRooms();
-      console.log("Rooms Initialized:", roomStore.entertainRooms.value);
     });
 
     return {

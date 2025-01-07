@@ -26,12 +26,9 @@ export const useRoomStore = defineStore("room", () => {
 
 
   async function filteredMeetingRooms() {
-    // ดึงข้อมูลจาก Service
     const response = await roomservice.getRoomTypes("Meeting");
 
-    // เข้าถึงข้อมูลใน data
     const rooms = response.data;
-    // คัดแยกข้อมูลห้องที่ต้องการ
     cyberZoneRooms.value = rooms.filter(
       (room: { roomName: string | string[] }) =>
         room.roomName.includes("CYBER ZONE")
@@ -57,22 +54,15 @@ export const useRoomStore = defineStore("room", () => {
       (room: { roomName: string }) =>
         room.roomName === "ห้อง 706" || room.roomName === "ห้อง 707"
     );
-
-    console.log("Filtered Rooms:", cyberZoneRooms.value);
-    console.log("Filtered Rooms:", room201.value);
-    console.log("Filtered Rooms:", lectureRooms.value);
-    console.log("Filtered Rooms:", smartRooms.value);
-    console.log("Filtered Rooms:", miniStudioRoom.value);
-    console.log("Filtered Rooms:", liveForLifeRoom.value);
-    console.log("Filtered Rooms:", meetingRoomFloor7.value);
-    // ส่งข้อมูลที่คัดแยกกลับ
     return cyberZoneRooms;
   }
+
   async function getAllRooms() {
     const rooms = await roomservice.getAllRooms();
     console.log(rooms.data);
     return rooms;
   }
+
   async function getRoomGroupStudy() {
     const rooms = await roomservice.getRoomTypes("Group study");
     groupStudyRooms.value = rooms.data;
@@ -88,6 +78,17 @@ export const useRoomStore = defineStore("room", () => {
     return { studyFloor3, studyFloor4, studyFloor5 };
   }
   
+
+  async function getGroupStudyRooms() {
+    const response = await roomservice.getRoomTypes("Group Study");
+    groupStudyRooms.value = response.data;
+  
+    studyFloor3.value = groupStudyRooms.value.filter((room) => room.floorId === 2);
+    studyFloor4.value = groupStudyRooms.value.filter((room) => room.floorId === 3);
+    studyFloor5.value = groupStudyRooms.value.filter((room) => room.floorId === 4);
+    }
+
+    
   async function filteredEntertainRooms() {
     const response = await roomservice.getRoomTypes("Entertain");
     const rooms = response.data;
@@ -100,53 +101,12 @@ export const useRoomStore = defineStore("room", () => {
     miniTheater.value = rooms.filter((room: { roomName: string | string[] }) =>
       room.roomName.includes("Mimi theater")
     );
-    console.log("Filtered Rooms:", okeRooms.value);
-    console.log("Filtered Rooms:", stvRooms.value);
-    console.log("Filtered Rooms:", miniTheater.value);
-  }
-
-  async function getGroupStudyRooms() {
-    const response = await roomservice.getRoomTypes("Group Study");
-    groupStudyRooms.value = response.data;
-  
-    // แยกข้อมูลตามชั้น
-    studyFloor3.value = groupStudyRooms.value.filter((room) => room.floorId === 2);
-    studyFloor4.value = groupStudyRooms.value.filter((room) => room.floorId === 3);
-    studyFloor5.value = groupStudyRooms.value.filter((room) => room.floorId === 4);
-  
-    console.log("Group Study Rooms Loaded:", { studyFloor3, studyFloor4, studyFloor5 });
   }
   
-  async function getEntertainRooms() {
-    const response = await roomservice.getRoomTypes("Entertain");
-    entertainRooms.value = response.data;
-  
-    console.log("API Response (Entertain):", entertainRooms.value);
-  
-    // กรองข้อมูลตามหมวดหมู่
-    okeRooms.value = entertainRooms.value.filter((room) =>
-      room.roomName.includes("คาราโอเกะ")
-    );
-    stvRooms.value = entertainRooms.value.filter((room) =>
-      room.roomName.includes("STV")
-    );
-    miniTheater.value = entertainRooms.value.filter((room) =>
-      room.roomName.includes("Mimi Theater")
-    );
-  
-    console.log("Filtered Rooms:", {
-      entertainRooms: entertainRooms.value,
-      okeRooms: okeRooms.value,
-      stvRooms: stvRooms.value,
-      miniTheater: miniTheater.value,
-    });
-  }
-
   async function getMeetingRooms() {
     const response = await roomservice.getRoomTypes("Meeting");
     meetingRooms.value = response.data;
   
-    // แยกข้อมูลตามหมวดหมู่หรือชื่อห้อง
     cyberZoneRooms.value = meetingRooms.value.filter((room) =>
       room.roomName.includes("Cyber Zone")
     );
@@ -166,28 +126,14 @@ export const useRoomStore = defineStore("room", () => {
       room.roomName.includes("Live for Life")
     );
     meetingRoomFloor7.value = meetingRooms.value.filter((room) => room.floorId === 7);
-  
-    console.log("Meeting Rooms Loaded:", {
-      cyberZoneRooms,
-      room201,
-      lectureRooms,
-      smartRooms,
-      miniStudioRoom,
-      liveForLifeRoom,
-      meetingRoomFloor7,
-    });
+
   }
   async function initializeRooms() {
     await getGroupStudyRooms();
-    await getEntertainRooms();
+    await filteredEntertainRooms();
     await getMeetingRooms();
-    console.log("Group Study Rooms:", groupStudyRooms.value);
-    console.log("Entertain Rooms:", entertainRooms.value);
-    console.log("Meeting Rooms:", meetingRooms.value);
   }
   
-  
-    
   return {
     getAllRooms,
     groupStudyRooms,
