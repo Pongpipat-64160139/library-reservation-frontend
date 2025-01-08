@@ -1,13 +1,8 @@
 <template>
   <Header_page />
 
-  <v-container
-    fluid
-    class="back-ground ms-kob"
-  >
-    <h1 class="pt-5 head-title text-center pb-10">
-      สถานะการจอง
-    </h1>
+  <v-container fluid class="back-ground ms-kob">
+    <h1 class="pt-5 head-title text-center pb-10">สถานะการจอง</h1>
 
     <v-data-table
       v-model:sort-by="sortBy"
@@ -23,7 +18,7 @@
           <td>{{ item.floor }}</td>
           <td>{{ item.room }}</td>
           <td>{{ item.date }}</td>
-          <td>{{ item.time }}</td>
+          <td>{{ item.startTime }} - {{ item.endTime }}</td>
           <td>{{ item.status }}</td>
           <td>
             <v-btn
@@ -40,10 +35,9 @@
     </v-data-table>
   </v-container>
 
-  <v-dialog
-    v-model="dialog"
-    max-width="500px"
-  >
+  <!-- Dialog รายละเอียดการจองห้อง -->
+
+  <v-dialog v-model="dialog" max-width="500px">
     <v-card class="rd-dialog">
       <span class="head-detailuser">
         <div class="head-detail">
@@ -66,7 +60,7 @@
           </v-col>
           <v-col>
             <div class="head-detail ms-10">
-              <strong>เวลา</strong> {{ selectedItem?.time }}
+              <strong>เวลา</strong> {{ selectedItem?.startTime }}
             </div>
           </v-col>
         </v-row>
@@ -80,7 +74,9 @@
             </div>
           </v-col>
           <v-col>
-            <div class="head-detail ms-10"><strong>เวลา</strong> 08.30</div>
+            <div class="head-detail ms-10">
+              <strong>เวลา</strong> {{ selectedItem?.endTime }}
+            </div>
           </v-col>
         </v-row>
       </span>
@@ -119,25 +115,64 @@
         </div>
       </span>
 
+      <span v-if="selectedItem?.reason" class="d-flex head-detail">
+        <div class="head-detail">
+          <strong>เหตุผลการยกเลิก</strong> {{ selectedItem.reason }}
+        </div>
+      </span>
+
       <v-card-text />
       <v-card-actions class="d-flex justify-center mb-8">
         <v-btn
-          class="rd-btncancel"
+          class="rd-btncanceldia"
           text="ยกเลิกจอง"
-          @click="dialog = false"
+          :disabled="
+            selectedItem?.status === 'ยกเลิก' ||
+            selectedItem?.status === 'อนุมัติ'
+          "
+          @click="reasonDialog = true"
         >
           ยกเลิกจอง
         </v-btn>
-        <v-btn
-          class="rd-btnclose"
-          text="ปิด"
-          @click="dialog = false"
-        >
+
+        <v-btn class="rd-btnclose" text="ปิด" @click="dialog = false">
           ปิด
         </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- Dialog กรอกเหตุผลในการยกเลิกจองห้อง -->
+  <v-dialog v-model="reasonDialog" max-width="400px">
+    <v-card>
+      <v-card-title class="text-center mt-5">
+        <span>ต้องการ "ยกเลิกการจองห้อง" ใช่หรือไม่ ? </span>
+      </v-card-title>
+      <v-card-text>
+        <v-text-field
+          v-model="cancelReason"
+          label="กรอกเหตุผลในการยกเลิก"
+          variant="outlined"
+          :rules="[(v) => !!v || '']"
+        ></v-text-field>
+      </v-card-text>
+      <v-card-actions class="d-flex justify-center mt-2">
+        <v-btn class="rd-btncancel" @click="() => (reasonDialog = false)"
+          >ยกเลิก</v-btn
+        >
+        <v-btn class="rd-btnconfirm" @click="confirmCancel"> ตกลง </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+  <v-snackbar
+    v-model="snackbar"
+    color="#b5cfb7"
+    timeout="3000"
+    top
+    class="text-center"
+  >
+    ยกเลิกการจองห้องสำเร็จ !
+  </v-snackbar>
 </template>
 
 <script lang="ts">
@@ -172,8 +207,10 @@ const data = ref([
     floor: 3,
     room: "ศึกษากลุ่ม 1",
     date: "2024-12-11",
-    time: "08:00",
+    startTime: "08:00",
+    endTime: "09:30",
     status: "รอ",
+    reason: "",
   },
   {
     index: 2,
@@ -182,8 +219,10 @@ const data = ref([
     floor: 4,
     room: "ศึกษากลุ่ม 1",
     date: "2024-12-12",
-    time: "09:00",
+    startTime: "08:00",
+    endTime: "09:30",
     status: "อนุมัติ",
+    reason: "",
   },
   {
     index: 3,
@@ -192,8 +231,10 @@ const data = ref([
     floor: 5,
     room: "ศึกษากลุ่ม 1",
     date: "2024-12-13",
-    time: "10:00",
+    startTime: "08:00",
+    endTime: "09:30",
     status: "ยกเลิก",
+    reason: "",
   },
   {
     index: 4,
@@ -202,8 +243,10 @@ const data = ref([
     floor: 3,
     room: "ศึกษากลุ่ม 1",
     date: "2024-12-14",
-    time: "11:00",
+    startTime: "08:00",
+    endTime: "09:30",
     status: "รอ",
+    reason: "",
   },
   {
     index: 5,
@@ -212,8 +255,10 @@ const data = ref([
     floor: 6,
     room: "ศึกษากลุ่ม 1",
     date: "2024-12-15",
-    time: "12:00",
+    startTime: "08:00",
+    endTime: "09:30",
     status: "อนุมัติ",
+    reason: "",
   },
   {
     index: 6,
@@ -222,8 +267,10 @@ const data = ref([
     floor: 4,
     room: "ศึกษากลุ่ม 1",
     date: "2024-12-16",
-    time: "13:00",
+    startTime: "08:00",
+    endTime: "09:30",
     status: "รอ",
+    reason: "",
   },
   {
     index: 7,
@@ -232,8 +279,10 @@ const data = ref([
     floor: 5,
     room: "ศึกษากลุ่ม 1",
     date: "2024-12-17",
-    time: "14:00",
+    startTime: "08:00",
+    endTime: "09:30",
     status: "ยกเลิก",
+    reason: "เปลี่ยนแผนการใช้งาน",
   },
   {
     index: 8,
@@ -242,8 +291,10 @@ const data = ref([
     floor: 3,
     room: "ศึกษากลุ่ม 1",
     date: "2024-12-18",
-    time: "15:00",
+    startTime: "08:00",
+    endTime: "09:30",
     status: "อนุมัติ",
+    reason: "",
   },
   {
     index: 9,
@@ -252,8 +303,10 @@ const data = ref([
     floor: 6,
     room: "ศึกษากลุ่ม 1",
     date: "2024-12-19",
-    time: "16:00",
+    startTime: "08:00",
+    endTime: "09:30",
     status: "รอ",
+    reason: "",
   },
   {
     index: 10,
@@ -262,8 +315,22 @@ const data = ref([
     floor: 4,
     room: "ศึกษากลุ่ม 1",
     date: "2024-12-20",
-    time: "17:00",
+    startTime: "08:00",
+    endTime: "09:30",
     status: "อนุมัติ",
+    reason: "",
+  },
+  {
+    index: 11,
+    user: "64160136",
+    name: "นวพรรษ สีหาบุตร",
+    floor: 4,
+    room: "ศึกษากลุ่ม 1",
+    date: "2024-12-20",
+    startTime: "08:00",
+    endTime: "09:30",
+    status: "อนุมัติ",
+    reason: "",
   },
 ]);
 
@@ -278,9 +345,42 @@ const sortedData = computed(() => {
 const dialog = ref(false);
 const selectedItem = ref<any>(null);
 
+const reasonDialog = ref(false);
+const cancelReason = ref("");
+const snackbar = ref(false);
+
 const showDialog = (item: any) => {
   selectedItem.value = item;
   dialog.value = true;
+};
+
+const cancelBooking = () => {
+  if (selectedItem.value && selectedItem.value.status === "รอ") {
+    const itemIndex = data.value.findIndex(
+      (item) => item.index === selectedItem.value.index
+    );
+    if (itemIndex !== -1) {
+      data.value[itemIndex].status = "ยกเลิก";
+      dialog.value = false;
+    }
+  }
+};
+
+const confirmCancel = () => {
+  if (selectedItem.value && cancelReason.value.trim()) {
+    const itemIndex = data.value.findIndex(
+      (item) => item.index === selectedItem.value.index
+    );
+    if (itemIndex !== -1) {
+      data.value[itemIndex].status = "ยกเลิก";
+      data.value[itemIndex].reason = cancelReason.value; // บันทึกเหตุผล
+      snackbar.value = true; // แสดง Snackbar
+    }
+    reasonDialog.value = false;
+    cancelReason.value = "";
+  } else {
+    alert("กรุณากรอกเหตุผลในการยกเลิก");
+  }
 };
 
 export default defineComponent({
@@ -292,6 +392,11 @@ export default defineComponent({
       dialog,
       selectedItem,
       showDialog,
+      cancelBooking,
+      reasonDialog,
+      cancelReason,
+      confirmCancel,
+      snackbar,
     };
   },
 });
@@ -402,7 +507,7 @@ th {
   background-color: #f5eded;
   border-radius: 20px;
 }
-.rd-btncancel {
+.rd-btncanceldia {
   font-weight: 400;
   font-size: 16px;
   color: #493628;
@@ -411,6 +516,29 @@ th {
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
   margin-right: 30px;
+}
+
+.rd-btncancel {
+  font-weight: 400;
+  font-size: 16px;
+  color: #493628;
+  background-color: #dad0c2;
+  width: 100px;
+  border-radius: 10px;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+  margin-right: 30px;
+  margin-top: -40px;
+}
+
+.rd-btnconfirm {
+  font-weight: 400;
+  font-size: 16px;
+  color: #493628;
+  background-color: #b5cfb7;
+  width: 100px;
+  border-radius: 10px;
+  margin-top: -40px;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
 }
 
 .rd-btnclose {

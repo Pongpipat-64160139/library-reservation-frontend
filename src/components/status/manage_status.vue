@@ -58,7 +58,7 @@
             {{ item.date }}
           </td>
           <td class="text-col">
-            {{ item.time }}
+            {{ item.startTime }} - {{ item.endTime }}
           </td>
           <td class="align-center justify-center">
             <v-select
@@ -252,7 +252,7 @@
           v-model="cancelReason"
           label="กรอกเหตุผลในการยกเลิก"
           variant="outlined"
-          :rules="[(v) => !!v || 'กรุณากรอกเหตุผล']"
+          :rules="[(v) => !!v || '']"
           class="mt-5"
         />
       </v-card-text>
