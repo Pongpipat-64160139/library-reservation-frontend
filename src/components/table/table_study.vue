@@ -195,42 +195,44 @@ import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import Footer_page from "../footer/footer_page.vue";
 import { useRoomStore } from "@/stores/roomStore";
+import { useHolidayStore } from "@/stores/holidayStore";
 const showDatePicker = ref(false);
 const currentDate = ref("");
 const selectedDate = ref<string | null>(null);
 const holidays = ref<string[]>([]);
 const roomStore = useRoomStore();
-const fetchHolidays = async (years: string[]) => {
-  const holidayPromises = years.map(async (year) => {
-    const response = await fetch(
-      `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=${year}`,
-      {
-        headers: {
-          "X-IBM-Client-Id": "516eaa15-07e4-428c-b4bf-84def4ea69ab",
-          accept: "application/json",
-        },
-      }
-    );
+const holidayStore = useHolidayStore();
+// const fetchHolidays = async (years: string[]) => {
+//   const holidayPromises = years.map(async (year) => {
+//     const response = await fetch(
+//       `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=${year}`,
+//       {
+//         headers: {
+//           "X-IBM-Client-Id": "516eaa15-07e4-428c-b4bf-84def4ea69ab",
+//           accept: "application/json",
+//         },
+//       }
+//     );
 
-    if (response.ok) {
-      const responseData = await response.json();
-      if (responseData.result && Array.isArray(responseData.result.data)) {
-        return responseData.result.data.map(
-          (holiday: { Date: string }) => holiday.Date
-        );
-      } else {
-        console.error(`Invalid data structure for year ${year}:`, responseData);
-        return [];
-      }
-    } else {
-      console.error(`Failed to fetch holidays for year ${year}`);
-      return [];
-    }
-  });
+//     if (response.ok) {
+//       const responseData = await response.json();
+//       if (responseData.result && Array.isArray(responseData.result.data)) {
+//         return responseData.result.data.map(
+//           (holiday: { Date: string }) => holiday.Date
+//         );
+//       } else {
+//         console.error(`Invalid data structure for year ${year}:`, responseData);
+//         return [];
+//       }
+//     } else {
+//       console.error(`Failed to fetch holidays for year ${year}`);
+//       return [];
+//     }
+//   });
 
-  const results = await Promise.all(holidayPromises);
-  holidays.value = results.flat(); // รวมวันหยุดจากทุกปี
-};
+//   const results = await Promise.all(holidayPromises);
+//   holidays.value = results.flat(); // รวมวันหยุดจากทุกปี
+// };
 
 const allowedDates = (date: unknown) => {
   if (!(date instanceof Date)) return false;
@@ -249,22 +251,27 @@ onMounted(async () => {
   try {
     const currentYear = new Date().getFullYear();
     const pastYears = 10; // จำนวนปีที่ดึงข้อมูลย้อนหลัง
-    const years = Array.from({ length: pastYears + 1 }, (_, i) => (currentYear - i).toString());
+    const years = Array.from({ length: pastYears + 1 }, (_, i) =>
+      (currentYear - i).toString()
+    );
 
     // เรียก API เพื่อดึงข้อมูลห้อง
     await roomStore.getRoomGroupStudy();
-    console.log("Room data loaded:", roomStore.studyFloor3, roomStore.studyFloor4, roomStore.studyFloor5);
+    console.log(
+      "Room data loaded:",
+      roomStore.studyFloor3,
+      roomStore.studyFloor4,
+      roomStore.studyFloor5
+    );
 
     // เรียก API เพื่อดึงข้อมูลวันหยุดย้อนหลัง
-    await fetchHolidays(years);
-    console.log(`Holidays loaded for years ${years.join(", ")}:`, holidays.value);
-
+    // await holidayStore.getAllHolidayInYear();
+    // await fetchHolidays(years);
+    // console.log(`Holidays loaded for years ${years.join(", ")}:`, holidays.value);
   } catch (error) {
     console.error("Error during onMounted:", error);
   }
 });
-
-
 
 const getDayClass = (day: { date: Date }) => {
   const date = new Date(day.date);
@@ -387,7 +394,9 @@ const generateBookingLink = (
   if (Array.isArray(rooms) && rooms[roomIndex]?.roomName) {
     roomName = rooms[roomIndex].roomName;
   } else {
-    console.error(`Room data is invalid for floor=${floor}, roomIndex=${roomIndex}`);
+    console.error(
+      `Room data is invalid for floor=${floor}, roomIndex=${roomIndex}`
+    );
     roomName = "Unknown Room";
   }
 
@@ -396,7 +405,6 @@ const generateBookingLink = (
     roomIndex + 1
   }&time=${time}&roomName=${encodeURIComponent(roomName)}`;
 };
-
 </script>
 
 <style scoped>
