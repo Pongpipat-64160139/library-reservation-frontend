@@ -22,5 +22,6 @@ export interface NormalRoomBooking {
 
   roomBooking: Room;
 
+  reason: string;
   userBookings: UserBooking[];
 }

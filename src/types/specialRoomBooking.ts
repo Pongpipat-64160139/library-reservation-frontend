@@ -33,6 +33,8 @@ export interface SpecialRoomBooking {
 
   room: Room;
 
+  reason: string;
+
   orderDetails: OrderDetail[];
 
   equipmentBookings: EquipmentBooking[];
