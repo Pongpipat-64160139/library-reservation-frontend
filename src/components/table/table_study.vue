@@ -265,7 +265,8 @@ onMounted(async () => {
     );
 
     // เรียก API เพื่อดึงข้อมูลวันหยุดย้อนหลัง
-    // await holidayStore.getAllHolidayInYear();
+    await holidayStore.getAllHolidayInYear(years);
+    console.log("Current year: " + currentYear);
     // await fetchHolidays(years);
     // console.log(`Holidays loaded for years ${years.join(", ")}:`, holidays.value);
   } catch (error) {
