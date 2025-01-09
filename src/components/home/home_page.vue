@@ -562,6 +562,7 @@ export default {
 .mg-bottomdialog {
   margin-bottom: 10px;
 }
+/* ipad */
 
 @media (max-width: 1024px) {
   .head-title {
