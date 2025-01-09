@@ -2,9 +2,13 @@ import { defineStore } from "pinia";
 import roomService from "../services/roomService";
 import { ref } from "vue";
 import { GetRoomType } from "../types/getRoomType";
+import { CurrentRoom } from "../types/currentRoom";
 
 export const useRoomStore = defineStore("room", () => {
   const roomservice = roomService;
+
+  const currentTypeRoom = ref<CurrentRoom>();
+
   const groupStudyRooms = ref<GetRoomType[]>([]);
   const studyFloor3 = ref<GetRoomType[]>([]);
   const studyFloor4 = ref<GetRoomType[]>([]);
@@ -14,7 +18,7 @@ export const useRoomStore = defineStore("room", () => {
   const okeRooms = ref<GetRoomType[]>([]);
   const stvRooms = ref<GetRoomType[]>([]);
   const miniTheater = ref<GetRoomType[]>([]);
-  
+
   const meetingRooms = ref<GetRoomType[]>([]);
   const cyberZoneRooms = ref<GetRoomType[]>([]);
   const room201 = ref<GetRoomType[]>([]);
@@ -23,8 +27,7 @@ export const useRoomStore = defineStore("room", () => {
   const miniStudioRoom = ref<GetRoomType[]>([]);
   const liveForLifeRoom = ref<GetRoomType[]>([]);
   const meetingRoomFloor7 = ref<GetRoomType[]>([]);
-
-
+  const meetingRoomFloor6 = ref<GetRoomType[]>([]);
   async function filteredMeetingRooms() {
     const response = await roomservice.getRoomTypes("Meeting");
 
@@ -77,18 +80,22 @@ export const useRoomStore = defineStore("room", () => {
     );
     return { studyFloor3, studyFloor4, studyFloor5 };
   }
-  
 
   async function getGroupStudyRooms() {
     const response = await roomservice.getRoomTypes("Group Study");
     groupStudyRooms.value = response.data;
-  
-    studyFloor3.value = groupStudyRooms.value.filter((room) => room.floorId === 2);
-    studyFloor4.value = groupStudyRooms.value.filter((room) => room.floorId === 3);
-    studyFloor5.value = groupStudyRooms.value.filter((room) => room.floorId === 4);
-    }
 
-    
+    studyFloor3.value = groupStudyRooms.value.filter(
+      (room) => room.floorId === 2
+    );
+    studyFloor4.value = groupStudyRooms.value.filter(
+      (room) => room.floorId === 3
+    );
+    studyFloor5.value = groupStudyRooms.value.filter(
+      (room) => room.floorId === 4
+    );
+  }
+
   async function filteredEntertainRooms() {
     const response = await roomservice.getRoomTypes("Entertain");
     const rooms = response.data;
@@ -102,11 +109,11 @@ export const useRoomStore = defineStore("room", () => {
       room.roomName.includes("Mimi theater")
     );
   }
-  
+
   async function getMeetingRooms() {
     const response = await roomservice.getRoomTypes("Meeting");
     meetingRooms.value = response.data;
-  
+
     cyberZoneRooms.value = meetingRooms.value.filter((room) =>
       room.roomName.includes("Cyber Zone")
     );
@@ -125,14 +132,24 @@ export const useRoomStore = defineStore("room", () => {
     liveForLifeRoom.value = meetingRooms.value.filter((room) =>
       room.roomName.includes("Live for Life")
     );
-    meetingRoomFloor7.value = meetingRooms.value.filter((room) => room.floorId === 7);
-
+    meetingRoomFloor7.value = meetingRooms.value.filter(
+      (room) => room.floorId === 7
+    );
   }
   async function initializeRooms() {
     await getGroupStudyRooms();
     await filteredEntertainRooms();
     await getMeetingRooms();
   }
+
+  async function compiledMeetingRoomsFloor6() {
+    const response = await roomservice.getRoomTypes("Meeting");
+    meetingRoomFloor6.value = response.data.filter(
+      (room: { floorId: number }) => room.floorId === 5
+    );
+    return meetingRoomFloor6.value;
+  }
+
   
   return {
     getAllRooms,
@@ -155,6 +172,9 @@ export const useRoomStore = defineStore("room", () => {
     miniTheater,
     initializeRooms,
     entertainRooms,
-    meetingRooms
+    meetingRooms,
+    compiledMeetingRoomsFloor6,
+    meetingRoomFloor6,
+    currentTypeRoom,
   };
 });

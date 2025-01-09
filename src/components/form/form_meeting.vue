@@ -1,8 +1,5 @@
 <template class="back-ground">
-  <v-container
-    fluid
-    class="back-ground ms-kob"
-  >
+  <v-container fluid class="back-ground ms-kob">
     <!-- Sheet1 จองห้อง -->
     <v-sheet
       class="mx-auto mt-10"
@@ -10,9 +7,7 @@
       max-width="1200"
       style="background-color: #dfd3c3; border-radius: 16px"
     >
-      <h1 class="pt-5 head-title text-center pb-10">
-        จองห้องประชุม
-      </h1>
+      <h1 class="pt-5 head-title text-center pb-10">จองห้องประชุม</h1>
 
       <!-- span1 -->
       <span class="d-flex">
@@ -93,17 +88,17 @@
               :value="
                 startDate
                   ? new Date(startDate).toLocaleDateString('th-TH', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
                   : new Date().toLocaleDateString('th-TH', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
               "
               readonly
             />
@@ -150,17 +145,17 @@
               :value="
                 endDate
                   ? new Date(endDate).toLocaleDateString('th-TH', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
                   : new Date().toLocaleDateString('th-TH', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
               "
               readonly
               :disabled="true"
@@ -213,17 +208,17 @@
               :value="
                 endRepeatDate
                   ? new Date(endRepeatDate).toLocaleDateString('th-TH', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
                   : new Date().toLocaleDateString('th-TH', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
               "
               readonly
               :disabled="repeatOption === 'ไม่'"
@@ -247,447 +242,163 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { useRoomStore } from "@/stores/roomStore";
+import { ref, computed, watch, onMounted } from "vue";
 
-export default defineComponent({
-  data() {
-    return {
-      numPeople: "",
-      phoneNumber: "",
-      menu: false,
-      startMenu: false,
-      endMenu: false,
-      startDate: null,
-      endDate: null,
-      endRepeatMenu: false,
-      endRepeatDate: null,
-      startTime: "08:00",
-      endTime: "08:30",
-      floor: 2,
-      room: "201",
-      repeatOption: "ไม่",
-      holidays: [] as string[],
-      timeOptions: [
-        "08:00",
-        "08:30",
-        "09:00",
-        "09:30",
-        "10:00",
-        "10:30",
-        "11:00",
-        "11:30",
-        "12:00",
-        "12:30",
-        "13:00",
-        "13:30",
-        "14:00",
-        "14:30",
-        "15:00",
-        "15:30",
-        "16:00",
-        "16:30",
-        "17:00",
-        "17:30",
-        "18:00",
-      ],
-      floorRooms: {
-        2: ["201"],
+const numPeople = ref("");
+const phoneNumber = ref("");
+const menu = ref(false);
+const startMenu = ref(false);
+const endMenu = ref(false);
+const startDate = ref<Date | null>(null);
+const endDate = ref<Date | null>(null);
+const endRepeatMenu = ref(false);
+const endRepeatDate = ref<Date | null>(null);
+const startTime = ref("08:00");
+const endTime = ref("08:30");
+const floor = ref(2);
+const room = ref("201");
+const repeatOption = ref("ไม่");
+const holidays = ref<string[]>([]);
+const timeOptions = [
+  "08:00",
+  "08:30",
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11:30",
+  "12:00",
+  "12:30",
+  "13:00",
+  "13:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+  "16:00",
+  "16:30",
+  "17:00",
+  "17:30",
+  "18:00",
+];
+const floorRooms = {
+  2: ["201"],
+  5: ["Lecturer's Room 1", "Lecturer's Room 2", "Lecturer's Room 3"],
+  6: [
+    "604 Smart Board",
+    "Mini Studio",
+    "Cyber Zone 1",
+    "Cyber Zone 2",
+    "Live for Life",
+  ],
+  7: ["706", "707"],
+};
+const currentDate = ref<string | null>(null);
+const showStartDatePicker = ref(false);
+const showEndDatePicker = ref(false);
+const currentStartDate = ref("");
+const currentEndDate = ref("");
+const roomStore = useRoomStore();
 
-        5: ["Lecturer's Room 1", "Lecturer's Room 2", "Lecturer's Room 3"],
-        6: [
-          "604 Smart Board",
-          "Mini Studio",
-          "Cyber Zone 1",
-          "Cyber Zone 2",
-          "Live for Life",
-        ],
-        7: ["706", "707"],
-      },
-      currentDate: null as string | null,
-      showStartDatePicker: false,
-      showEndDatePicker: false,
-      currentStartDate: "",
-      currentEndDate: "",
-    };
-  },
-  
-
-  computed: {
-    filteredEndTimes() {
-      if (this.startTime === "08:00") {
-        return [
-          "08:30",
-          "09:00",
-          "09:30",
-          "10:00",
-          "10:30",
-          "11:00",
-          "11:30",
-          "12:00",
-          "12:30",
-          "13:00",
-          "13:30",
-          "14:00",
-          "14:30",
-          "15:00",
-          "15:30",
-          "16:00",
-          "16:30",
-          "17:00",
-          "17:30",
-          "18:00",
-          "18:30",
-        ];
-      }
-      if (this.startTime === "08:30") {
-        return [
-          "09:00",
-          "09:30",
-          "10:00",
-          "10:30",
-          "11:00",
-          "11:30",
-          "12:00",
-          "12:30",
-          "13:00",
-          "13:30",
-          "14:00",
-          "14:30",
-          "15:00",
-          "15:30",
-          "16:00",
-          "16:30",
-          "17:00",
-          "17:30",
-          "18:00",
-          "18:30",
-        ];
-      }
-      if (this.startTime === "09:00") {
-        return [
-          "09:30",
-          "10:00",
-          "10:30",
-          "11:00",
-          "11:30",
-          "12:00",
-          "12:30",
-          "13:00",
-          "13:30",
-          "14:00",
-          "14:30",
-          "15:00",
-          "15:30",
-          "16:00",
-          "16:30",
-          "17:00",
-          "17:30",
-          "18:00",
-          "18:30",
-        ];
-      }
-      if (this.startTime === "09:30") {
-        return [
-          "10:00",
-          "10:30",
-          "11:00",
-          "11:30",
-          "12:00",
-          "12:30",
-          "13:00",
-          "13:30",
-          "14:00",
-          "14:30",
-          "15:00",
-          "15:30",
-          "16:00",
-          "16:30",
-          "17:00",
-          "17:30",
-          "18:00",
-          "18:30",
-        ];
-      }
-      if (this.startTime === "10:00") {
-        return [
-          "10:30",
-          "11:00",
-          "11:30",
-          "12:00",
-          "12:30",
-          "13:00",
-          "13:30",
-          "14:00",
-          "14:30",
-          "15:00",
-          "15:30",
-          "16:00",
-          "16:30",
-          "17:00",
-          "17:30",
-          "18:00",
-          "18:30",
-        ];
-      }
-      if (this.startTime === "10:30") {
-        return [
-          "11:00",
-          "11:30",
-          "12:00",
-          "12:30",
-          "13:00",
-          "13:30",
-          "14:00",
-          "14:30",
-          "15:00",
-          "15:30",
-          "16:00",
-          "16:30",
-          "17:00",
-          "17:30",
-          "18:00",
-          "18:30",
-        ];
-      }
-      if (this.startTime === "11:00") {
-        return [
-          "11:30",
-          "12:00",
-          "12:30",
-          "13:00",
-          "13:30",
-          "14:00",
-          "14:30",
-          "15:00",
-          "15:30",
-          "16:00",
-          "16:30",
-          "17:00",
-          "17:30",
-          "18:00",
-          "18:30",
-        ];
-      }
-      if (this.startTime === "11:30") {
-        return [
-          "12:00",
-          "12:30",
-          "13:00",
-          "13:30",
-          "14:00",
-          "14:30",
-          "15:00",
-          "15:30",
-          "16:00",
-          "16:30",
-          "17:00",
-          "17:30",
-          "18:00",
-          "18:30",
-        ];
-      }
-      if (this.startTime === "12:00") {
-        return [
-          "12:30",
-          "13:00",
-          "13:30",
-          "14:00",
-          "14:30",
-          "15:00",
-          "15:30",
-          "16:00",
-          "16:30",
-          "17:00",
-          "17:30",
-          "18:00",
-          "18:30",
-        ];
-      }
-      if (this.startTime === "12:30") {
-        return [
-          "13:00",
-          "13:30",
-          "14:00",
-          "14:30",
-          "15:00",
-          "15:30",
-          "16:00",
-          "16:30",
-          "17:00",
-          "17:30",
-          "18:00",
-          "18:30",
-        ];
-      }
-      if (this.startTime === "13:00") {
-        return [
-          "13:30",
-          "14:00",
-          "14:30",
-          "15:00",
-          "15:30",
-          "16:00",
-          "16:30",
-          "17:00",
-          "17:30",
-          "18:00",
-          "18:30",
-        ];
-      }
-      if (this.startTime === "13:30") {
-        return [
-          "14:00",
-          "14:30",
-          "15:00",
-          "15:30",
-          "16:00",
-          "16:30",
-          "17:00",
-          "17:30",
-          "18:00",
-          "18:30",
-        ];
-      }
-      if (this.startTime === "14:00") {
-        return [
-          "14:30",
-          "15:00",
-          "15:30",
-          "16:00",
-          "16:30",
-          "17:00",
-          "17:30",
-          "18:00",
-          "18:30",
-        ];
-      }
-      if (this.startTime === "14:30") {
-        return [
-          "15:00",
-          "15:30",
-          "16:00",
-          "16:30",
-          "17:00",
-          "17:30",
-          "18:00",
-          "18:30",
-        ];
-      }
-      if (this.startTime === "15:00") {
-        return ["15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"];
-      }
-      if (this.startTime === "15:30") {
-        return ["16:00", "16:30", "17:00", "17:30", "18:00", "18:30"];
-      }
-      if (this.startTime === "16:00") {
-        return ["16:30", "17:00", "17:30", "18:00", "18:30"];
-      }
-      if (this.startTime === "16:30") {
-        return ["17:00", "17:30", "18:00", "18:30"];
-      }
-      if (this.startTime === "17:00") {
-        return ["17:30", "18:00", "18:30"];
-      }
-      if (this.startTime === "17:30") {
-        return ["18:00", "18:30"];
-      }
-      if (this.startTime === "18:00") {
-        return ["18:30"];
-      }
-
-      return this.timeOptions.filter((time) => time !== "08:30");
-    },
-    availableRooms() {
-      if (this.floor in this.floorRooms) {
-        return this.floorRooms[this.floor as keyof typeof this.floorRooms];
-      } else {
-        return [];
-      }
-    },
-  },
-
-  watch: {
-    startTime(newStartTime) {
-      const availableTimes = this.filteredEndTimes;
-      this.endTime = availableTimes[0] || "08:30";
-    },
-    floor(newFloor: keyof typeof this.floorRooms) {
-      const firstRoom = this.floorRooms[newFloor]
-        ? this.floorRooms[newFloor][0]
-        : "";
-      this.room = firstRoom;
-    },
-  },
-
-  mounted() {
+// Lifecycle hooks
+onMounted(async () => {
+  try {
     const currentYear = new Date().getFullYear().toString();
-    this.fetchHolidays(currentYear);
-    this.currentDate = this.formatDate(new Date());
-  },
-
-  methods: {
-    async fetchHolidays(year: string) {
-      try {
-        const response = await fetch(
-          `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=${year}`,
-          {
-            headers: {
-              "X-IBM-Client-Id": "516eaa15-07e4-428c-b4bf-84def4ea69ab",
-              accept: "application/json",
-            },
-          }
-        );
-
-        if (response.ok) {
-          const responseData = await response.json();
-          if (responseData.result && Array.isArray(responseData.result.data)) {
-            this.holidays = responseData.result.data.map(
-              (holiday: { Date: string }) => holiday.Date
-            );
-          } else {
-            console.error("Invalid data structure:", responseData);
-          }
-        } else {
-          console.error("Failed to fetch holidays");
-        }
-      } catch (error) {
-        console.error("Error fetching holidays:", error);
-      }
-    },
-
-    allowedDates(date: Date) {
-      if (!(date instanceof Date)) return false;
-
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      const formattedDate = `${year}-${month}-${day}`;
-
-      return !this.holidays.includes(formattedDate);
-    },
-
-    validateNumber() {
-      this.numPeople = this.numPeople.replace(/\D/g, "");
-    },
-
-    formatDate(date: Date) {
-      const options: Intl.DateTimeFormatOptions = {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      };
-      return new Intl.DateTimeFormat("th-TH", options).format(date);
-    },
-
-    onRepeatOptionChange() {
-      if (this.repeatOption === "ไม่") {
-        this.endRepeatDate = null;
-      }
-    },
-  },
+    await Promise.all([
+      fetchHolidays(currentYear),
+      (currentDate.value = formatDate(new Date())),
+    ]);
+  } catch (error) {
+    console.error("Error initializing holidays:", error);
+  }
 });
+// Computed properties
+const filteredEndTimes = computed(() => {
+  const start = startTime.value;
+  const startIndex = timeOptions.indexOf(start);
+  return startIndex >= 0 ? timeOptions.slice(startIndex + 1) : [];
+});
+
+const availableRooms = computed(() => {
+  return floor.value in floorRooms
+    ? floorRooms[floor.value as keyof typeof floorRooms]
+    : [];
+});
+
+// Watchers
+watch(startTime, (newStartTime) => {
+  const availableTimes = filteredEndTimes.value;
+  endTime.value = availableTimes[0] || "08:30";
+});
+
+watch(floor, (newFloor) => {
+  const firstRoom = floorRooms[newFloor as keyof typeof floorRooms]?.[0] || "";
+  room.value = firstRoom;
+});
+
+// Methods
+async function fetchHolidays(year: string) {
+  try {
+    const response = await fetch(
+      `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=${year}`,
+      {
+        headers: {
+          "X-IBM-Client-Id": "516eaa15-07e4-428c-b4bf-84def4ea69ab",
+          accept: "application/json",
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      if (responseData.result && Array.isArray(responseData.result.data)) {
+        holidays.value = responseData.result.data.map(
+          (holiday: { Date: string }) => holiday.Date
+        );
+      } else {
+        console.error("Invalid data structure:", responseData);
+      }
+    } else {
+      console.error("Failed to fetch holidays");
+    }
+  } catch (error) {
+    console.error("Error fetching holidays:", error);
+  }
+}
+
+function allowedDates(date: Date) {
+  if (!(date instanceof Date)) return false;
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const formattedDate = `${year}-${month}-${day}`;
+
+  return !holidays.value.includes(formattedDate);
+}
+
+function validateNumber() {
+  numPeople.value = numPeople.value.replace(/\D/g, "");
+}
+
+function formatDate(date: Date) {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  };
+  return new Intl.DateTimeFormat("th-TH", options).format(date);
+}
+
+function onRepeatOptionChange() {
+  if (repeatOption.value === "ไม่") {
+    endRepeatDate.value = null;
+  }
+}
 </script>
 
 <style scoped>

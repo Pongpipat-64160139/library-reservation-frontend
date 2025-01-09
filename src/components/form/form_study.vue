@@ -273,7 +273,6 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const roomStore = useRoomStore();
-
     const roomType = ref((route.query.roomType as string) || "Group Study");
     const floor = ref(parseInt((route.query.floor as string) || "3"));
     const roomName = ref(
@@ -288,7 +287,7 @@ export default defineComponent({
         case "Entertain":
           return [6];
         case "Meeting":
-          return [2, 5, 6, 7];
+          return [2, 5, 6, 7,12];
         default:
           return [];
       }
@@ -524,7 +523,7 @@ export default defineComponent({
 
       return !isHoliday;
     },
-    handleDateUpdate(val: Date) {
+    handleDateUpdate(val: any) {
       this.startDate = val;
       this.endDate = val;
       this.endRepeatDate = val;

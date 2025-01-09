@@ -84,6 +84,7 @@
               v-for="(room, roomIndex) in rooms3"
               :key="roomIndex"
               class="room6-column"
+              @click="selectRoom(roomIndex, 3, time)"
             >
               <a
                 :href="generateBookingLink(roomIndex, time, 3)"
@@ -130,6 +131,7 @@
               v-for="(room, roomIndex) in rooms4"
               :key="roomIndex"
               class="room5-column"
+              @click="selectRoom(roomIndex, 4, time)"
             >
               <a
                 :href="generateBookingLink(roomIndex, time, 4)"
@@ -176,6 +178,7 @@
               v-for="(room, roomIndex) in rooms5"
               :key="roomIndex"
               class="room5-column"
+              @click="selectRoom(roomIndex, 5, time)"
             >
               <a
                 :href="generateBookingLink(roomIndex, time, 5)"
@@ -196,12 +199,16 @@ import { useRouter } from "vue-router";
 import Footer_page from "../footer/footer_page.vue";
 import { useRoomStore } from "@/stores/roomStore";
 import { useHolidayStore } from "@/stores/holidayStore";
+import type { CurrentRoom } from "@/types/currentRoom";
 const showDatePicker = ref(false);
 const currentDate = ref("");
 const selectedDate = ref<string | null>(null);
 const holidays = ref<string[]>([]);
 const roomStore = useRoomStore();
 const holidayStore = useHolidayStore();
+// ตัวแปรเก็บห้องที่ถูกเลือก
+const selectedRoom = ref<CurrentRoom | null>(null);
+
 // const fetchHolidays = async (years: string[]) => {
 //   const holidayPromises = years.map(async (year) => {
 //     const response = await fetch(
@@ -267,6 +274,8 @@ onMounted(async () => {
     // เรียก API เพื่อดึงข้อมูลวันหยุดย้อนหลัง
     await holidayStore.getAllHolidayInYear(years);
     console.log("Current year: " + currentYear);
+
+    // เปลี่ยน CurrentType
     // await fetchHolidays(years);
     // console.log(`Holidays loaded for years ${years.join(", ")}:`, holidays.value);
   } catch (error) {
@@ -373,6 +382,29 @@ const onSelectChange = (value: string) => {
     router.push("/table_meeting");
   }
 };
+function selectRoom(roomIndex: number, floor: number, time: string) {
+  const rooms =
+    floor === 3
+      ? roomStore.studyFloor3
+      : floor === 4
+      ? roomStore.studyFloor4
+      : floor === 5
+      ? roomStore.studyFloor5
+      : [];
+
+  const room = rooms[roomIndex];
+  if (room) {
+    roomStore.currentTypeRoom = {
+      roomId: room.roomId,
+      roomName: room.roomName,
+      floorId: floor,
+      selectedTime: time,
+    }
+    console.log("Selected Room:", roomStore.currentTypeRoom); // สำหรับ Debug
+  } else {
+    console.error(`Room not found: floor=${floor}, roomIndex=${roomIndex}`);
+  }
+}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
