@@ -1,13 +1,8 @@
 <template class="back-ground">
   <Header_page />
 
-  <v-container
-    fluid
-    class="back-ground ms-kob"
-  >
-    <h1 class="pt-5 head-title text-center pb-10">
-      ประเภทห้อง
-    </h1>
+  <v-container fluid class="back-ground ms-kob">
+    <h1 class="pt-5 head-title text-center pb-10">ประเภทห้อง</h1>
 
     <!-- Sheet1 Group Study Room -->
     <v-sheet class="mx-auto study_box">
@@ -21,23 +16,13 @@
         </router-link>
       </span>
 
-      <v-slide-group
-        show-arrows
-        class="ps-13"
-      >
-        <v-slide-group-item
-          v-for="(room, index) in studys"
-          :key="index"
-        >
+      <v-slide-group show-arrows class="mg-arrow mg-arrowipad">
+        <v-slide-group-item v-for="(room, index) in studys" :key="index">
           <div
-            class="ma-4 d-flex flex-column align-center"
+            class="ma-4 d-flex flex-column align-center mg-leftimage"
             @click="openDialog(room)"
           >
-            <img
-              :src="room.src"
-              :alt="room.alt"
-              class="slide-image"
-            >
+            <img :src="room.src" :alt="room.alt" class="slide-image" />
             <span class="mt-2 text-center room-caption">{{
               room.caption
             }}</span>
@@ -58,23 +43,13 @@
         </router-link>
       </span>
 
-      <v-slide-group
-        show-arrows
-        class="ps-13"
-      >
-        <v-slide-group-item
-          v-for="(room, index) in entertainment"
-          :key="index"
-        >
+      <v-slide-group show-arrows class="mg-arrow mg-arrowipad">
+        <v-slide-group-item v-for="(room, index) in entertainment" :key="index">
           <div
             class="ma-4 d-flex flex-column align-center"
             @click="openDialog(room)"
           >
-            <img
-              :src="room.src"
-              :alt="room.alt"
-              class="slide-image"
-            >
+            <img :src="room.src" :alt="room.alt" class="slide-image" />
             <span class="mt-2 text-center room-caption">
               {{ room.caption }}
             </span>
@@ -95,23 +70,13 @@
         </router-link>
       </span>
 
-      <v-slide-group
-        show-arrows
-        class=""
-      >
-        <v-slide-group-item
-          v-for="(room, index) in meeting"
-          :key="index"
-        >
+      <v-slide-group show-arrows class="ms-1 mg-arrow">
+        <v-slide-group-item v-for="(room, index) in meeting" :key="index">
           <div
             class="ma-4 d-flex flex-column align-center"
             @click="openDialog(room)"
           >
-            <img
-              :src="room.src"
-              :alt="room.alt"
-              class="slide-image"
-            >
+            <img :src="room.src" :alt="room.alt" class="slide-image" />
             <span class="mt-2 text-center room-caption">
               {{ room.caption }}
             </span>
@@ -120,29 +85,23 @@
       </v-slide-group>
     </v-sheet>
 
-    <v-dialog
-      v-model="dialog"
-      overlay
-      max-width="900px"
-    >
+    <v-dialog v-model="dialog" overlay max-width="900px">
       <v-card class="style_dialog">
         <v-card-title class="headline text-center text-bold mt-8">
-          {{
-            selectedRoom.caption
-          }}
+          {{ selectedRoom.caption }}
         </v-card-title>
         <v-card-text>
           <div class="d-flex">
             <!-- ซ้าย -->
-            <div class="text-left ms-4">
+            <div class="text-left mg-textdialogs">
               <!-- ไอคอนและข้อความจำนวนห้อง -->
-              <div class="align-center mb-16 mt-16">
+              <div class="align-center mg-topdialog">
                 <p>จำนวน {{ selectedRoom.count }} ห้อง</p>
                 <img
                   :src="selectedRoom.gifRoom"
                   alt="Room GIF"
                   class="icon-gif me-2"
-                >
+                />
               </div>
               <div class="align-center mt-16">
                 <p>จำนวน {{ selectedRoom.seats }} ที่นั่ง</p>
@@ -150,7 +109,7 @@
                   :src="selectedRoom.gifSeat"
                   alt="Room GIF"
                   class="icon-gif me-2"
-                >
+                />
               </div>
             </div>
 
@@ -159,17 +118,13 @@
               :src="selectedRoom.src"
               :alt="selectedRoom.alt"
               class="dialog-image mx-auto"
-            >
+            />
 
             <!-- ขวา -->
-            <div class="text-left me-4">
-              <div class="align-center mb-16 mt-16">
+            <div class="text-left mg-textdialoge">
+              <div class="align-center mg-topdialog">
                 <p>รับกุญแจชั้น {{ selectedRoom.key }}</p>
-                <img
-                  :src="key_gif"
-                  alt="Dressing Room Icon"
-                  class="icon-gif"
-                >
+                <img :src="key_gif" alt="Dressing Room Icon" class="icon-gif" />
               </div>
               <div class="align-center mt-16">
                 <p>ผู้มีสิทธิ์จอง</p>
@@ -177,7 +132,7 @@
                   :src="selectedRoom.gifRole"
                   alt="Room GIF"
                   class="icon-gif me-2"
-                >
+                />
               </div>
             </div>
           </div>
@@ -477,23 +432,27 @@ export default {
   font-size: 20px;
 }
 
+.mg-arrow {
+  margin-left: 50px;
+}
+
 .regular-study-title {
   font-weight: 400;
   font-size: 16px;
   margin-left: 355px;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 .regular-entertain-title {
   font-weight: 400;
   font-size: 16px;
   margin-left: 447px;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 .regular-meeting-title {
   font-weight: 400;
   font-size: 16px;
   margin-left: 395px;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .room-caption {
@@ -555,16 +514,6 @@ export default {
   z-index: 10;
 }
 
-@media (max-width: 500px) {
-  .dialog-image {
-    width: 250px;
-    height: 250px;
-  }
-  .text-left {
-    font-size: 14px;
-  }
-}
-
 .icon-gif {
   width: 70px;
   height: 70px;
@@ -598,6 +547,191 @@ export default {
   box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
 }
 
+.mg-textdialogs {
+  margin-left: 50px;
+}
 
+.mg-textdialoge {
+  margin-right: 50px;
+}
 
+.mg-topdialog {
+  margin-top: 50px;
+}
+
+.mg-bottomdialog {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 1024px) {
+  .head-title {
+    font-weight: 600;
+    font-size: 20px;
+  }
+
+  .head1-title {
+    font-weight: 600;
+    font-size: 20px;
+    margin-left: 40px;
+  }
+
+  .mg-leftimage {
+    margin-left: 100px;
+  }
+
+  .regular-study-title {
+    font-weight: 400;
+    font-size: 16px;
+    margin-left: 255px;
+    margin-top: 8px;
+  }
+  .regular-entertain-title {
+    font-weight: 400;
+    font-size: 16px;
+    margin-left: 347px;
+    margin-top: 8px;
+  }
+  .regular-meeting-title {
+    font-weight: 400;
+    font-size: 16px;
+    margin-left: 295px;
+    margin-top: 8px;
+  }
+
+  .room-caption {
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  .slide-image {
+    width: 170px;
+    height: 170px;
+    border-radius: 10px;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .ms-kob {
+    margin-top: -900px;
+  }
+
+  .mg-arrow {
+    margin-left: 1px;
+  }
+
+  .mg-arrowipad {
+    margin-left: 85px;
+  }
+
+  .dialog-image {
+    width: 300px;
+    height: 300px;
+    margin: auto;
+  }
+  .icon-gif {
+    width: 50px;
+    height: 50px;
+    margin-top: 10px;
+  }
+  .text-left {
+    font-size: 16px;
+  }
+  .mg-textdialogs {
+    margin-left: 0px;
+  }
+
+  .mg-textdialoge {
+    margin-right: 0px;
+  }
+  .mg-topdialog {
+    margin-top: 20px;
+  }
+
+  .mg-bottomdialog {
+    margin-bottom: 10px;
+  }
+}
+
+/* phone */
+@media (max-width: 768px) {
+  .head-title {
+    font-weight: 600;
+    font-size: 20px;
+  }
+
+  .head1-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-left: -40px;
+  }
+
+  .regular-study-title {
+    font-weight: 400;
+    font-size: 14px;
+    margin-left: 40px;
+    margin-top: 5px;
+  }
+  .regular-entertain-title {
+    font-weight: 400;
+    font-size: 14px;
+    margin-left: 123px;
+    margin-top: 5px;
+  }
+  .regular-meeting-title {
+    font-weight: 400;
+    font-size: 14px;
+    margin-left: 68px;
+    margin-top: 5px;
+  }
+
+  .room-caption {
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  .slide-image {
+    width: 170px;
+    height: 170px;
+    border-radius: 10px;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .ms-kob {
+    margin-top: -550px;
+  }
+
+  .mg-arrow {
+    margin-left: 1px;
+  }
+
+  .dialog-image {
+    width: 170px;
+    height: 170px;
+    margin: auto;
+    padding: 10px;
+  }
+  .icon-gif {
+    width: 50px;
+    height: 50px;
+    margin-top: 10px;
+  }
+  .text-left {
+    font-size: 11px;
+  }
+  .mg-textdialogs {
+    margin-left: 0px;
+  }
+
+  .mg-textdialoge {
+    margin-right: 0px;
+  }
+  .mg-topdialog {
+    margin-top: 20px;
+  }
+
+  .mg-bottomdialog {
+    margin-bottom: 10px;
+  }
+}
 </style>
