@@ -392,7 +392,7 @@ function selectRoom(roomIndex: number, floor: number, time: string) {
 
   const room = rooms[roomIndex];
   if (room) {
-    roomStore.currentTypeRoom = {
+    roomStore.setCurrentRoom({
       roomId: room.roomId,
       roomName: room.roomName,
       capacity: room.capacity,
@@ -403,8 +403,8 @@ function selectRoom(roomIndex: number, floor: number, time: string) {
       orderFood: room.orderFood,
       floorId: room.floorId,
       selectedTime: time,
-    };
-    console.log("Selected Room:", roomStore.currentTypeRoom); // สำหรับ Debug
+    });
+    console.log("Selected Room:", roomStore.currentTypeRoom);
   } else {
     console.error(`Room not found: floor=${floor}, roomIndex=${roomIndex}`);
   }

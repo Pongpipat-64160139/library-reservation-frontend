@@ -7,7 +7,9 @@ import { CurrentRoom } from "../types/currentRoom";
 export const useRoomStore = defineStore("room", () => {
   const roomservice = roomService;
 
-  const currentTypeRoom = ref<CurrentRoom>();
+  const currentTypeRoom = ref<CurrentRoom>(
+    JSON.parse(localStorage.getItem("currentTypeRoom") || "null")
+  );
 
   const groupStudyRooms = ref<GetRoomType[]>([]);
   const studyFloor3 = ref<GetRoomType[]>([]);
@@ -29,6 +31,20 @@ export const useRoomStore = defineStore("room", () => {
   const meetingRoomFloor7 = ref<GetRoomType[]>([]);
   const meetingRoomFloor6 = ref<GetRoomType[]>([]);
   const holidays = ref<string[]>([]);
+
+  function setCurrentRoom(room: CurrentRoom) {
+    currentTypeRoom.value = room;
+    localStorage.setItem("currentTypeRoom", JSON.stringify(room)); // เก็บใน LocalStorage
+  }
+
+  function getCurrentRoom() {
+    const storedRoom = localStorage.getItem("currentTypeRoom");
+    if (storedRoom) {
+      currentTypeRoom.value = JSON.parse(storedRoom);
+    }
+    return currentTypeRoom;
+  }  
+
   async function filteredMeetingRooms() {
     const response = await roomservice.getRoomTypes("Meeting");
 
@@ -177,5 +193,7 @@ export const useRoomStore = defineStore("room", () => {
     meetingRoomFloor6,
     currentTypeRoom,
     holidays,
+    setCurrentRoom,
+    getCurrentRoom,
   };
 });

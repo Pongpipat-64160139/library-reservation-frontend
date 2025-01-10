@@ -198,7 +198,7 @@ const endRepeatMenu = ref(false);
 const endRepeatDate = ref<Date | null>(null);
 const startTime = ref<"08:00" | "08:30" | "09:00" | "19:30">("08:00");
 const endTime = ref("08:30");
-const floor = ref(3);
+const floor = ref<number>();
 const room = ref("ศึกษากลุ่ม 1");
 const repeatOption = ref("ไม่");
 const timeOptions = ref([
@@ -229,42 +229,27 @@ const timeOptions = ref([
 ]);
 
 // Room type and related computed properties
-const roomType = ref((route.query.roomType as string) || "Group Study");
+// const roomType = ref((route.query.roomType as string) || "Group Study");
 const roomName = ref(decodeURIComponent(route.query.roomName as string) || "");
+const currentRoom = roomStore.currentTypeRoom;
 const availableFloors = computed(() => {
-  switch (roomType.value) {
-    case "Group Study":
-      return [3, 4, 5];
-    case "Entertain":
-      return [6];
-    case "Meeting":
-      return [2, 5, 6, 7, 12];
-    default:
-      return [];
+  if (currentRoom.roomType === "Group study") {
+    return [3, 4, 5];
   }
 });
 
 const availableRooms = computed(() => {
-  switch (roomType.value) {
-    case "Group Study":
-      if (floor.value === 3)
-        return roomStore.studyFloor3.map((r) => r.roomName);
-      if (floor.value === 4)
-        return roomStore.studyFloor4.map((r) => r.roomName);
-      if (floor.value === 5)
-        return roomStore.studyFloor5.map((r) => r.roomName);
-      break;
-    case "Entertain":
-      return roomStore.okeRooms
-        .map((r) => r.roomName)
-        .concat(roomStore.stvRooms.map((r) => r.roomName))
-        .concat(roomStore.miniTheater.map((r) => r.roomName));
-    case "Meeting":
-      return roomStore.meetingRooms
-        .filter((r) => r.floorId === floor.value)
-        .map((r) => r.roomName);
-    default:
-      return [];
+  if (currentRoom.roomType === "Group study") {
+    if (floor.value === 3) {
+      console.log(roomStore.studyFloor3.map((room) => room.roomName));
+      return roomStore.studyFloor3.map((room) => room.roomName);
+    } else if (floor.value === 4) {
+      console.log(roomStore.studyFloor4.map((room) => room.roomName));
+      return roomStore.studyFloor4.map((room) => room.roomName);
+    } else if (floor.value === 5) {
+      console.log(roomStore.studyFloor5.map((room) => room.roomName));
+      return roomStore.studyFloor5.map((room) => room.roomName);
+    }
   }
 });
 
@@ -332,11 +317,14 @@ const fetchHolidays = async () => {
     console.error("Failed to fetch holidays:", error);
   }
 };
-
+function selectFloor(floor: number) {
+  console.log("Select Floor:", floor);
+}
 // Lifecycle hooks
 onMounted(async () => {
   await roomStore.filteredEntertainRooms();
   await roomStore.initializeRooms();
+  floor.value = roomStore.currentTypeRoom.floorId + 1;
 });
 
 // Watchers
@@ -348,14 +336,7 @@ watch(startTime, (newStartTime) => {
 });
 
 watch(floor, (newFloor) => {
-  const rooms = roomStore.studyFloor3;
-  const filteredRooms = rooms.filter((room) => room.floorId === newFloor); // กรองห้องเฉพาะชั้น
-  if (filteredRooms.length > 0) {
-    room.value = filteredRooms[0].roomName; // ใช้ห้องแรกในผลลัพธ์
-  } else {
-    console.error(`No rooms found for floor: ${newFloor}`);
-    room.value = ""; // หรือค่าที่คุณต้องการตั้งเป็นค่าเริ่มต้น
-  }
+  console.log("Floor update:", newFloor);
 });
 </script>
 
