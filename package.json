@@ -20,6 +20,7 @@
     "pinia": "^2.3.0",
     "roboto-fontface": "*",
     "vue": "^3.4.31",
+    "vue-month-picker": "^1.7.2",
     "vuetify": "^3.7.5"
   },
   "devDependencies": {

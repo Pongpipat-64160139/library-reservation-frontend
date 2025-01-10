@@ -1,21 +1,10 @@
 <template>
   <Header_page />
-  <v-container
-    fluid
-    class="back-ground ms-kob"
-  >
-    <h1 class="pt-5 head-title text-center pb-10">
-      รายละเอียดห้อง
-    </h1>
+  <v-container fluid class="back-ground ms-kob">
+    <h1 class="pt-5 head-title text-center pb-10">รายละเอียดห้อง</h1>
 
-    <div
-      v-for="floor in Object.keys(floorRooms)"
-      :key="floor"
-      class="mb-10"
-    >
-      <h2 class="text-h5 font-weight-bold ms-5 mb-2">
-        ชั้น {{ floor }}
-      </h2>
+    <div v-for="floor in Object.keys(floorRooms)" :key="floor" class="mb-10">
+      <h2 class="text-h5 font-weight-bold ms-5 mb-2">ชั้น {{ floor }}</h2>
       <v-data-table
         :headers="headers"
         :items="filteredRooms(Number(floor))"
@@ -27,29 +16,14 @@
         <template #headers>
           <tr>
             <th style="width: 40%">
-              ชื่อห้อง <v-icon
-                left
-                class="ms-2 mg-icon"
-              >
-                mdi-door
-              </v-icon>
+              ชื่อห้อง <v-icon left class="ms-2 mg-icon"> mdi-door </v-icon>
             </th>
             <th style="width: 40%">
               จำนวนคน
-              <v-icon
-                left
-                class="ms-2 mg-icon"
-              >
-                mdi-account-group
-              </v-icon>
+              <v-icon left class="ms-2 mg-icon"> mdi-account-group </v-icon>
             </th>
             <th style="width: 20%">
-              รับกุญแจ <v-icon
-                left
-                class="ms-2 mg-icon"
-              >
-                mdi-key
-              </v-icon>
+              รับกุญแจ <v-icon left class="ms-2 mg-icon"> mdi-key </v-icon>
             </th>
           </tr>
         </template>

@@ -1,33 +1,15 @@
 <template>
   <v-row>
     <!-- Col ซ้าย -->
-    <v-col
-      cols="12"
-      md="5"
-      class="ms-15"
-    >
+    <v-col cols="12" md="5" class="ms-15">
       <div>
-        <v-img
-          :src="buulib"
-          width="350"
-          height="100"
-          class="mt-10"
-        />
-        <p class="font-text mt-3 ms-9">
-          Welcome to our online
-        </p>
-        <p class="font-text ms-9">
-          library reservation system!
-        </p>
+        <v-img :src="buulib" width="350" height="100" class="mt-10" />
+        <p class="font-text mt-3 ms-9">Welcome to our online</p>
+        <p class="font-text ms-9">library reservation system!</p>
 
         <v-card-text class="mt-15 ms-6">
-          <p class="font-head2">
-            Username
-          </p>
-          <v-form
-            class="width-form"
-            @submit.prevent="submitForm"
-          >
+          <p class="font-head2">Username</p>
+          <v-form class="width-form" @submit.prevent="submitForm">
             <v-text-field
               v-model="username"
               class="mt-2 text-field-rounded"
@@ -37,9 +19,7 @@
               hide-details
             />
 
-            <p class="font-head2 mt-9">
-              Password
-            </p>
+            <p class="font-head2 mt-9">Password</p>
             <v-text-field
               v-model="password"
               class="mt-2 text-field-rounded"
@@ -64,15 +44,8 @@
     </v-col>
 
     <!-- Col ขวา -->
-    <v-col
-      cols="12"
-      md="6"
-    >
-      <v-img
-        :src="lib"
-        width="700"
-        height="700"
-      />
+    <v-col cols="12" md="6">
+      <v-img :src="lib" width="700" height="700" />
     </v-col>
   </v-row>
 </template>

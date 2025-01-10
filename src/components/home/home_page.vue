@@ -141,6 +141,7 @@
       </v-card>
     </v-dialog>
   </v-container>
+  <Footer_page />
 </template>
 
 <script lang="ts">
