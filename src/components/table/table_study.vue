@@ -206,8 +206,6 @@ const selectedDate = ref<string | null>(null);
 const holidays = ref<string[]>([]);
 const roomStore = useRoomStore();
 const holidayStore = useHolidayStore();
-// ตัวแปรเก็บห้องที่ถูกเลือก
-const selectedRoom = ref<CurrentRoom | null>(null);
 
 // const fetchHolidays = async (years: string[]) => {
 //   const holidayPromises = years.map(async (year) => {
@@ -397,9 +395,15 @@ function selectRoom(roomIndex: number, floor: number, time: string) {
     roomStore.currentTypeRoom = {
       roomId: room.roomId,
       roomName: room.roomName,
-      floorId: floor,
+      capacity: room.capacity,
+      maxHours: room.maxHours,
+      roomStatus: room.roomStatus,
+      roomType: room.roomType,
+      roomMinimum: room.roomMinimum,
+      orderFood: room.orderFood,
+      floorId: room.floorId,
       selectedTime: time,
-    }
+    };
     console.log("Selected Room:", roomStore.currentTypeRoom); // สำหรับ Debug
   } else {
     console.error(`Room not found: floor=${floor}, roomIndex=${roomIndex}`);

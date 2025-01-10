@@ -1,6 +1,5 @@
 <template class="back-ground">
   <v-container fluid class="back-ground ms-kob">
-    <!-- Sheet1 จองห้อง -->
     <v-sheet
       class="mx-auto mt-1"
       elevation="8"
@@ -14,6 +13,7 @@
         <h1 class="mg-name pt-5 head1-title">ชื่อ</h1>
         <v-text-field
           class="width-formname text-field-rounded"
+          v-model="numPeople"
           single-line
           outlined
           :rules="[(v) => !!v || '']"
@@ -24,7 +24,6 @@
       <!-- span2 -->
       <span class="d-flex">
         <h1 class="mg-date1 head1-title">วันที่เริ่ม</h1>
-
         <v-menu
           v-model="startMenu"
           v-model:return-value="startDate"
@@ -32,28 +31,12 @@
           transition="scale-transition"
           offset-y
         >
-          <template
-            #activator="{ props }"
-            class="width-formdate1 text-field-rounded"
-          >
-            <!-- ปุ่มหรือฟิลด์ที่ใช้เปิด dropdown -->
+          <template #activator="{ props }">
             <v-text-field
               class="width-formdate1 text-field-rounded"
               v-bind="props"
               :value="
-                startDate
-                  ? new Date(startDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
+                startDate ? formatDate(startDate) : formatDate(new Date())
               "
               readonly
             />
@@ -80,34 +63,15 @@
         <v-menu
           v-model="endMenu"
           v-model:return-value="endDate"
-          class="width-formdate2 text-field-rounded"
           :close-on-content-click="false"
           transition="scale-transition"
           offset-y
         >
-          <template
-            #activator="{ props }"
-            class="width-formdate2 text-field-rounded"
-          >
-            <!-- ปุ่มหรือฟิลด์ที่ใช้เปิด dropdown -->
+          <template #activator="{ props }">
             <v-text-field
               class="width-formdate2 text-field-rounded"
               v-bind="props"
-              :value="
-                endDate
-                  ? new Date(endDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-              "
+              :value="endDate ? formatDate(endDate) : formatDate(new Date())"
               readonly
               :disabled="true"
             />
@@ -174,18 +138,8 @@
               v-bind="props"
               :value="
                 endRepeatDate
-                  ? new Date(endRepeatDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
+                  ? formatDate(endRepeatDate)
+                  : formatDate(new Date())
               "
               readonly
               :disabled="repeatOption === 'ไม่'"
@@ -209,6 +163,7 @@
       <span class="d-flex">
         <h1 class="head1-title mg-detail">รายละเอียด</h1>
         <v-textarea
+          v-model="phoneNumber"
           label=""
           rows="3"
           outlined
@@ -216,28 +171,32 @@
         />
       </span>
       <v-btn to="/table_study" type="submit" class="save-btn custom-btn">
-        <v-icon left> mdi-content-save </v-icon>
+        <v-icon left>mdi-content-save</v-icon>
         จองห้อง
       </v-btn>
     </v-sheet>
   </v-container>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch } from "vue";
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useRoomStore } from "@/stores/roomStore";
 
+const route = useRoute();
+const roomStore = useRoomStore();
+
+// Data properties
 const numPeople = ref("");
 const phoneNumber = ref("");
 const menu = ref(false);
 const startMenu = ref(false);
 const endMenu = ref(false);
-const startDate = ref(null);
-const endDate = ref(null);
+const startDate = ref<Date | null>(null);
+const endDate = ref<Date | null>(null);
 const endRepeatMenu = ref(false);
-const endRepeatDate = ref(null);
-const startTime = ref("08:00");
+const endRepeatDate = ref<Date | null>(null);
+const startTime = ref<"08:00" | "08:30" | "09:00" | "19:30">("08:00");
 const endTime = ref("08:30");
 const floor = ref(3);
 const room = ref("ศึกษากลุ่ม 1");
@@ -269,326 +228,135 @@ const timeOptions = ref([
   "19:30",
 ]);
 
-export default defineComponent({
-  setup() {
-    const route = useRoute();
-    const roomStore = useRoomStore();
-    const roomType = ref((route.query.roomType as string) || "Group Study");
-    const floor = ref(parseInt((route.query.floor as string) || "3"));
-    const roomName = ref(
-      decodeURIComponent(route.query.roomName as string) || ""
-    );
-    const startTime = ref(route.query.time || "08:00");
-
-    const availableFloors = computed(() => {
-      switch (roomType.value) {
-        case "Group Study":
-          return [3, 4, 5];
-        case "Entertain":
-          return [6];
-        case "Meeting":
-          return [2, 5, 6, 7,12];
-        default:
-          return [];
-      }
-    });
-
-    const availableRooms = computed(() => {
-      switch (roomType.value) {
-        case "Group Study":
-          if (floor.value === 3)
-            return roomStore.studyFloor3.map((r) => r.roomName);
-          if (floor.value === 4)
-            return roomStore.studyFloor4.map((r) => r.roomName);
-          if (floor.value === 5)
-            return roomStore.studyFloor5.map((r) => r.roomName);
-          break;
-        case "Entertain":
-          return roomStore.okeRooms
-            .map((r) => r.roomName)
-            .concat(roomStore.stvRooms.map((r) => r.roomName))
-            .concat(roomStore.miniTheater.map((r) => r.roomName));
-        case "Meeting":
-          return roomStore.meetingRooms
-            .filter((r) => r.floorId === floor.value)
-            .map((r) => r.roomName);
-        default:
-          return [];
-      }
-    });
-
-    onMounted(async () => {
-      await roomStore.filteredEntertainRooms();
-      await roomStore.initializeRooms();
-    });
-
-    return {
-      floor,
-      roomName,
-      startTime,
-      roomType,
-      availableFloors,
-      availableRooms,
-    };
-  },
-  data() {
-    return {
-      numPeople: "",
-      phoneNumber: "",
-      menu: false,
-      startMenu: false,
-      endMenu: false,
-      startDate: null,
-      endDate: null,
-      endRepeatMenu: false,
-      endRepeatDate: null,
-      startTime: "08:00",
-      endTime: "08:30",
-      floor: 3,
-      floorRooms: {
-        3: ["Room 301", "Room 302", "Room 303"],
-        4: ["Room 401", "Room 402", "Room 403"],
-        5: ["Room 501", "Room 502", "Room 503"],
-      },
-      room: "ศึกษากลุ่ม 1",
-      repeatOption: "ไม่",
-      timeOptions: [
-        "08:00",
-        "08:30",
-        "09:00",
-        "09:30",
-        "10:00",
-        "10:30",
-        "11:00",
-        "11.30",
-        "12:00",
-        "12:30",
-        "13:00",
-        "13:30",
-        "14:00",
-        "14:30",
-        "15:00",
-        "15:30",
-        "16:00",
-        "16:30",
-        "17:00",
-        "17:30",
-        "18:00",
-        "18:30",
-        "19:00",
-        "19:30",
-      ],
-
-      currentDate: this.formatDate(
-        new Date("Tue Dec 03 2024 00:00:00 GMT+0700")
-      ),
-
-      showStartDatePicker: false,
-      showEndDatePicker: false,
-      currentStartDate: "",
-      currentEndDate: "",
-      holidays: [] as string[],
-    };
-  },
-
-  watch: {
-    startTime(newStartTime) {
-      console.log("Start Time:", newStartTime); // สำหรับการดีบัก
-      const availableTimes = this.filteredEndTimes();
-      console.log("Available End Times:", availableTimes); // ตรวจสอบรายการที่กรองแล้ว
-      this.endTime = availableTimes.length > 0 ? availableTimes[0] : ""; // ตั้งค่า endTime เป็นค่าแรก
-    },
-    floor(newFloor: keyof typeof this.floorRooms) {
-      if (newFloor in this.floorRooms) {
-        const firstRoom = this.floorRooms[newFloor]?.[0] || ""; // ใช้ optional chaining
-        this.room = firstRoom;
-      } else {
-        console.error(`Invalid floor: ${newFloor}`);
-        this.room = ""; // หรือค่า default
-      }
-    },
-  },
-
-  async mounted() {
-    console.log("Initial startTime:", this.startTime);
-    const availableTimes = this.filteredEndTimes();
-    this.endTime = availableTimes.length > 0 ? availableTimes[0] : "";
-
-    if (this.startTime === "20:00") {
-      this.startTime = "19:30";
-    }
-  },
-
-  methods: {
-    filteredEndTimes() {
-      if (this.startTime === "08:00") {
-        return ["08:30", "09:00", "09:30", "10:00"];
-      }
-      if (this.startTime === "08:30") {
-        return ["09:00", "09:30", "10:00", "10:30"];
-      }
-      if (this.startTime === "09:00") {
-        return ["09:30", "10:00", "10:30", "11:00"];
-      }
-      if (this.startTime === "09:30") {
-        return ["10:00", "10:30", "11:00", "11:30"];
-      }
-      if (this.startTime === "10:00") {
-        return ["10:30", "11:00", "11:30", "12:00"];
-      }
-      if (this.startTime === "10:30") {
-        return ["11:00", "11:30", "12:00", "12:30"];
-      }
-      if (this.startTime === "11:00") {
-        return ["11:30", "12:00", "12:30", "13:00"];
-      }
-      if (this.startTime === "11:30") {
-        return ["12:00", "12:30", "13:00", "13:30"];
-      }
-      if (this.startTime === "12:00") {
-        return ["12:30", "13:00", "13:30", "14:00"];
-      }
-      if (this.startTime === "12:30") {
-        return ["13:00", "13:30", "14:00", "14:30"];
-      }
-      if (this.startTime === "13:00") {
-        return ["13:30", "14:00", "14:30", "15:00"];
-      }
-      if (this.startTime === "13:30") {
-        return ["14:00", "14:30", "15:00", "15:30"];
-      }
-      if (this.startTime === "14:00") {
-        return ["14:30", "15:00", "15:30", "16:00"];
-      }
-      if (this.startTime === "14:30") {
-        return ["15:00", "15:30", "16:00", "16:30"];
-      }
-      if (this.startTime === "15:00") {
-        return ["15:30", "16:00", "16:30", "17:00"];
-      }
-      if (this.startTime === "15:30") {
-        return ["16:00", "16:30", "17:00", "17:30"];
-      }
-      if (this.startTime === "16:00") {
-        return ["16:30", "17:00", "17:30", "18:00"];
-      }
-      if (this.startTime === "16:30") {
-        return ["17:00", "17:30", "18:00", "18:30"];
-      }
-      if (this.startTime === "17:00") {
-        return ["17:30", "18:00", "18:30", "19:00"];
-      }
-      if (this.startTime === "17:30") {
-        return ["18:00", "18:30", "19:00", "19:30"];
-      }
-      if (this.startTime === "18:00") {
-        return ["18:30", "19:00", "19:30", "20:00"];
-      }
-      if (this.startTime === "18:30") {
-        return ["19:00", "19:30", "20:00"];
-      }
-      if (this.startTime === "19:00") {
-        return ["19:30", "20:00"];
-      }
-      if (this.startTime === "19:30") {
-        return ["20:00"];
-      }
-
-      return []; // ถ้า startTime ไม่มีใน timeOptions
-    },
-
-    validateNumber() {
-      this.numPeople = this.numPeople.replace(/\D/g, "");
-    },
-
-    formatDate(date: Date) {
-      const options: Intl.DateTimeFormatOptions = {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      };
-
-      const thaiDate = new Intl.DateTimeFormat("th-TH", options).format(date);
-
-      return thaiDate;
-    },
-    allowedDates(date: Date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      const formattedDate = `${year}-${month}-${day}`;
-
-      const isHoliday = this.holidays.includes(formattedDate);
-
-      return !isHoliday;
-    },
-    handleDateUpdate(val: any) {
-      this.startDate = val;
-      this.endDate = val;
-      this.endRepeatDate = val;
-      this.startMenu = false;
-    },
-    async fetchHolidays() {
-      try {
-        const response = await fetch(
-          `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=2024`,
-          {
-            headers: {
-              "X-IBM-Client-Id": "516eaa15-07e4-428c-b4bf-84def4ea69ab",
-              accept: "application/json",
-            },
-          }
-        );
-
-        if (response.ok) {
-          const responseData = await response.json();
-          if (responseData.result && Array.isArray(responseData.result.data)) {
-            this.holidays = responseData.result.data.map(
-              (holiday: { Date: string }) => holiday.Date
-            );
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch holidays:", error);
-      }
-    },
-  },
+// Room type and related computed properties
+const roomType = ref((route.query.roomType as string) || "Group Study");
+const roomName = ref(decodeURIComponent(route.query.roomName as string) || "");
+const availableFloors = computed(() => {
+  switch (roomType.value) {
+    case "Group Study":
+      return [3, 4, 5];
+    case "Entertain":
+      return [6];
+    case "Meeting":
+      return [2, 5, 6, 7, 12];
+    default:
+      return [];
+  }
 });
 
-const showDatePicker = ref(false);
-const currentDate = ref("");
-const selectedDate = ref<string | null>(null);
-const holidays = ref<string[]>([]);
+const availableRooms = computed(() => {
+  switch (roomType.value) {
+    case "Group Study":
+      if (floor.value === 3)
+        return roomStore.studyFloor3.map((r) => r.roomName);
+      if (floor.value === 4)
+        return roomStore.studyFloor4.map((r) => r.roomName);
+      if (floor.value === 5)
+        return roomStore.studyFloor5.map((r) => r.roomName);
+      break;
+    case "Entertain":
+      return roomStore.okeRooms
+        .map((r) => r.roomName)
+        .concat(roomStore.stvRooms.map((r) => r.roomName))
+        .concat(roomStore.miniTheater.map((r) => r.roomName));
+    case "Meeting":
+      return roomStore.meetingRooms
+        .filter((r) => r.floorId === floor.value)
+        .map((r) => r.roomName);
+    default:
+      return [];
+  }
+});
 
-const allowedDates = (date: unknown) => {
-  if (!(date instanceof Date)) return false;
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const formattedDate = `${year}-${month}-${day}`;
-
-  const isHoliday = holidays.value.includes(formattedDate);
-
-  return !isHoliday;
+// Methods
+const filteredEndTimes = () => {
+  const times: Record<string, string[]> = {
+    "08:00": ["08:30", "09:00", "09:30", "10:00"],
+    "08:30": ["09:00", "09:30", "10:00", "10:30"],
+    "09:00": ["09:30", "10:00", "10:30", "11:00"],
+    "19:30": ["20:00"],
+  };
+  return times[startTime.value] || [];
 };
 
-const getCurrentDate = () => {
-  const date = new Date();
+const validateNumber = () => {
+  numPeople.value = numPeople.value.replace(/\D/g, "");
+};
 
+const formatDate = (date: Date) => {
   const options: Intl.DateTimeFormatOptions = {
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
   };
-
-  const formatter = new Intl.DateTimeFormat("th-TH", options);
-  currentDate.value = formatter.format(date);
+  return new Intl.DateTimeFormat("th-TH", options).format(date);
 };
 
-getCurrentDate();
+const allowedDates = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const formattedDate = `${year}-${month}-${day}`;
+  return !roomStore.holidays.includes(formattedDate);
+};
+
+const handleDateUpdate = (val: any) => {
+  startDate.value = val;
+  endDate.value = val;
+  endRepeatDate.value = val;
+  startMenu.value = false;
+};
+
+const fetchHolidays = async () => {
+  try {
+    const response = await fetch(
+      `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=2024`,
+      {
+        headers: {
+          "X-IBM-Client-Id": "516eaa15-07e4-428c-b4bf-84def4ea69ab",
+          accept: "application/json",
+        },
+      }
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      if (responseData.result && Array.isArray(responseData.result.data)) {
+        roomStore.holidays = responseData.result.data.map(
+          (holiday: { Date: string }) => holiday.Date
+        );
+      }
+    }
+  } catch (error) {
+    console.error("Failed to fetch holidays:", error);
+  }
+};
+
+// Lifecycle hooks
+onMounted(async () => {
+  await roomStore.filteredEntertainRooms();
+  await roomStore.initializeRooms();
+});
+
+// Watchers
+watch(startTime, (newStartTime) => {
+  console.log("Start Time:", newStartTime);
+  const availableTimes = filteredEndTimes();
+  console.log("Available End Times:", availableTimes);
+  endTime.value = availableTimes.length > 0 ? availableTimes[0] : "";
+});
+
+watch(floor, (newFloor) => {
+  const rooms = roomStore.studyFloor3;
+  const filteredRooms = rooms.filter((room) => room.floorId === newFloor); // กรองห้องเฉพาะชั้น
+  if (filteredRooms.length > 0) {
+    room.value = filteredRooms[0].roomName; // ใช้ห้องแรกในผลลัพธ์
+  } else {
+    console.error(`No rooms found for floor: ${newFloor}`);
+    room.value = ""; // หรือค่าที่คุณต้องการตั้งเป็นค่าเริ่มต้น
+  }
+});
 </script>
 
 <style scoped>

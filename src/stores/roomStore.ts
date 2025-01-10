@@ -28,6 +28,7 @@ export const useRoomStore = defineStore("room", () => {
   const liveForLifeRoom = ref<GetRoomType[]>([]);
   const meetingRoomFloor7 = ref<GetRoomType[]>([]);
   const meetingRoomFloor6 = ref<GetRoomType[]>([]);
+  const holidays = ref<string[]>([]);
   async function filteredMeetingRooms() {
     const response = await roomservice.getRoomTypes("Meeting");
 
@@ -150,7 +151,6 @@ export const useRoomStore = defineStore("room", () => {
     return meetingRoomFloor6.value;
   }
 
-  
   return {
     getAllRooms,
     groupStudyRooms,
@@ -176,5 +176,6 @@ export const useRoomStore = defineStore("room", () => {
     compiledMeetingRoomsFloor6,
     meetingRoomFloor6,
     currentTypeRoom,
+    holidays,
   };
 });
