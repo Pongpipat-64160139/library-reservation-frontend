@@ -20,7 +20,6 @@ declare module 'vue' {
     Login_page: typeof import('./src/components/home/login_page.vue')['default']
     Manage_room: typeof import('./src/components/status/manage_room.vue')['default']
     Manage_status: typeof import('./src/components/status/manage_status.vue')['default']
-    MonthPicker: typeof import('./src/components/month/MonthPicker.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Status_page: typeof import('./src/components/status/status_page.vue')['default']

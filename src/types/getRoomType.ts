@@ -1,5 +1,5 @@
 export interface GetRoomType {
-  id?: number;
+  // id?: number;
   roomId: number;
   roomName: string;
   capacity: number;

@@ -36,6 +36,16 @@ export const useRoomStore = defineStore("room", () => {
     currentTypeRoom.value = room;
     localStorage.setItem("currentTypeRoom", JSON.stringify(room)); // เก็บใน LocalStorage
   }
+  function setCurrentRoomFromGetRoomType(
+    room: GetRoomType,
+    selectedTime: string
+  ) {
+    currentTypeRoom.value = {
+      ...room, // ใช้ค่า property ทั้งหมดจาก GetRoomType
+      selectedTime, // เพิ่มค่า selectedTime
+    };
+    localStorage.setItem("currentRoom", JSON.stringify(room));
+  }
 
   function getCurrentRoom() {
     const storedRoom = localStorage.getItem("currentTypeRoom");
@@ -43,7 +53,7 @@ export const useRoomStore = defineStore("room", () => {
       currentTypeRoom.value = JSON.parse(storedRoom);
     }
     return currentTypeRoom;
-  }  
+  }
 
   async function filteredMeetingRooms() {
     const response = await roomservice.getRoomTypes("Meeting");
@@ -123,7 +133,7 @@ export const useRoomStore = defineStore("room", () => {
       room.roomName.includes("Room STV")
     );
     miniTheater.value = rooms.filter((room: { roomName: string | string[] }) =>
-      room.roomName.includes("Mimi theater")
+      room.roomName.includes("Mini theater")
     );
   }
 
@@ -195,5 +205,6 @@ export const useRoomStore = defineStore("room", () => {
     holidays,
     setCurrentRoom,
     getCurrentRoom,
+    setCurrentRoomFromGetRoomType,
   };
 });
