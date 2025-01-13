@@ -26,7 +26,7 @@ declare module 'vue' {
     Status_page: typeof import('./src/components/status/status_page.vue')['default']
     Table_entertain: typeof import('./src/components/table/table_entertain.vue')['default']
     Table_meeting: typeof import('./src/components/table/table_meeting.vue')['default']
-    Table_month: typeof import('./src/components/month/table_month.vue')['default']
+    Table_month: typeof import('./src/components/home/table_month.vue')['default']
     Table_study: typeof import('./src/components/table/table_study.vue')['default']
     TestAPIVue: typeof import('./src/components/testAPI/testAPIVue.vue')['default']
   }

@@ -22,7 +22,6 @@ export default defineConfig({
         "src/components/status",
         "src/components/form",
         "src/components/booking",
-        "src/components/month",
         "src/components/testAPI",
       ],
     }),

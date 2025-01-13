@@ -4,66 +4,69 @@
     <div>
       <div class="calendar-header">
         <div class="year-month-selector">
-          <div class="selector-container">
-             <!-- Dropdown ที่คลิกแล้วแสดง vue-month-picker -->
-            <select
-              v-model="selectedMonth"
-              @focus="showMonthPicker = true"
-              style="cursor: pointer"
+          <button
+            @click="showMonthDropdown = !showMonthDropdown"
+            class="month-button"
+          >
+            {{ months[selectedMonth - 1] }}
+          </button>
+          <div v-if="showMonthDropdown" class="dropdown-month">
+            <div
+              v-for="(month, index) in months"
+              :key="index"
+              @click="changeMonth(index + 1)"
+              class="dropdown-item"
             >
-              <option
-                v-for="(month, index) in months"
-                :key="index"
-                :value="index + 1"
-              >
-                {{ month }}
-              </option>
-            </select>
+              {{ month }}
+            </div>
+          </div>
 
-            <!-- Vue Month Picker -->
-            <month-picker
-              v-if="showMonthPicker"
-              :value="{ month: selectedMonth - 1, year: selectedYear }"
-              @input="onMonthYearChange"
-              @close="showMonthPicker = false"
-              :locale="{ months: months, years: years }"
-            />
-            <select class="mg-calendar" v-model="selectedYear" @change="updateCalendar">
-              <option v-for="year in years" :key="year" :value="year">
-                {{ year }}
-              </option>
-            </select>
-            <span class="calendar-icon mdi mdi-calendar-month"></span>
+          <!-- ปุ่มเลือกปี -->
+          <button
+            @click="showYearDropdown = !showYearDropdown"
+            class="year-button"
+          >
+            {{ selectedYear }}
+          </button>
+          <div v-if="showYearDropdown" class="dropdown-year">
+            <div
+              v-for="year in years"
+              :key="year"
+              @click="changeYear(year)"
+              class="dropdown-item"
+            >
+              {{ year }}
+            </div>
           </div>
         </div>
       </div>
-
-      <table class="calendar-table">
-        <thead>
-          <tr>
-            <th v-for="day in daysOfWeek" :key="day">{{ day }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="week in calendar" :key="week[0].date">
-            <td v-for="day in week" :key="day.date">
-              <div class="date-cell">
-                <span>{{ day.day }}</span>
-                <div v-if="day.bookings && day.bookings.length" class="booking">
-                  <div
-                    v-for="(booking, index) in day.bookings.slice(0, 3)"
-                    :key="index"
-                  >
-                    <p>{{ booking.name }} : {{ booking.status }}</p>
-                  </div>
-                  <p v-if="day.bookings.length > 3">...และอื่น ๆ</p>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </div>
+
+    <table class="calendar-table">
+      <thead>
+        <tr>
+          <th v-for="day in daysOfWeek" :key="day">{{ day }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="week in calendar" :key="week[0].date">
+          <td v-for="day in week" :key="day.date">
+            <div class="date-cell">
+              <span>{{ day.day }}</span>
+              <div v-if="day.bookings && day.bookings.length" class="booking">
+                <div
+                  v-for="(booking, index) in day.bookings.slice(0, 3)"
+                  :key="index"
+                >
+                  <p>{{ booking.name }} : {{ booking.status }}</p>
+                </div>
+                <p v-if="day.bookings.length > 3">...และอื่น ๆ</p>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </v-container>
 </template>
 
@@ -74,6 +77,8 @@ export default {
     return {
       selectedYear: currentYear,
       selectedMonth: new Date().getMonth() + 1,
+      showMonthDropdown: false,
+      showYearDropdown: false,
       years: Array.from({ length: 11 }, (_, i) => currentYear - 5 + i),
       months: [
         "มกราคม",
@@ -164,9 +169,34 @@ export default {
 
       this.calendar = calendar;
     },
+    changeMonth(month) {
+      this.selectedMonth = month;
+      this.showMonthDropdown = false;
+      this.updateCalendar();
+    },
+    changeYear(year) {
+      this.selectedYear = year;
+      this.showYearDropdown = false;
+      this.updateCalendar();
+    },
+    handleClickOutside(event) {
+      if (
+        !event.target.closest(".dropdown-month") &&
+        !event.target.closest(".month-button")
+      ) {
+        this.showMonthDropdown = false;
+      }
+      if (
+        !event.target.closest(".dropdown-year") &&
+        !event.target.closest(".year-button")
+      ) {
+        this.showYearDropdown = false;
+      }
+    },
   },
   mounted() {
     this.updateCalendar();
+    document.addEventListener("click", this.handleClickOutside);
   },
 };
 </script>
@@ -189,7 +219,6 @@ export default {
 
 .ms-kob {
   margin-top: -600px;
-
 }
 .calendar-header {
   margin-bottom: 30px;
@@ -197,30 +226,62 @@ export default {
   justify-content: center;
 }
 
-.year-month-selector .selector-container {
+.year-month-selector {
   display: flex;
-  align-items: center;
-  border: 2px solid;
-  justify-content: center;
-  border-radius: 5px;
+  gap: 20px;
+  position: relative;
+  font-size: 16px;
+}
+
+.month-button {
   padding: 10px;
   background-color: #f5eded;
-  gap: 10px;
-  width: 300px;
+  border: 2px solid #493628;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 120px;
 }
 
-.year-month-selector select {
-  border: none;
-  font-size: 16px;
-  outline: none;
+.year-button {
+  padding: 10px;
+  background-color: #f5eded;
+  border: 2px solid #493628;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100px;
 }
 
-.mg-calendar {
-  margin-left: -20px;
+.dropdown-month {
+  position: absolute;
+  background-color: #f5eded;
+  border: 2px solid #493628;
+  border-radius: 5px;
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 50px;
+  width: 120px;
+}
+.dropdown-year {
+  position: absolute;
+  background-color: #f5eded;
+  border: 2px solid #493628;
+  border-radius: 5px;
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 50px;
+  width: 100px;
+  margin-left: 140px;
 }
 
-.calendar-icon {
-  font-size: 20px;
+.dropdown-item {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #b5cfb7;
 }
 
 .calendar-table {
