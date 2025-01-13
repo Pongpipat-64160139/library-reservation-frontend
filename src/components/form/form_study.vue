@@ -387,11 +387,16 @@ const formatDate = (date: Date) => {
 };
 
 const allowedDates = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const formattedDate = `${year}-${month}-${day}`;
-  return !roomStore.holidays.includes(formattedDate);
+  const today = new Date();
+  const maxDate = new Date();
+  maxDate.setDate(today.getDate() + 4); // นับรวมวันที่ล่าสุด (วันที่ที่ 5)
+
+  // ทำให้เวลาใน today และ maxDate เท่ากับ 00:00:00 เพื่อเปรียบเทียบอย่างถูกต้อง
+  today.setHours(0, 0, 0, 0);
+  maxDate.setHours(0, 0, 0, 0);
+
+  // ตรวจสอบว่าวันที่อยู่ในช่วงหรือไม่
+  return date >= today && date <= maxDate;
 };
 
 const handleDateUpdate = (val: any) => {
