@@ -200,10 +200,11 @@ import { ref, computed, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useRoomStore } from "@/stores/roomStore";
 import type { GetRoomType } from "@/types/getRoomType";
+import { useTimeStore } from "@/stores/timeStore";
 
 const route = useRoute();
 const roomStore = useRoomStore();
-
+const timeStore = useTimeStore();
 // Data properties
 const numPeople = ref("");
 const phoneNumber = ref("");
@@ -214,76 +215,27 @@ const startDate = ref<Date | null>(null);
 const endDate = ref<Date | null>(null);
 const endRepeatMenu = ref(false);
 const endRepeatDate = ref<Date | null>(null);
-const startTime = ref("08:00");
-const endTime = ref("08:30");
+const startTime = ref("");
+const endTime = ref("");
 const floor = ref<number>();
 const repeatOption = ref("ไม่");
 const listparticipants = ref<string[]>([]);
-const timeOptions = ref([
-  "08:00",
-  "08:30",
-  "09:00",
-  "09:30",
-  "10:00",
-  "10:30",
-  "11:00",
-  "11:30",
-  "12:00",
-  "12:30",
-  "13:00",
-  "13:30",
-  "14:00",
-  "14:30",
-  "15:00",
-  "15:30",
-  "16:00",
-  "16:30",
-  "17:00",
-  "17:30",
-  "18:00",
-  "18:30",
-  "19:00",
-  "19:30",
-]);
 
-const timeOptionsInMinutes = ref<number[]>([]); // แปลงรายการเวลาทั้งหมดเป็นนาทีรวม
-
-// ดึงเวลาปัจจุบันและแปลงเป็นนาทีรวม
-function getCurrentTimeInMinutes(): number {
-  const now = new Date();
-  const hour = now.getHours();
-  const minutes = now.getMinutes();
-  return hour * 60 + minutes; // นาทีรวม
+function updateEndTimeSlots() {
+  endTime.value = timeStore.updateEndTime(startTime.value!);
 }
 
-const currentTotalMinutes = getCurrentTimeInMinutes();
-
-// แปลงเวลาทั้งหมดใน `timeOptions` เป็นนาทีรวม
-function convertTimeOptionsToMinutes(): void {
-  timeOptionsInMinutes.value = timeOptions.value.map((time) => {
-    const [hour, minutes] = time.split(":").map(Number);
-    return hour * 60 + minutes;
-  });
+function generateStartTime() {
+  // เวลาถัดไป
+  const nextTime = timeStore.findNextAvailableTime();
+  startTime.value = nextTime!;
+  updateEndTimeSlots();
+  const endTime = "19:30";
+  timeStore.generateTimeSlots(startTime.value, endTime);
 }
-
-// หาค่าเวลาที่มากกว่าหรือเท่ากับเวลาปัจจุบัน
-function findNextAvailableTime(): string | null {
-  convertTimeOptionsToMinutes(); // อัปเดต `timeOptionsInMinutes`
-  const nextTimeInMinutes = timeOptionsInMinutes.value.find(
-    (time) => time >= currentTotalMinutes
-  );
-  if (nextTimeInMinutes !== undefined) {
-    const hours = Math.floor(nextTimeInMinutes / 60)
-      .toString()
-      .padStart(2, "0");
-    const minutes = (nextTimeInMinutes % 60).toString().padStart(2, "0");
-    return `${hours}:${minutes}`; // แปลงกลับเป็นรูปแบบ HH:mm
-  }
-  return null; // ไม่มีเวลาในอนาคต
-}
-
-// เวลาถัดไป
-const nextAvailableTime = findNextAvailableTime();
+const callFunction_GenerateTime = generateStartTime();
+// เวลาที่เริ่มต้นสำหรับการใช้งาน
+const timeOptions = timeStore.timeSlots;
 
 // Room type and related computed properties
 // const roomType = ref((route.query.roomType as string) || "Group Study");
@@ -309,66 +261,16 @@ const availableRooms = computed(() => {
     }
   }
 });
-
 // Methods
 const filteredEndTimes = () => {
   const maxHours = roomStore.currentTypeRoom.maxHours;
+  const times = ref<string[]>([]);
+  const clossingTime = "20:30"
   if (maxHours == 2) {
-    const times: Record<string, string[]> = {
-      "08:00": ["08:30", "09:00", "09:30", "10:00"],
-      "08:30": ["09:00", "09:30", "10:00", "10:30"],
-      "09:00": ["09:30", "10:00", "10:30", "11:00"],
-      "09:30": ["10:00", "10:30", "11:00", "11:30"],
-      "10:00": ["10:30", "11:00", "11:30", "12:00"],
-      "10:30": ["11:00", "11:30", "12:00", "12:30"],
-      "11:00": ["11:30", "12:00", "12:30", "13:00"],
-      "11:30": ["12:00", "12:30", "13:00", "13:30"],
-      "12:00": ["12:30", "13:00", "13:30", "14:00"],
-      "12:30": ["13:00", "13:30", "14:00", "14:30"],
-      "13:00": ["13:30", "14:00", "14:30", "15:00"],
-      "13:30": ["14:00", "14:30", "15:00", "15:30"],
-      "14:00": ["14:30", "15:00", "15:30", "16:00"],
-      "14:30": ["15:00", "15:30", "16:00", "16:30"],
-      "15:00": ["15:30", "16:00", "16:30", "17:00"],
-      "15:30": ["16:00", "16:30", "17:00", "17:30"],
-      "16:00": ["16:30", "17:00", "17:30", "18:00"],
-      "16:30": ["17:00", "17:30", "18:00", "18:30"],
-      "17:00": ["17:30", "18:00", "18:30", "19:00"],
-      "17:30": ["18:00", "18:30", "19:00", "19:30"],
-      "18:00": ["18:30", "19:00", "19:30", "20:00"],
-      "18:30": ["19:00", "19:30", "20:00"],
-      "19:00": ["19:30", "20:00"],
-      "19:30": ["20:00"],
-    };
-    return times[startTime.value] || [];
-  } else if (maxHours == 3) {
-    const times: Record<string, string[]> = {
-      "08:00": ["08:30", "09:00", "09:30", "10:00", "10:30", "11:00"],
-      "08:30": ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30"],
-      "09:00": ["09:30", "10:00", "10:30", "11:00", "11:30", "12:00"],
-      "09:30": ["10:00", "10:30", "11:00", "11:30", "12:00", "12:30"],
-      "10:00": ["10:30", "11:00", "11:30", "12:00", "12:30", "13:00"],
-      "10:30": ["11:00", "11:30", "12:00", "12:30", "13:00", "13:30"],
-      "11:00": ["11:30", "12:00", "12:30", "13:00", "13:30", "14:00"],
-      "11:30": ["12:00", "12:30", "13:00", "13:30", "14:00", "14:30"],
-      "12:00": ["12:30", "13:00", "13:30", "14:00", "14:30", "15:00"],
-      "12:30": ["13:00", "13:30", "14:00", "14:30", "15:00", "15:30"],
-      "13:00": ["13:30", "14:00", "14:30", "15:00", "15:30", "16:00"],
-      "13:30": ["14:00", "14:30", "15:00", "15:30", "16:00", "16:30"],
-      "14:00": ["14:30", "15:00", "15:30", "16:00", "16:30", "17:00"],
-      "14:30": ["15:00", "15:30", "16:00", "16:30", "17:00", "17:30"],
-      "15:00": ["15:30", "16:00", "16:30", "17:00", "17:30", "18:00"],
-      "15:30": ["16:00", "16:30", "17:00", "17:30", "18:00", "18:30"],
-      "16:00": ["16:30", "17:00", "17:30", "18:00", "18:30", "19:00"],
-      "16:30": ["17:00", "17:30", "18:00", "18:30", "19:00", "19:30"],
-      "17:00": ["17:30", "18:00", "18:30", "19:00", "19:30", "20:00"],
-      "17:30": ["18:00", "18:30", "19:00", "19:30", "20:00"],
-      "18:00": ["18:30", "19:00", "19:30", "20:00"],
-      "18:30": ["19:00", "19:30", "20:00"],
-      "19:00": ["19:30", "20:00"],
-      "19:30": ["20:00"],
-    };
-    return times[startTime.value] || [];
+    times.value = [];
+    timeStore.generateEndTimeSlots(startTime.value, maxHours,clossingTime);
+    times.value = timeStore.endTimeSlots;
+    return times.value;
   }
 };
 
@@ -452,25 +354,26 @@ async function selectRoom(floor: number, roomName: string) {
 }
 // Lifecycle hooks
 onMounted(async () => {
-  await roomStore.filteredEntertainRooms();
-  await roomStore.initializeRooms();
-  console.log("Room:", roomStore.currentTypeRoom);
-  floor.value = roomStore.currentTypeRoom.floorId + 1;
+  Promise.all([
+    await roomStore.filteredEntertainRooms(),
+    await roomStore.initializeRooms(),
+    console.log("Room:", roomStore.currentTypeRoom),
+    (floor.value = roomStore.currentTypeRoom.floorId + 1),
+    await filteredEndTimes(),
+  ]);
 });
 
 // Watchers
 watch(startTime, (newStartTime) => {
   console.log("Start Time:", newStartTime);
-  const availableTimes = filteredEndTimes() as string[];
-  endTime.value = availableTimes.length > 0 ? availableTimes[0] : "";
+  updateEndTimeSlots();
 });
-watch(endTime, (newEntTime) => {
-  console.log("End Time:", newEntTime);
+watch(endTime, (newEndTime, oldEndTime) => {
+  console.log("new End Time:", newEndTime);
 });
 
 watch(floor, (newFloor) => {
   console.log("Floor update:", newFloor);
-  console.log("Next Time :", nextAvailableTime);
 });
 watch(roomName, (newRoom, oldRoom) => {
   console.log("Old Room :", oldRoom);
