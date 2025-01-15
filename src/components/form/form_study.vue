@@ -187,7 +187,12 @@
           class="width-detail text-field-rounded"
         />
       </span>
-      <v-btn to="/table_study" type="submit" class="save-btn custom-btn">
+      <!-- to="/table_study" -->
+      <v-btn
+        type="submit"
+        class="save-btn custom-btn"
+        @click="submitBookingRoom()"
+      >
         <v-icon left>mdi-content-save</v-icon>
         จองห้อง
       </v-btn>
@@ -265,10 +270,10 @@ const availableRooms = computed(() => {
 const filteredEndTimes = () => {
   const maxHours = roomStore.currentTypeRoom.maxHours;
   const times = ref<string[]>([]);
-  const clossingTime = "20:30"
+  const clossingTime = "20:30";
   if (maxHours == 2) {
     times.value = [];
-    timeStore.generateEndTimeSlots(startTime.value, maxHours,clossingTime);
+    timeStore.generateEndTimeSlots(startTime.value, maxHours, clossingTime);
     times.value = timeStore.endTimeSlots;
     return times.value;
   }
@@ -351,6 +356,9 @@ async function selectRoom(floor: number, roomName: string) {
       roomStore.setCurrentRoomFromGetRoomType(room!, startTime.value);
     }
   }
+}
+
+async function submitBookingRoom() {
 }
 // Lifecycle hooks
 onMounted(async () => {

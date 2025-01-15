@@ -177,6 +177,11 @@ export const useRoomStore = defineStore("room", () => {
     return meetingRoomFloor6.value;
   }
 
+  async function getRoomByID(id: number) {
+    const response = await roomservice.getRoomById(id);
+    const findRoom = response.data;
+    return findRoom;
+  }
   return {
     getAllRooms,
     groupStudyRooms,
@@ -206,5 +211,6 @@ export const useRoomStore = defineStore("room", () => {
     setCurrentRoom,
     getCurrentRoom,
     setCurrentRoomFromGetRoomType,
+    getRoomByID,
   };
 });
