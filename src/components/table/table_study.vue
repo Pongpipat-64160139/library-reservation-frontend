@@ -402,7 +402,6 @@ function selectRoom(roomIndex: number, floor: number, time: string) {
       roomMinimum: room.roomMinimum,
       orderFood: room.orderFood,
       floorId: room.floorId,
-      selectedTime: time,
     });
     console.log("Selected Room:", roomStore.currentTypeRoom);
   } else {

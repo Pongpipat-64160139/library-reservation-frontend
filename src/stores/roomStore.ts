@@ -7,7 +7,7 @@ import { CurrentRoom } from "../types/currentRoom";
 export const useRoomStore = defineStore("room", () => {
   const roomservice = roomService;
 
-  const currentTypeRoom = ref<CurrentRoom>(
+  const currentTypeRoom = ref<GetRoomType>(
     JSON.parse(localStorage.getItem("currentTypeRoom") || "null")
   );
 
@@ -32,19 +32,9 @@ export const useRoomStore = defineStore("room", () => {
   const meetingRoomFloor6 = ref<GetRoomType[]>([]);
   const holidays = ref<string[]>([]);
 
-  function setCurrentRoom(room: CurrentRoom) {
+  function setCurrentRoom(room: GetRoomType) {
     currentTypeRoom.value = room;
     localStorage.setItem("currentTypeRoom", JSON.stringify(room)); // เก็บใน LocalStorage
-  }
-  function setCurrentRoomFromGetRoomType(
-    room: GetRoomType,
-    selectedTime: string
-  ) {
-    currentTypeRoom.value = {
-      ...room, // ใช้ค่า property ทั้งหมดจาก GetRoomType
-      selectedTime, // เพิ่มค่า selectedTime
-    };
-    localStorage.setItem("currentRoom", JSON.stringify(room));
   }
 
   function getCurrentRoom() {
@@ -210,7 +200,5 @@ export const useRoomStore = defineStore("room", () => {
     holidays,
     setCurrentRoom,
     getCurrentRoom,
-    setCurrentRoomFromGetRoomType,
-    getRoomByID,
   };
 });

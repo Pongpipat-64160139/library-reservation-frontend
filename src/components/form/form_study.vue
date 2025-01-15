@@ -180,7 +180,7 @@
       <span class="d-flex">
         <h1 class="head1-title mg-detail">รายละเอียด</h1>
         <v-textarea
-          v-model="phoneNumber"
+          v-model="formDetail"
           label=""
           rows="3"
           outlined
@@ -206,13 +206,17 @@ import { useRoute } from "vue-router";
 import { useRoomStore } from "@/stores/roomStore";
 import type { GetRoomType } from "@/types/getRoomType";
 import { useTimeStore } from "@/stores/timeStore";
+import type { NormalRoomBooking } from "@/types/normalRoomBooking";
+import type { Room } from "@/types/room";
+import { useNormalRoomBookStore } from "@/stores/nrbStore";
 
 const route = useRoute();
 const roomStore = useRoomStore();
 const timeStore = useTimeStore();
+const nrbStore = useNormalRoomBookStore();
 // Data properties
 const numPeople = ref("");
-const phoneNumber = ref("");
+const formDetail = ref<string>("");
 const menu = ref(false);
 const startMenu = ref(false);
 const endMenu = ref(false);
@@ -225,6 +229,9 @@ const endTime = ref("");
 const floor = ref<number>();
 const repeatOption = ref("ไม่");
 const listparticipants = ref<string[]>([]);
+const currentDate = ref("");
+const saveSelectRoom = ref<GetRoomType>();
+const normalRoomBooking = ref<NormalRoomBooking>();
 
 function updateEndTimeSlots() {
   endTime.value = timeStore.updateEndTime(startTime.value!);
@@ -255,13 +262,10 @@ const availableFloors = computed(() => {
 const availableRooms = computed(() => {
   if (currentRoom.roomType === "Group study") {
     if (floor.value === 3) {
-      console.log(roomStore.studyFloor3.map((room) => room.roomName));
       return roomStore.studyFloor3.map((room) => room.roomName);
     } else if (floor.value === 4) {
-      console.log(roomStore.studyFloor4.map((room) => room.roomName));
       return roomStore.studyFloor4.map((room) => room.roomName);
     } else if (floor.value === 5) {
-      console.log(roomStore.studyFloor5.map((room) => room.roomName));
       return roomStore.studyFloor5.map((room) => room.roomName);
     }
   }
@@ -339,35 +343,92 @@ const fetchHolidays = async () => {
 };
 async function selectRoom(floor: number, roomName: string) {
   if (currentRoom.roomType === "Group study") {
-    if (floor == 3) {
-      const room = await roomStore.studyFloor3.find(
+    if (floor === 3) {
+      const findRoom = roomStore.studyFloor3.find(
         (r) => r.roomName === roomName
       );
-      roomStore.setCurrentRoomFromGetRoomType(room!, startTime.value);
-    } else if (floor == 4) {
-      const room = await roomStore.studyFloor4.find(
+      const updateRoom = (roomStore.currentTypeRoom = findRoom!);
+      saveSelectRoom.value = updateRoom;
+      return saveSelectRoom.value;
+    } else if (floor === 4) {
+      const findRoom = roomStore.studyFloor4.find(
         (r) => r.roomName === roomName
       );
-      roomStore.setCurrentRoomFromGetRoomType(room!, startTime.value);
-    } else if (floor == 5) {
-      const room = await roomStore.studyFloor5.find(
+      const updateRoom = (roomStore.currentTypeRoom = findRoom!);
+      saveSelectRoom.value = updateRoom;
+      return saveSelectRoom.value;
+    } else if (floor === 5) {
+      const findRoom = roomStore.studyFloor5.find(
         (r) => r.roomName === roomName
       );
-      roomStore.setCurrentRoomFromGetRoomType(room!, startTime.value);
+      const updateRoom = (roomStore.currentTypeRoom = findRoom!);
+      saveSelectRoom.value = updateRoom;
+      return saveSelectRoom.value;
     }
   }
 }
 
+async function getCurrentDate() {
+  const today = new Date();
+  // เรียกวัน
+  const day = today.getDate(); // วันที่ (1-31)
+  // เรียกเดือน
+  const month = today.getMonth() + 1; // เดือน (0-11) + 1 เพื่อให้ได้เดือน (1-12)
+  // เรียกปี
+  const year = today.getFullYear(); // ปี (เช่น 2025
+  // แสดงผลรวม
+  console.log(`${day}-${month}-${year}`);
+  currentDate.value = `${day}-${month}-${year}`;
+  return `${day}-${month}-${year}`;
+}
+
+function formatToDDMMYYYY(date: Date): string {
+  const day = date.getDate().toString().padStart(2, "0"); // ดึงวันที่ และเติม 0 หากมีตัวเลขหลักเดียว
+  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // ดึงเดือน (เพิ่ม +1 เนื่องจาก getMonth() เริ่มจาก 0)
+  const year = date.getFullYear(); // ดึงปี
+  return `${day}-${month}-${year}`; // จัดเรียงรูปแบบ dd-mm-yyyy
+}
 async function submitBookingRoom() {
+  if (startDate.value === null) {
+    normalRoomBooking.value = {
+      startDate: currentDate.value,
+      startTime: startTime.value,
+      endDate: currentDate.value,
+      endTime: endTime.value,
+      repeat_Flag: "No",
+      reseve_status: "รอ",
+      repeat_End_Flag: currentDate.value,
+      details: formDetail.value!,
+      roomId: saveSelectRoom.value?.roomId!,
+    };
+    const res = await nrbStore.createNewBooking(normalRoomBooking.value);
+    console.log("Data :", res);
+  } else if (startDate.value != null) {
+    const formatDate = formatToDDMMYYYY(startDate.value);
+    normalRoomBooking.value = {
+      startDate: formatDate,
+      startTime: startTime.value,
+      endDate: formatDate,
+      endTime: endTime.value,
+      repeat_Flag: "No",
+      reseve_status: "รอ",
+      repeat_End_Flag: formatDate,
+      details: formDetail.value!,
+      roomId: saveSelectRoom.value?.roomId!,
+    };
+    const res = await nrbStore.createNewBooking(normalRoomBooking.value);
+    console.log("Data :", res);
+  }
 }
 // Lifecycle hooks
 onMounted(async () => {
   Promise.all([
     await roomStore.filteredEntertainRooms(),
     await roomStore.initializeRooms(),
-    console.log("Room:", roomStore.currentTypeRoom),
     (floor.value = roomStore.currentTypeRoom.floorId + 1),
     await filteredEndTimes(),
+    getCurrentDate(),
+    (saveSelectRoom.value = roomStore.currentTypeRoom),
   ]);
 });
 
@@ -384,7 +445,7 @@ watch(floor, (newFloor) => {
   console.log("Floor update:", newFloor);
 });
 watch(roomName, (newRoom, oldRoom) => {
-  console.log("Old Room :", oldRoom);
+  console.log(roomName.value);
   selectRoom(floor.value!, newRoom);
 });
 </script>

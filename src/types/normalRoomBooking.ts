@@ -2,7 +2,7 @@ import type { Room } from "./room";
 import type { UserBooking } from "./userBooking";
 
 export interface NormalRoomBooking {
-  nrbId: number;
+  nrbId?: number;
 
   startDate: string;
 
@@ -16,12 +16,11 @@ export interface NormalRoomBooking {
 
   repeat_End_Flag: string;
 
-  reseve_status: string; // สถานะการจอง
+  reseve_status?: string;
 
   details: string;
 
-  roomBooking: Room;
+  roomId: number;
 
-  reason: string;
-  userBookings: UserBooking[];
+  reason?: string;
 }

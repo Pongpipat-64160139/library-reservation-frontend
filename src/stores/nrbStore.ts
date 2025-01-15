@@ -5,9 +5,9 @@ import { NormalRoomBooking } from "../types/normalRoomBooking";
 export const useNormalRoomBookStore = defineStore("normal-room-booking", () => {
   const nrbService = normalBookService;
   async function createNewBooking(nrb: NormalRoomBooking) {
-    const newReserve = await nrbService.createNRB(nrb);
-    console.log(newReserve.data);
-    return newReserve;
+    const res = await nrbService.createNRB(nrb);
+    const newNRB = res.data;
+    return newNRB;
   }
   async function getAllReserve() {
     return await nrbService.getAllRNB();
