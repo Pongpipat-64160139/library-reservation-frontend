@@ -4,7 +4,6 @@
     <!-- Breadcrumbs -->
     <v-breadcrumbs :items="items" divider=">" class="head-title mg-table">
       <template #item="{ item }" class="head-title">
-        <!-- ลิงก์ที่สามารถคลิกได้ -->
         <router-link
           v-if="!item.disabled && item.href"
           :to="item.href"
@@ -13,7 +12,6 @@
           {{ item.title }}
         </router-link>
 
-        <!-- ลิงก์ที่ไม่สามารถคลิกได้ -->
         <span v-else class="breadcrumb-disabled head-title">
           {{ item.title }}
         </span>
@@ -36,30 +34,28 @@
     <v-data-table
       v-model:sort-by="sortBy"
       :headers="headers"
-      :items="sortedData"
+      :items="filteredData"
       style="background-color: #cdbba7"
       class="rd-test text-col"
     >
       <template #item="{ item, index }">
         <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
           <td class="text-col">
-            {{ item.index }}
+            {{ index + 1 }}
           </td>
           <td class="text-col">
-            {{ item.name }}
+            {{ item.details }}
           </td>
           <td class="text-col">
-            {{ item.floor }}
+            {{ item.floorNumber }}
           </td>
           <td class="text-col">
-            {{ item.room }}
+            {{ item.roomName }}
           </td>
           <td class="text-col">
-            {{ item.date }}
+            {{ item.startDate }}
           </td>
-          <td class="text-col">
-            {{ item.startTime }} - {{ item.endTime }}
-          </td>
+          <td class="text-col">{{ item.startTime }} - {{ item.endTime }}</td>
           <td class="align-center justify-center">
             <v-select
               :model-value="item.status"
@@ -93,13 +89,13 @@
     <v-card class="rd-dialog">
       <span class="head-detailuser">
         <div class="head-detail">
-          <strong>ผู้ใช้</strong> {{ selectedItem?.user }}
+          <strong>ผู้ใช้</strong>
         </div>
       </span>
 
       <span class="head-detailname">
         <div class="head-detail">
-          <strong>ชื่อ</strong> {{ selectedItem?.name }}
+          <strong>ชื่อ</strong>
         </div>
       </span>
 
@@ -107,7 +103,7 @@
         <v-row>
           <v-col cols="6">
             <div class="head-detail">
-              <strong>วันที่เริ่ม</strong> {{ selectedItem?.date }}
+              <strong>วันที่เริ่ม</strong> {{ selectedItem?.startDate }}
             </div>
           </v-col>
           <v-col>
@@ -131,7 +127,7 @@
         <v-row>
           <v-col cols="6">
             <div class="head-detail">
-              <strong>วันที่จบ</strong> {{ selectedItem?.date }}
+              <strong>วันที่จบ</strong> {{ selectedItem?.endDate }}
             </div>
           </v-col>
           <v-col>
@@ -144,7 +140,6 @@
                 density="compact"
                 variant="outlined"
                 class="time-select"
-
               />
               <span v-else>{{ selectedItem?.endTime }}</span>
             </div>
@@ -165,7 +160,7 @@
                 variant="outlined"
                 @update:model-value="updateAvailableRooms"
               />
-              <span v-else>{{ selectedItem?.floor }}</span>
+              <span v-else>{{ selectedItem?.floorNumber }}</span>
             </div>
           </v-col>
           <v-col>
@@ -178,7 +173,7 @@
                 density="compact"
                 variant="outlined"
               />
-              <span v-else>{{ selectedItem?.room }}</span>
+              <span v-else>{{ selectedItem?.roomName }}</span>
             </div>
           </v-col>
         </v-row>
@@ -199,7 +194,7 @@
 
       <span class="d-flex head-detail ms-6">
         <div class="head-detail">
-          <strong>รายละเอียด</strong>
+          <strong>รายละเอียด</strong> {{ selectedItem?.details }}
         </div>
       </span>
 
@@ -273,16 +268,58 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, onMounted } from "vue";
+import { useRoomStore } from "@/stores/roomStore";
+import { useNormalRoomBookStore } from "@/stores/nrbStore";
 
-const formatDate = (date: string): string => {
-  const dateObj = new Date(date);
-  const day = String(dateObj.getDate()).padStart(2, "0");
-  const month = String(dateObj.getMonth() + 1).padStart(2, "0"); // เดือนเริ่มต้นที่ 0
-  const year = dateObj.getFullYear();
+const roomStore = useRoomStore(); // เชื่อม store ห้อง
+const nrbStore = useNormalRoomBookStore(); // เชื่อม store การจอง
 
-  return `${day}/${month}/${year}`;
-};
+// 1. นิยาม Type ของข้อมูล
+interface BookingDetail {
+  numb: number;
+  floorNumber: string;
+  roomName: string;
+  startDate: string;
+  startTime: string;
+  endDate: string;
+  endTime: string;
+  status: string;
+  details: string;
+  cancelReason: string;
+}
+
+// 2. เปลี่ยน `bookingDetails` ให้รองรับ `BookingDetail[]`
+const bookingDetails = ref<BookingDetail[]>([]);
+
+// 3. ใน `onMounted` เพิ่มข้อมูลที่มีโครงสร้างตรงกับ `BookingDetail`
+onMounted(async () => {
+  try {
+    const reserveResponse = await nrbStore.getAllReserve();
+    if (reserveResponse.data && reserveResponse.data.length > 0) {
+      for (const booking of reserveResponse.data) {
+        const roomId = booking.roomBooking?.roomId;
+        if (roomId) {
+          const roomResponse = await roomStore.getRoomByID(roomId);
+          bookingDetails.value.push({
+            numb: booking.nrbId,
+            floorNumber: roomResponse.floor?.floor_Number || "ไม่มีข้อมูลชั้น",
+            roomName: roomResponse.room_Name || "ไม่มีชื่อห้อง",
+            startDate: formatThaiDate(booking.startDate),
+            startTime: formatTime(booking.startTime),
+            endDate: formatThaiDate(booking.endDate),
+            endTime: formatTime(booking.endTime),
+            status: booking.reseve_status || "ไม่มีสถานะ",
+            details: booking.details || "ไม่มีรายละเอียด",
+            cancelReason: booking.reason || "",
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+});
 
 const sortBy = ref([
   { key: "index", order: "asc" },
@@ -352,129 +389,6 @@ const formatThaiDate = (dateString) => {
   return `${day} ${date} ${month} ${year}`;
 };
 
-const data = ref([
-  {
-    index: 1,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 3,
-    room: "ศึกษากลุ่ม 1",
-    date: formatThaiDate("2024-12-17"),
-    startTime: "08:00",
-    endTime: "10:00",
-    status: "รอ",
-    cancelReason: "",
-  },
-  {
-    index: 2,
-    user: "64160137",
-    name: "สมคิด ธรรมวงศ์",
-    floor: 4,
-    room: "ศึกษากลุ่ม 2",
-    date: formatThaiDate("2024-12-12"),
-    startTime: "08:00",
-    endTime: "10:00",
-    status: "อนุมัติ",
-    cancelReason: "",
-  },
-  {
-    index: 3,
-    user: "64160138",
-    name: "กนกพร พันธ์นุช",
-    floor: 5,
-    room: "ศึกษากลุ่ม 3",
-    date: formatThaiDate("2024-12-13"),
-    startTime: "08:00",
-    endTime: "10:00",
-    status: "ยกเลิก",
-    cancelReason: "",
-  },
-  {
-    index: 4,
-    user: "64160139",
-    name: "พรพรรณ ศรีธนู",
-    floor: 3,
-    room: "ศึกษากลุ่ม 4",
-    date: formatThaiDate("2024-12-17"),
-    startTime: "08:00",
-    endTime: "10:00",
-    status: "รอ",
-    cancelReason: "",
-  },
-  {
-    index: 5,
-    user: "64160140",
-    name: "ณัฐวุฒิ ประเสริฐศักดิ์",
-    floor: 6,
-    room: "STV 1",
-    date: formatThaiDate("2024-12-15"),
-    startTime: "08:00",
-    endTime: "10:00",
-    status: "อนุมัติ",
-    cancelReason: "",
-  },
-  {
-    index: 6,
-    user: "64160141",
-    name: "อรอุมา คงสมบูรณ์",
-    floor: 4,
-    room: "ศึกษากลุ่ม 3",
-    date: formatThaiDate("2024-12-17"),
-    startTime: "08:00",
-    endTime: "10:00",
-    status: "รอ",
-    cancelReason: "",
-  },
-  {
-    index: 7,
-    user: "64160142",
-    name: "ธนชัย ศรีวิวัฒน์",
-    floor: 5,
-    room: "ศึกษากลุ่ม 1",
-    date: formatThaiDate("2024-12-17"),
-    startTime: "08:00",
-    endTime: "10:00",
-    status: "ยกเลิก",
-    cancelReason: "",
-  },
-  {
-    index: 8,
-    user: "64160143",
-    name: "ภัทรา สุขสว่าง",
-    floor: 3,
-    room: "ศึกษากลุ่ม 4",
-    date: formatThaiDate("2024-12-18"),
-    startTime: "08:00",
-    endTime: "10:00",
-    status: "อนุมัติ",
-    cancelReason: "",
-  },
-  {
-    index: 9,
-    user: "64160144",
-    name: "วรัญญา สร้างเจริญ",
-    floor: 6,
-    room: "LIBRA OKE I",
-    date: formatThaiDate("2024-12-17"),
-    startTime: "08:00",
-    endTime: "10:00",
-    status: "รอ",
-    cancelReason: "",
-  },
-  {
-    index: 10,
-    user: "64160145",
-    name: "สุทธิชัย วัฒนากร",
-    floor: 6,
-    room: "Mini Studio",
-    date: formatThaiDate("2024-12-20"),
-    startTime: "08:00",
-    endTime: "10:00",
-    status: "อนุมัติ",
-    cancelReason: "",
-  },
-]);
-
 const items = [
   { title: "อนุมัติสถานะการจอง", disabled: true, href: "/" },
   { title: "สถานะห้อง", disabled: false, href: "/manage_room" },
@@ -483,29 +397,9 @@ const items = [
 const selectedFloor = ref(2); // ค่าเริ่มต้นให้ตรงกับชั้นแรกที่มีในแท็บ
 
 const filteredData = computed(() => {
-  return data.value.filter((item) => item.floor === selectedFloor.value);
-});
-
-const sortedData = computed(() => {
-  const sortedItems = [...filteredData.value];
-
-  sortedItems.sort((a, b) => {
-    // ให้ "รอ" อยู่ข้างบนสุด
-    if (a.status === "รอ" && b.status !== "รอ") return -1;
-    if (a.status !== "รอ" && b.status === "รอ") return 1;
-
-    // จัดเรียงตามลำดับต่อไป
-    if (a.status === "อนุมัติ" && b.status !== "อนุมัติ") return 1;
-    if (a.status !== "อนุมัติ" && b.status === "อนุมัติ") return -1;
-
-    // กรณีสถานะเหมือนกัน ใช้ index ในการจัดลำดับ
-    return a.index - b.index;
-  });
-
-  return sortedItems.map((item, idx) => ({
-    ...item,
-    index: idx + 1,
-  }));
+  return bookingDetails.value.filter(
+    (item) => parseInt(item.floorNumber) === selectedFloor.value
+  );
 });
 
 const dialog = ref(false);
@@ -607,6 +501,11 @@ const availableRooms = computed(() => {
   return floorRooms[editedFloor.value as keyof typeof floorRooms] || [];
 });
 
+const updateAvailableRooms = () => {
+  const rooms = floorRooms[editedFloor.value as keyof typeof floorRooms];
+  editedRoom.value = rooms ? rooms[0] : "";
+};
+
 watch(
   () => editedFloor.value,
   (newFloor) => {
@@ -615,20 +514,7 @@ watch(
   }
 );
 
-const showDialog = (item: any) => {
-  selectedItem.value = { ...item };
-  editedFloor.value = item.floor;
-  editedRoom.value = item.room;
-  editedStartTime.value = item.startTime; // เวลาเริ่ม
-  editedEndTime.value = item.endTime; // เวลาจบ
-  dialog.value = true;
-  editMode.value = false;
-};
 
-const updateAvailableRooms = () => {
-  const rooms = floorRooms[editedFloor.value];
-  editedRoom.value = rooms ? rooms[0] : "";
-};
 
 const floorRooms = {
   2: ["201 (20-50)"],
@@ -690,13 +576,35 @@ const toggleEditMode = () => {
       return;
     }
 
-    // บันทึกการแก้ไข
-    selectedItem.value.startTime = editedStartTime.value;
-    selectedItem.value.endTime = editedEndTime.value;
+    // บันทึกการแก้ไขลงใน `bookingDetails`
+    const index = bookingDetails.value.findIndex(
+      (item) => item.numb === selectedItem.value.numb
+    );
+
+    if (index !== -1) {
+      bookingDetails.value[index] = {
+        ...bookingDetails.value[index],
+        startTime: editedStartTime.value,
+        endTime: editedEndTime.value,
+        floorNumber: editedFloor.value.toString(),
+        roomName: editedRoom.value,
+      };
+    }
+
     editMode.value = false;
   } else {
     editMode.value = true;
   }
+};
+
+const showDialog = (item: BookingDetail) => {
+  selectedItem.value = { ...item };
+  editedFloor.value = parseInt(item.floorNumber); // แปลง `floorNumber` เป็นตัวเลข
+  editedRoom.value = item.roomName;
+  editedStartTime.value = item.startTime;
+  editedEndTime.value = item.endTime;
+  dialog.value = true;
+  editMode.value = false;
 };
 
 const handleCancel = () => {
@@ -707,6 +615,10 @@ const handleCancel = () => {
   } else {
     dialog.value = false;
   }
+};
+
+const formatTime = (time: string): string => {
+  return time.slice(0, 5); // ตัดเอาเฉพาะ 5 ตัวแรก (HH:mm)
 };
 </script>
 

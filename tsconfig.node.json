@@ -7,7 +7,7 @@
     "nightwatch.conf.*",
     "playwright.config.*",
     "src/**/*.ts" // เพิ่มให้รวมไฟล์ใน src ด้วย
-  ],
+, "src/components/status/script_manage_status.jss"  ],
   "compilerOptions": {
     "composite": true,
     "noEmit": true,
