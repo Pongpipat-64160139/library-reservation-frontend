@@ -120,7 +120,7 @@ export default {
 }
 
 .ms-020 {
-  margin-left: 70px;
+  margin-left: 130px;
 }
 
 .text-center {
@@ -139,14 +139,118 @@ export default {
 .mg-tophead {
   margin-top: 11px;
 }
-/* ipad */
 
-@media (max-width: 1024px) {
+/* Phones */
+
+@media only screen and (max-width: 480px) {
+  .buu-font {
+    font-weight: 400;
+    font-size: 8px;
+    margin-left: -20px;
+    margin-top: 3px;
+  }
+
+  .breadcrumbs-font {
+    font-weight: 400;
+    font-size: 8px;
+  }
+  .user-font {
+    font-weight: 400;
+    font-size: 8px;
+    margin-top: 9px;
+  }
+  .image-size {
+    width: 30px;
+    height: 30px;
+    margin-left: -50px;
+  }
+
+
+  .ms-136 {
+    margin-left: 60px;
+  }
+
+  .ms-020 {
+    margin-left: 10px;
+  }
+
+  .mg-tophead {
+    margin-top: 20px;
+  }
+
+  .mg-leftbuu {
+    margin-right: 30px;
+  }
+}
+
+/* Phones landscape */
+@media only screen and (min-width: 481px) and (max-width: 760px) {
+  .buu-font {
+    font-weight: 400;
+    font-size: 10px;
+    margin-left: -10px;
+    margin-top: 3px;
+  }
+
+  .breadcrumbs-font {
+    font-weight: 400;
+    font-size: 10px;
+    margin-left: 250px;
+  }
+  .user-font {
+    font-weight: 400;
+    font-size: 10px;
+    margin-left: -120px;
+    margin-top: 9px;
+  }
+  .image-size {
+    width: 50px;
+    height: 50px;
+    margin-left: -20px;
+  }
+
+  .mg-tophead {
+    margin-top: 10px;
+  }
+}
+
+/* restore  */
+@media only screen and (min-width: 761px) and (max-width: 769px) {
+  .buu-font {
+    font-weight: 400;
+    font-size: 10px;
+    margin-left: -10px;
+    margin-top: 3px;
+  }
+
+  .breadcrumbs-font {
+    font-weight: 400;
+    font-size: 12px;
+    margin-left: 250px;
+  }
+  .user-font {
+    font-weight: 400;
+    font-size: 12px;
+    margin-left: -120px;
+    margin-top: 9px;
+  }
+  .image-size {
+    width: 50px;
+    height: 50px;
+    margin-left: -20px;
+  }
+
+  .mg-tophead {
+    margin-top: 10px;
+  }
+}
+
+/* Tablet */
+@media only screen and (min-width: 769px) and (max-width: 1024px) {
   .buu-font {
     font-weight: 400;
     font-size: 12px;
     margin-left: -10px;
-
   }
   .breadcrumbs-font {
     font-weight: 400;
@@ -163,47 +267,48 @@ export default {
   .image-size {
     width: 55px;
     height: 55px;
+    margin-left: -20px;
   }
 
   .mg-tophead {
     margin-top: 10px;
   }
+
+  .ms-020 {
+    margin-left: 100px;
+  }
 }
 
-@media (max-width: 768px) {
+/* Tablet  landscape */
+@media only screen and (min-width: 1025px) and (max-width: 1440px) {
   .buu-font {
     font-weight: 400;
-    font-size: 10px;
+    font-size: 13px;
+    margin-left: -10px;
   }
   .breadcrumbs-font {
     font-weight: 400;
-    font-size: 10px;
-    margin: 20px 0;
-    padding-top: 12px;
-    margin-left: 15px;
-
+    font-size: 13px;
   }
   .user-font {
     font-weight: 400;
-    font-size: 10px;
-    margin-left: -80px;
-    margin-top: 1px;
+    font-size: 13px;
+    margin-left: -40px;
+    margin-top: 9px;
   }
 
   .image-size {
-    width: 35px;
-    height: 35px;
+    width: 55px;
+    height: 55px;
+    margin-left: -20px;
   }
 
   .mg-tophead {
-    margin-top: 15px;
+    margin-top: 10px;
   }
 
-  .mg-leftimage {
-    margin-left: 10px;
-  }
-  .mg-leftbuu {
-    margin-right: 10px;
+  .ms-136 {
+    margin-left: 500px;
   }
 }
 </style>
