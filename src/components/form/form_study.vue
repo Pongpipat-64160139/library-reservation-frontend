@@ -201,38 +201,79 @@
 </template>
 
 <script setup lang="ts">
+// ---------------------
+// Import Modules
+// ---------------------
+// Vue Composition API
 import { ref, computed, watch, onMounted } from "vue";
+
+// Vue Router
 import { useRoute } from "vue-router";
+
+// Stores
 import { useRoomStore } from "@/stores/roomStore";
-import type { GetRoomType } from "@/types/getRoomType";
 import { useTimeStore } from "@/stores/timeStore";
+import { useNormalRoomBookStore } from "@/stores/nrbStore";
+import { useUserStore } from "@/stores/userStore";
+import { useUserBookStore } from "@/stores/userBookStore";
+import { useParticipantStore } from "@/stores/participant";
+
+// Types
+import type { GetRoomType } from "@/types/getRoomType";
 import type { NormalRoomBooking } from "@/types/normalRoomBooking";
 import type { Room } from "@/types/room";
-import { useNormalRoomBookStore } from "@/stores/nrbStore";
+import type { UBPostpayload, UserBooking } from "@/types/userBooking";
+import type { User } from "@/types/user";
+import type { ParticipantPostPayload } from "@/types/participant";
 
+
+// ---------------------
+// Store Initialization
+// ---------------------
+// ใช้ store ในการจัดการข้อมูล
 const route = useRoute();
 const roomStore = useRoomStore();
 const timeStore = useTimeStore();
 const nrbStore = useNormalRoomBookStore();
-// Data properties
-const numPeople = ref("");
-const formDetail = ref<string>("");
-const menu = ref(false);
-const startMenu = ref(false);
-const endMenu = ref(false);
-const startDate = ref<Date | null>(null);
-const endDate = ref<Date | null>(null);
-const endRepeatMenu = ref(false);
-const endRepeatDate = ref<Date | null>(null);
-const startTime = ref("");
-const endTime = ref("");
-const floor = ref<number>();
-const repeatOption = ref("ไม่");
-const listparticipants = ref<string[]>([]);
-const currentDate = ref("");
-const saveSelectRoom = ref<GetRoomType>();
-const normalRoomBooking = ref<NormalRoomBooking>();
+const userStore = useUserStore();
+const ubStore = useUserBookStore();
+const participantStore = useParticipantStore();
 
+// ---------------------
+// Data Properties
+// ---------------------
+// ตัวแปรแบบ reactive สำหรับจัดการข้อมูลใน component
+const numPeople = ref(""); // จำนวนคนที่เข้าร่วม
+const formDetail = ref<string>(""); // รายละเอียดในฟอร์ม
+const menu = ref(false); // เมนูแสดง/ซ่อน
+const startMenu = ref(false); // เมนูเริ่มต้น
+const endMenu = ref(false); // เมนูสิ้นสุด
+const startDate = ref<Date | null>(null); // วันที่เริ่มต้น
+const endDate = ref<Date | null>(null); // วันที่สิ้นสุด
+const endRepeatMenu = ref(false); // เมนูทำซ้ำ
+const endRepeatDate = ref<Date | null>(null); // วันที่สิ้นสุดการทำซ้ำ
+const startTime = ref(""); // เวลาเริ่มต้น
+const endTime = ref(""); // เวลาสิ้นสุด
+const floor = ref<number>(); // ชั้นของห้อง
+const repeatOption = ref("ไม่"); // ตัวเลือกการทำซ้ำ
+const listparticipants = ref<string[]>([]); // รายชื่อผู้เข้าร่วม
+const currentDate = ref(""); // วันที่ปัจจุบัน
+const saveSelectRoom = ref<GetRoomType>(); // ห้องที่ถูกเลือก
+const normalRoomBooking = ref<NormalRoomBooking>(); // การจองห้องปกติ
+const user = ref<User>(); // ข้อมูลผู้ใช้
+
+// ---------------------
+// Functions and Computed
+// ---------------------
+// สามารถเพิ่ม watcher, methods หรือ computed properties ตามความเหมาะสม
+
+
+async function setLeaderUser() {
+  await userStore.getUserById(1);
+  user.value = userStore.leaderUser;
+  numPeople.value = `${user.value?.firstName} ${user.value?.lastName}`;
+}
+// computed properties
 function updateEndTimeSlots() {
   endTime.value = timeStore.updateEndTime(startTime.value!);
 }
@@ -388,36 +429,61 @@ function formatToDDMMYYYY(date: Date): string {
   const year = date.getFullYear(); // ดึงปี
   return `${day}-${month}-${year}`; // จัดเรียงรูปแบบ dd-mm-yyyy
 }
+async function createdUserBookAndParticipant(nrb: NormalRoomBooking) {
+  // เก็บข้อมูลของ user book
+  const newUserBook = ref<UBPostpayload>();
+  newUserBook.value = {
+    userId: user.value?.userId!,
+    nrbBookingId: nrb.nrbId!,
+  };
+  // สร้างข้อมูลของ User Booking ผ่าน Store
+  const createUB = await ubStore.createNewUserBook(newUserBook.value);
+  const saveUB = createUB as UserBooking;
+  console.log("Data :", saveUB.userbooking_Id);
+
+  // สร้าง Participant ตาม loop ข้อมูลรายชื่อ
+  for (let i = 0; i < listparticipants.value.length; i++) {
+    // แสดงรายชื่อตามที่เก็บไว้ใน field
+    let participant = listparticipants.value[i];
+    // Post ข้อมูลของ participant ผ่าน API จาก Store
+    let createParticipant = await participantStore.createParticipant({
+      fullName: participant,
+      userbookingId: saveUB.userbooking_Id,
+    });
+    console.log("Participant :", createParticipant);
+  }
+}
 async function submitBookingRoom() {
   if (startDate.value === null) {
-    // normalRoomBooking.value = {
-    //   startDate: currentDate.value,
-    //   startTime: startTime.value,
-    //   endDate: currentDate.value,
-    //   endTime: endTime.value,
-    //   repeat_Flag: "No",
-    //   reseve_status: "รอ",
-    //   repeat_End_Flag: currentDate.value,
-    //   details: formDetail.value!,
-    //   roomId: saveSelectRoom.value?.roomId!,
-    // };
-    // const res = await nrbStore.createNewBooking(normalRoomBooking.value);
-    // console.log("Data :", res);
+    normalRoomBooking.value = {
+      startDate: currentDate.value,
+      startTime: startTime.value,
+      endDate: currentDate.value,
+      endTime: endTime.value,
+      repeat_Flag: "No",
+      reseve_status: "รอ",
+      repeat_End_Flag: currentDate.value,
+      details: formDetail.value!,
+      reason: "",
+      roomId: saveSelectRoom.value?.roomId!,
+    };
+    const res = await nrbStore.createNewBooking(normalRoomBooking.value);
+    createdUserBookAndParticipant(res);
   } else if (startDate.value != null) {
-    // const formatDate = formatToDDMMYYYY(startDate.value);
-    // normalRoomBooking.value = {
-    //   startDate: formatDate,
-    //   startTime: startTime.value,
-    //   endDate: formatDate,
-    //   endTime: endTime.value,
-    //   repeat_Flag: "No",
-    //   reseve_status: "รอ",
-    //   repeat_End_Flag: formatDate,
-    //   details: formDetail.value!,
-    //   roomId: saveSelectRoom.value?.roomId!,
-    // };
-    // const res = await nrbStore.createNewBooking(normalRoomBooking.value);
-    // console.log("Data :", res);
+    const formatDate = formatToDDMMYYYY(startDate.value);
+    normalRoomBooking.value = {
+      startDate: formatDate,
+      startTime: startTime.value,
+      endDate: formatDate,
+      endTime: endTime.value,
+      repeat_Flag: "No",
+      reseve_status: "รอ",
+      repeat_End_Flag: formatDate,
+      details: formDetail.value!,
+      roomId: saveSelectRoom.value?.roomId!,
+    };
+    const res = await nrbStore.createNewBooking(normalRoomBooking.value);
+    createdUserBookAndParticipant(res);
   }
 }
 // Lifecycle hooks
@@ -429,6 +495,7 @@ onMounted(async () => {
     await filteredEndTimes(),
     getCurrentDate(),
     (saveSelectRoom.value = roomStore.currentTypeRoom),
+    await setLeaderUser(),
   ]);
 });
 

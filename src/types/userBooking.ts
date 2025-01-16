@@ -1,5 +1,4 @@
 import { NormalRoomBooking } from "./normalRoomBooking";
-import { Participant } from "./participant";
 import type { User } from "./user";
 
 export interface UserBooking {
@@ -9,5 +8,10 @@ export interface UserBooking {
 
   normalRoomBooking: NormalRoomBooking;
 
-  participants: Participant[];
+  // participants: Participant[];
+}
+
+export interface UBPostpayload {
+  userId: number;
+  nrbBookingId: number;
 }

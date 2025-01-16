@@ -1,9 +1,8 @@
-import type { UserBooking } from "./userBooking";
 
-export interface Participant {
-  participant_ID: number;
+export interface ParticipantPostPayload {
+  participant_ID?: number;
 
   fullName: string;
 
-  userbooking: UserBooking;
+  userbookingId: number;
 }

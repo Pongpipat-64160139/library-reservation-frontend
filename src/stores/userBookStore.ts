@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import floorService from "../services/floorService";
 import { ref } from "vue";
-import { UserBooking } from "../types/userBooking";
+import { UBPostpayload, UserBooking } from "../types/userBooking";
 import userBookService from "../services/userBookService";
 
 export const useUserBookStore = defineStore("userbooking", () => {
@@ -14,9 +14,10 @@ export const useUserBookStore = defineStore("userbooking", () => {
   async function findOneUserBooking(id: number) {
     return await userbookservice.getUserBookById(id);
   }
-  async function createNewUserBook(userBooking: UserBooking) {
-    const newUserbook = await userbookservice.createUserBook(userBooking);
-    return newUserbook;
+  async function createNewUserBook(userBooking: UBPostpayload) {
+    const res = await userbookservice.createUserBook(userBooking);
+    const newUserBooking = res.data;
+    return newUserBooking;
   }
 
   return {

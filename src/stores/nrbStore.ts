@@ -22,22 +22,30 @@ export const useNormalRoomBookStore = defineStore("normal-room-booking", () => {
       if (!existingBooking || !existingBooking.data) {
         throw new Error(`Booking with ID ${id} not found`);
       }
-  
+
       // อัปเดตการจอง
-      const updatedBooking = await nrbService.updateNRB(existingBooking.data.nrbId, nrb);
-  
+      const updatedBooking = await nrbService.updateNRB(
+        existingBooking.data.nrbId,
+        nrb
+      );
+
       // ตรวจสอบผลลัพธ์
       if (!updatedBooking || !updatedBooking.data) {
         throw new Error(`Failed to update booking with ID ${id}`);
       }
-  
+
       return updatedBooking.data; // คืนค่าที่อัปเดตสำเร็จ
     } catch (error: any) {
-      console.error(`Error updating booking with ID ${id}:`, error.message || error);
-      throw new Error(`Error updating booking: ${error.message || "Unknown error"}`);
+      console.error(
+        `Error updating booking with ID ${id}:`,
+        error.message || error
+      );
+      throw new Error(
+        `Error updating booking: ${error.message || "Unknown error"}`
+      );
     }
   }
-  
+
   async function deleteReserve(id: number) {
     return nrbService.deleteNRB(id);
   }
