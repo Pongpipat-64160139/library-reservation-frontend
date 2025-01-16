@@ -390,34 +390,34 @@ function formatToDDMMYYYY(date: Date): string {
 }
 async function submitBookingRoom() {
   if (startDate.value === null) {
-    normalRoomBooking.value = {
-      startDate: currentDate.value,
-      startTime: startTime.value,
-      endDate: currentDate.value,
-      endTime: endTime.value,
-      repeat_Flag: "No",
-      reseve_status: "รอ",
-      repeat_End_Flag: currentDate.value,
-      details: formDetail.value!,
-      roomId: saveSelectRoom.value?.roomId!,
-    };
-    const res = await nrbStore.createNewBooking(normalRoomBooking.value);
-    console.log("Data :", res);
+    // normalRoomBooking.value = {
+    //   startDate: currentDate.value,
+    //   startTime: startTime.value,
+    //   endDate: currentDate.value,
+    //   endTime: endTime.value,
+    //   repeat_Flag: "No",
+    //   reseve_status: "รอ",
+    //   repeat_End_Flag: currentDate.value,
+    //   details: formDetail.value!,
+    //   roomId: saveSelectRoom.value?.roomId!,
+    // };
+    // const res = await nrbStore.createNewBooking(normalRoomBooking.value);
+    // console.log("Data :", res);
   } else if (startDate.value != null) {
-    const formatDate = formatToDDMMYYYY(startDate.value);
-    normalRoomBooking.value = {
-      startDate: formatDate,
-      startTime: startTime.value,
-      endDate: formatDate,
-      endTime: endTime.value,
-      repeat_Flag: "No",
-      reseve_status: "รอ",
-      repeat_End_Flag: formatDate,
-      details: formDetail.value!,
-      roomId: saveSelectRoom.value?.roomId!,
-    };
-    const res = await nrbStore.createNewBooking(normalRoomBooking.value);
-    console.log("Data :", res);
+    // const formatDate = formatToDDMMYYYY(startDate.value);
+    // normalRoomBooking.value = {
+    //   startDate: formatDate,
+    //   startTime: startTime.value,
+    //   endDate: formatDate,
+    //   endTime: endTime.value,
+    //   repeat_Flag: "No",
+    //   reseve_status: "รอ",
+    //   repeat_End_Flag: formatDate,
+    //   details: formDetail.value!,
+    //   roomId: saveSelectRoom.value?.roomId!,
+    // };
+    // const res = await nrbStore.createNewBooking(normalRoomBooking.value);
+    // console.log("Data :", res);
   }
 }
 // Lifecycle hooks

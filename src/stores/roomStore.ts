@@ -200,5 +200,6 @@ export const useRoomStore = defineStore("room", () => {
     holidays,
     setCurrentRoom,
     getCurrentRoom,
+    getRoomByID,
   };
 });
