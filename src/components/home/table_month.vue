@@ -53,12 +53,13 @@
           <td v-for="day in week" :key="day.date">
             <div class="date-cell">
               <span>{{ day.day }}</span>
-              <div v-if="day.bookings && day.bookings.length" class="booking">
+              <div v-if="day.bookings && day.bookings.length">
                 <div
                   v-for="(booking, index) in day.bookings.slice(0, 3)"
                   :key="index"
+                  :class="getBookingClass(booking.status)"
                 >
-                  <p>{{ booking.name }} : {{ booking.status }}</p>
+                  <p>{{ booking.name }}</p>
                 </div>
                 <p v-if="day.bookings.length > 3">...และอื่น ๆ</p>
               </div>
@@ -193,6 +194,14 @@ export default {
         this.showYearDropdown = false;
       }
     },
+    getBookingClass(status) {
+      if (status === "จองล่วงหน้า") {
+        return "status-pending";
+      } else if (status === "กำลังใช้งาน") {
+        return "status-active";
+      }
+      return "";
+    },
   },
   mounted() {
     this.updateCalendar();
@@ -220,6 +229,7 @@ export default {
 .ms-kob {
   margin-top: -600px;
 }
+
 .calendar-header {
   margin-bottom: 30px;
   display: flex;
@@ -310,6 +320,347 @@ export default {
 .booking {
   background-color: #b5cfb7;
   padding: 5px;
-  border-radius: 10px;
+  border-radius: 5px;
+}
+.status-pending {
+  background-color: rgb(196, 196, 196); /* สีเหลืองสำหรับสถานะจองล่วงหน้า */
+  color: #493628; /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
+  border-radius: 5px;
+  padding: 2px;
+  margin-top: 5px;
+}
+
+.status-active {
+  background-color: #b5cfb7; /* สีเขียวสำหรับสถานะกำลังใช้งาน */
+  color: #493628; /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
+  border-radius: 5px;
+  padding: 2px;
+  margin-top: 5px;
+}
+
+/* Phones */
+@media only screen and (max-width: 480px) {
+  .ms-kob {
+    margin-top: -550px;
+  }
+
+  .calendar-header {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .month-button {
+    padding: 10px;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 90px;
+    font-size: 10px;
+  }
+
+  .year-button {
+    padding: 10px;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 70px;
+    font-size: 10px;
+  }
+  .dropdown-month {
+    position: absolute;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 50px;
+    width: 90px;
+    font-size: 10px;
+  }
+  .dropdown-year {
+    position: absolute;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 50px;
+    width: 70px;
+    margin-left: 110px;
+    font-size: 10px;
+  }
+  .calendar-table th {
+    border: 2px solid #493628;
+    background-color: #f9f3ea;
+    text-align: center;
+    vertical-align: top;
+    width: 13%;
+    height: 20px;
+    font-size: 8px;
+    padding: 5px;
+  }
+  .calendar-table td {
+    border: 2px solid #493628;
+    background-color: #f9f3ea;
+    text-align: center;
+    vertical-align: top;
+    width: 14.28%;
+    height: 70px;
+    font-size: 7px;
+  }
+}
+
+/* Phones landscape*/
+@media only screen and (min-width: 481px) and (max-width: 760px) {
+  .ms-kob {
+    margin-top: -200px;
+  }
+  .calendar-header {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .month-button {
+    padding: 10px;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 90px;
+    font-size: 10px;
+  }
+
+  .year-button {
+    padding: 10px;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 70px;
+    font-size: 10px;
+  }
+  .dropdown-month {
+    position: absolute;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 50px;
+    width: 90px;
+    font-size: 10px;
+  }
+  .dropdown-year {
+    position: absolute;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 50px;
+    width: 70px;
+    margin-left: 110px;
+    font-size: 10px;
+  }
+  .calendar-table th {
+    border: 2px solid #493628;
+    background-color: #f9f3ea;
+    text-align: center;
+    vertical-align: top;
+    width: 13%;
+    height: 20px;
+    font-size: 10px;
+    padding: 5px;
+  }
+  .calendar-table td {
+    border: 2px solid #493628;
+    background-color: #f9f3ea;
+    text-align: center;
+    vertical-align: top;
+    width: 14.28%;
+    height: 70px;
+    font-size: 10px;
+  }
+
+  .booking {
+    margin-top: 5px;
+    background-color: #b5cfb7;
+    padding: 5px;
+    border-radius: 5px;
+  }
+}
+
+/* restore */
+@media only screen and (min-width: 761px) and (max-width: 769px) {
+  .ms-kob {
+    margin-top: -600px;
+  }
+  .calendar-header {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .month-button {
+    padding: 10px;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 90px;
+    font-size: 10px;
+  }
+
+  .year-button {
+    padding: 10px;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 70px;
+    font-size: 10px;
+  }
+  .dropdown-month {
+    position: absolute;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 50px;
+    width: 90px;
+    font-size: 10px;
+  }
+  .dropdown-year {
+    position: absolute;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 50px;
+    width: 70px;
+    margin-left: 110px;
+    font-size: 10px;
+  }
+  .calendar-table th {
+    border: 2px solid #493628;
+    background-color: #f9f3ea;
+    text-align: center;
+    vertical-align: top;
+    width: 13%;
+    height: 20px;
+    font-size: 10px;
+    padding: 5px;
+  }
+  .calendar-table td {
+    border: 2px solid #493628;
+    background-color: #f9f3ea;
+    text-align: center;
+    vertical-align: top;
+    width: 14.28%;
+    height: 70px;
+    font-size: 10px;
+  }
+
+  .booking {
+    margin-top: 5px;
+    background-color: #b5cfb7;
+    padding: 5px;
+    border-radius: 5px;
+  }
+}
+
+/* Tablet  landscape */
+@media only screen and (min-width: 769px) and (max-width: 1024px) {
+  .ms-kob {
+    margin-top: -880px;
+  }
+  .calendar-header {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .month-button {
+    padding: 10px;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 90px;
+    font-size: 10px;
+  }
+
+  .year-button {
+    padding: 10px;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 70px;
+    font-size: 10px;
+  }
+  .dropdown-month {
+    position: absolute;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 50px;
+    width: 100px;
+    font-size: 10px;
+  }
+  .dropdown-year {
+    position: absolute;
+    background-color: #f5eded;
+    border: 2px solid #493628;
+    border-radius: 5px;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 50px;
+    width: 80px;
+    margin-left: 120px;
+    font-size: 10px;
+  }
+  .calendar-table th {
+    border: 2px solid #493628;
+    background-color: #f9f3ea;
+    text-align: center;
+    vertical-align: top;
+    width: 13%;
+    height: 20px;
+    font-size: 10px;
+    padding: 5px;
+  }
+  .calendar-table td {
+    border: 2px solid #493628;
+    background-color: #f9f3ea;
+    text-align: center;
+    vertical-align: top;
+    width: 14.28%;
+    height: 70px;
+    font-size: 10px;
+  }
+
+  .booking {
+    margin-top: 5px;
+    background-color: #b5cfb7;
+    padding: 5px;
+    border-radius: 5px;
+  }
 }
 </style>
