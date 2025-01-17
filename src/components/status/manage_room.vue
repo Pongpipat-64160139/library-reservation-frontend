@@ -1,19 +1,9 @@
 <template>
   <Header_page />
-  <v-container
-    fluid
-    class="back-ground ms-kob"
-  >
+  <v-container fluid class="back-ground ms-kob">
     <!-- Breadcrumbs -->
-    <v-breadcrumbs
-      :items="items"
-      divider=">"
-      class="head-title mg-table"
-    >
-      <template
-        #item="{ item }"
-        class="head-title"
-      >
+    <v-breadcrumbs :items="items" divider=">" class="head-title mg-table">
+      <template #item="{ item }" class="head-title">
         <!-- ลิงก์ที่สามารถคลิกได้ -->
         <router-link
           v-if="!item.disabled && item.href"
@@ -24,10 +14,7 @@
         </router-link>
 
         <!-- ลิงก์ที่ไม่สามารถคลิกได้ -->
-        <span
-          v-else
-          class="breadcrumb-disabled head-title"
-        >
+        <span v-else class="breadcrumb-disabled head-title">
           {{ item.title }}
         </span>
       </template>
@@ -42,22 +29,14 @@
           large
           @click="closeServiceDialog = true"
         >
-          <v-icon left>
-            mdi-close
-          </v-icon>
+          <v-icon left> mdi-close </v-icon>
           ปิดบริการ
         </v-btn>
       </v-col>
     </v-row>
 
-    <div
-      v-for="floor in 6"
-      :key="floor"
-      class="mb-10"
-    >
-      <h2 class="text-h5 font-weight-bold ms-5 mb-2">
-        ชั้น {{ floor + 1 }}
-      </h2>
+    <div v-for="floor in 6" :key="floor" class="mb-10">
+      <h2 class="text-h5 font-weight-bold ms-5 mb-2">ชั้น {{ floor + 1 }}</h2>
       <v-data-table
         :headers="headers"
         :items="filteredRooms(floor + 1)"
@@ -67,21 +46,11 @@
       >
         <template #headers>
           <tr>
-            <th style="width: 20%">
-              ห้อง
-            </th>
-            <th style="width: 20%">
-              ผู้จอง
-            </th>
-            <th style="width: 20%">
-              เวลา
-            </th>
-            <th style="width: 20%">
-              สถานะ
-            </th>
-            <th style="width: 20%">
-              จัดการ
-            </th>
+            <th style="width: 20%">ห้อง</th>
+            <th style="width: 20%">ผู้จอง</th>
+            <th style="width: 20%">เวลา</th>
+            <th style="width: 20%">สถานะ</th>
+            <th style="width: 20%">จัดการ</th>
           </tr>
         </template>
         <template #item="{ item, index }">
@@ -106,11 +75,7 @@
       </v-data-table>
     </div>
 
-    <v-dialog
-      v-model="dialog"
-      max-width="500px"
-      max-height="600px"
-    >
+    <v-dialog v-model="dialog" max-width="500px" max-height="600px">
       <v-card>
         <v-card-title class="head-dialog text-center mt-5">
           ปิดให้บริการจองห้อง (รายห้อง)
@@ -132,6 +97,18 @@
             density="compact"
             variant="outlined"
           />
+
+          <v-radio-group v-model="selectedDayType" label="เลือกวัน">
+  <v-row class="d-flex align-center">
+    <v-col cols="6">
+      <v-radio label="วันปกติ" value="วันปกติ"></v-radio>
+    </v-col>
+    <v-col cols="6">
+      <v-radio label="วันเสาร์-อาทิตย์" value="วันเสาร์-อาทิตย์"></v-radio>
+    </v-col>
+  </v-row>
+</v-radio-group>
+
 
           <!-- วันที่และเวลา -->
           <v-row>
@@ -201,29 +178,17 @@
         </v-card-text>
 
         <v-card-actions class="d-flex justify-center mb-5">
-          <v-btn
-            class="rd-btncancel"
-            variant="flat"
-            @click="dialog = false"
-          >
+          <v-btn class="rd-btncancel" variant="flat" @click="dialog = false">
             ยกเลิก
           </v-btn>
-          <v-btn
-            class="rd-btnclose"
-            variant="flat"
-            @click="saveChanges"
-          >
+          <v-btn class="rd-btnclose" variant="flat" @click="saveChanges">
             ตกลง
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <v-dialog
-      v-model="closeServiceDialog"
-      max-width="500px"
-      max-height="600px"
-    >
+    <v-dialog v-model="closeServiceDialog" max-width="500px" max-height="600px">
       <v-card>
         <v-card-title class="head-dialog text-center mt-5">
           ยืนยันการปิดให้บริการ
@@ -293,11 +258,7 @@
           >
             ยกเลิก
           </v-btn>
-          <v-btn
-            class="rd-btnclose"
-            variant="flat"
-            @click="saveCloseService"
-          >
+          <v-btn class="rd-btnclose" variant="flat" @click="saveCloseService">
             ตกลง
           </v-btn>
         </v-card-actions>
@@ -308,8 +269,19 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+const selectedDayType = ref("วันปกติ");
 
 const closeServiceDialog = ref(false);
+
+watch(selectedDayType, (newValue) => {
+  if (newValue === "วันปกติ") {
+    startTime.value = "08:00";
+    endTime.value = "20:30";
+  } else if (newValue === "วันเสาร์-อาทิตย์") {
+    startTime.value = "09:00";
+    endTime.value = "19:00";
+  }
+});
 
 const saveCloseService = () => {
   console.log("หมายเหตุ:", remark.value);
@@ -397,7 +369,9 @@ const data = ref(
       const hasUser = Math.random() > 0.5; // สุ่มว่ามีผู้จองหรือไม่
       return {
         room,
-        user: hasUser ? mockUsers[Math.floor(Math.random() * mockUsers.length)] : "-", // ถ้าไม่มี ให้เป็น "-"
+        user: hasUser
+          ? mockUsers[Math.floor(Math.random() * mockUsers.length)]
+          : "-", // ถ้าไม่มี ให้เป็น "-"
         time: hasUser ? "08:00-10:00" : "-", // ถ้าไม่มี ให้เป็น "-"
         status: hasUser ? (Math.random() > 0.5 ? "ไม่ว่าง" : "จอง") : "ว่าง", // ถ้าไม่มี ให้เป็น "ว่าง"
         floor: Number(floor),
@@ -405,8 +379,6 @@ const data = ref(
     })
   )
 );
-
-
 
 const filteredRooms = (floor: number) => {
   return data.value
@@ -418,7 +390,6 @@ const filteredRooms = (floor: number) => {
       status: item.status || "ว่าง", // หากไม่มีสถานะ ให้สถานะ = "ว่าง"
     }));
 };
-
 
 const dialog = ref(false);
 const selectedItem = ref<any>(null);
