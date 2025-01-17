@@ -99,16 +99,18 @@
           />
 
           <v-radio-group v-model="selectedDayType" label="เลือกวัน">
-  <v-row class="d-flex align-center">
-    <v-col cols="6">
-      <v-radio label="วันปกติ" value="วันปกติ"></v-radio>
-    </v-col>
-    <v-col cols="6">
-      <v-radio label="วันเสาร์-อาทิตย์" value="วันเสาร์-อาทิตย์"></v-radio>
-    </v-col>
-  </v-row>
-</v-radio-group>
-
+            <v-row class="d-flex align-center">
+              <v-col cols="6">
+                <v-radio label="วันปกติ" value="วันปกติ"></v-radio>
+              </v-col>
+              <v-col cols="6">
+                <v-radio
+                  label="วันเสาร์-อาทิตย์"
+                  value="วันเสาร์-อาทิตย์"
+                ></v-radio>
+              </v-col>
+            </v-row>
+          </v-radio-group>
 
           <!-- วันที่และเวลา -->
           <v-row>

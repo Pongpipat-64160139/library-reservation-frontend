@@ -208,6 +208,19 @@
         </div>
       </span>
 
+      <span v-if="selectedItem?.status === 'ยกเลิก'" class="d-flex mg-top ms-6">
+        <div class="mg-top">
+          <strong>ยกเลิกโดย</strong>
+        </div>
+      </span>
+
+      <span v-if="selectedItem?.status === 'ยกเลิก'" class="d-flex mg-top ms-6">
+        <div class="mg-top">
+          <strong>เวลาที่ยกเลิก</strong>
+          {{ selectedItem?.cancelTime || "ไม่มีข้อมูล" }}
+        </div>
+      </span>
+
       <v-card-text />
       <v-card-actions class="d-flex justify-center mb-8">
         <v-btn
@@ -287,6 +300,7 @@ interface BookingDetail {
   status: string;
   details: string;
   cancelReason: string;
+  cancelTime?: string; // ฟิลด์สำหรับเก็บเวลายกเลิก
 }
 
 // 2. เปลี่ยน `bookingDetails` ให้รองรับ `BookingDetail[]`
@@ -432,7 +446,15 @@ const confirmStatusChange = () => {
       return;
     }
     itemToUpdate.value.status = newStatus.value;
-    itemToUpdate.value.cancelReason = cancelReason.value; // Store reason if needed
+    itemToUpdate.value.cancelReason = cancelReason.value;
+    if (newStatus.value === "ยกเลิก") {
+      const now = new Date();
+      const formattedTime = `${now.getHours().toString().padStart(2, "0")}:${now
+        .getMinutes()
+        .toString()
+        .padStart(2, "0")}`;
+      itemToUpdate.value.cancelTime = formattedTime; // เก็บเวลา
+    }
   }
   statusChangeDialog.value = false;
   cancelReason.value = ""; // Reset reason
@@ -513,8 +535,6 @@ watch(
     editedRoom.value = rooms ? rooms[0] : "";
   }
 );
-
-
 
 const floorRooms = {
   2: ["201 (20-50)"],
@@ -735,6 +755,13 @@ th {
   font-weight: 300;
   font-size: 18px;
   margin-top: -10px;
+  margin-left: 25px;
+}
+
+.mg-top {
+  font-weight: 300;
+  font-size: 16px;
+  margin-top: 5px;
   margin-left: 25px;
 }
 
