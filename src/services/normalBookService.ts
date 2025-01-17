@@ -19,10 +19,16 @@ export function updateNRB(id: number, nrb: NormalRoomBooking) {
 export function deleteNRB(id: number) {
   return http.delete(`/normal-room-booking/${id}`);
 }
+export function getReservedRoom(currentDate: string) {
+  return http.get(`/normal-room-booking/getReserved`, {
+    params: { currentDate: currentDate }, // ใช้ params เพื่อส่ง Query String
+  });
+}
 export default {
   getAllRNB,
   getNRBById,
   createNRB,
   updateNRB,
   deleteNRB,
+  getReservedRoom,
 };

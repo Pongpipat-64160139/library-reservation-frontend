@@ -1,9 +1,14 @@
 import { defineStore } from "pinia";
 import normalBookService from "../services/normalBookService";
-import { NormalRoomBooking } from "../types/normalRoomBooking";
+import {
+  getStatusReserved,
+  NormalRoomBooking,
+} from "../types/normalRoomBooking";
+import { ref } from "vue";
 
 export const useNormalRoomBookStore = defineStore("normal-room-booking", () => {
   const nrbService = normalBookService;
+  const bookings = ref<getStatusReserved[]>([]);
   async function createNewBooking(nrb: NormalRoomBooking) {
     const res = await nrbService.createNRB(nrb);
     const newNRB = res.data;
@@ -49,11 +54,17 @@ export const useNormalRoomBookStore = defineStore("normal-room-booking", () => {
   async function deleteReserve(id: number) {
     return nrbService.deleteNRB(id);
   }
+  async function getStatusReserve(currentDate: string) {
+    const res = await nrbService.getReservedRoom(currentDate);
+    return res.data;
+  }
   return {
     createNewBooking,
     getAllReserve,
     findOneReserve,
     updateReserve,
     deleteReserve,
+    getStatusReserve,
+    bookings,
   };
 });

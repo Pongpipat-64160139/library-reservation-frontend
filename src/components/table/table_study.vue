@@ -84,6 +84,7 @@
               v-for="(room, roomIndex) in rooms3"
               :key="roomIndex"
               class="room6-column"
+              :class="getCellClass(room.roomId,time,currentReserveDate!)"
               @click="selectRoom(roomIndex, 3, time)"
             >
               <a
@@ -194,19 +195,21 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import Footer_page from "../footer/footer_page.vue";
 import { useRoomStore } from "@/stores/roomStore";
 import { useHolidayStore } from "@/stores/holidayStore";
 import type { CurrentRoom } from "@/types/currentRoom";
+import { useNormalRoomBookStore } from "@/stores/nrbStore";
 const showDatePicker = ref(false);
 const currentDate = ref("");
 const selectedDate = ref<string | null>(null);
 const holidays = ref<string[]>([]);
 const roomStore = useRoomStore();
+const nrbStore = useNormalRoomBookStore();
 const holidayStore = useHolidayStore();
-
+const currentReserveDate = ref<string>();
 // const fetchHolidays = async (years: string[]) => {
 //   const holidayPromises = years.map(async (year) => {
 //     const response = await fetch(
@@ -272,7 +275,8 @@ onMounted(async () => {
     // เรียก API เพื่อดึงข้อมูลวันหยุดย้อนหลัง
     await holidayStore.getAllHolidayInYear(years);
     console.log("Current year: " + currentYear);
-
+    await getCurrentReserveDate();
+    await loadedReserveRoom(currentReserveDate.value!);
     // เปลี่ยน CurrentType
     // await fetchHolidays(years);
     // console.log(`Holidays loaded for years ${years.join(", ")}:`, holidays.value);
@@ -441,10 +445,67 @@ const generateBookingLink = (
     roomIndex + 1
   }&time=${time}&roomName=${encodeURIComponent(roomName)}`;
 };
+function formatDate(date: string) {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+function getCurrentReserveDate() {
+  if (selectedDate.value === null) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    currentReserveDate.value = `${year}-${month}-${day}`;
+    console.log("Reserve Date: " + currentReserveDate.value);
+    return currentReserveDate;
+  }
+}
+async function loadedReserveRoom(selectedDate: string) {
+  const loadedRoom = await nrbStore.getStatusReserve(selectedDate);
+  nrbStore.bookings = loadedRoom;
+  console.log("Loaded Reserve Room: ", nrbStore.bookings);
+}
+
+function getCellClass(roomId: number, time: string, date: string) {
+  const bookings = nrbStore.bookings.find(
+    (b) =>
+      b.room_id === roomId &&
+      b.start_date === date &&
+      b.start_time <= time &&
+      b.end_time > time
+  );
+  if (!bookings) {
+    return null;
+  } else if (bookings.re_status === "รอ") {
+    return "booked";
+  } else if (bookings.re_status === "อนุมัติ") {
+    return "confirmed";
+  }
+}
+
+watch(selectedDate, (newDate, oldDate) => {
+  const year = formatDate(newDate!);
+  currentReserveDate.value = year;
+  console.log("Selected New date  :", currentReserveDate.value);
+  loadedReserveRoom(currentReserveDate.value);
+});
 </script>
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
+
+.booked {
+  background-color: gray; /* สีสำหรับสถานะ "รอ" */
+  color: white; /* ข้อความเป็นสีขาว */
+}
+
+.confirmed {
+  background-color: green; /* สีสำหรับสถานะ "ยืนยัน" */
+  color: white; /* ข้อความเป็นสีขาว */
+}
 
 * {
   font-family: "Kanit", sans-serif;

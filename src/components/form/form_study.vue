@@ -480,6 +480,7 @@ async function submitBookingRoom() {
       reseve_status: "รอ",
       repeat_End_Flag: formatDate,
       details: formDetail.value!,
+      reason: "",
       roomId: saveSelectRoom.value?.roomId!,
     };
     const res = await nrbStore.createNewBooking(normalRoomBooking.value);

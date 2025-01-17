@@ -24,3 +24,13 @@ export interface NormalRoomBooking {
 
   reason?: string;
 }
+export interface getStatusReserved {
+  user_name: string;
+  room_id: number;
+  normal_room_booking: number;
+  start_date: string;
+  start_time: string;
+  end_date: string;
+  end_time: string;
+  re_status: string;
+}
