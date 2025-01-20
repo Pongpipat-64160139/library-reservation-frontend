@@ -83,8 +83,8 @@
             <td
               v-for="(room, roomIndex) in rooms3"
               :key="roomIndex"
-              class="room6-column"
-              :class="getCellClass(room.roomId,time,currentReserveDate!)"
+              class="room5-column"
+              :class="getCellClass(room.roomId, time)"
               @click="selectRoom(roomIndex, 3, time)"
             >
               <a
@@ -209,7 +209,7 @@ const holidays = ref<string[]>([]);
 const roomStore = useRoomStore();
 const nrbStore = useNormalRoomBookStore();
 const holidayStore = useHolidayStore();
-const currentReserveDate = ref<string>();
+const currentReserveDate = ref<string>(); // เก็บวันที่ปัจจุบัน หรือ วันที่ๆ เลือกใหม่และมีการอัพเดทตามตารางตลอด
 // const fetchHolidays = async (years: string[]) => {
 //   const holidayPromises = years.map(async (year) => {
 //     const response = await fetch(
@@ -466,23 +466,31 @@ function getCurrentReserveDate() {
 async function loadedReserveRoom(selectedDate: string) {
   const loadedRoom = await nrbStore.getStatusReserve(selectedDate);
   nrbStore.bookings = loadedRoom;
-  console.log("Loaded Reserve Room: ", nrbStore.bookings);
+
 }
 
-function getCellClass(roomId: number, time: string, date: string) {
-  const bookings = nrbStore.bookings.find(
-    (b) =>
-      b.room_id === roomId &&
-      b.start_date === date &&
-      b.start_time <= time &&
-      b.end_time > time
+function getCellClass(roomId: number, time: string) {
+  const bookings = nrbStore.bookings; // ดึงรายการจองทั้งหมด
+  const isBooked = bookings.some(
+    (booking) =>
+      booking.room_id === roomId &&
+      time >= booking.start_time &&
+      time <= booking.end_time
   );
-  if (!bookings) {
-    return null;
-  } else if (bookings.re_status === "รอ") {
-    return "booked";
-  } else if (bookings.re_status === "อนุมัติ") {
+  // ถ้าไม่มีการจอง
+  if (!isBooked) {
+    return null; // ไม่ต้องเพิ่มคลาสพิเศษ
+  }
+  if (
+    bookings.find(
+      (book) => book.room_id === roomId && book.re_status == "อนุมัติ"
+    )
+  ) {
     return "confirmed";
+  } else if (
+    bookings.find((book) => book.room_id === roomId && book.re_status == "รอ")
+  ) {
+    return "booked";
   }
 }
 
@@ -503,8 +511,9 @@ watch(selectedDate, (newDate, oldDate) => {
 }
 
 .confirmed {
-  background-color: green; /* สีสำหรับสถานะ "ยืนยัน" */
-  color: white; /* ข้อความเป็นสีขาว */
+  background-color: #4caf50; /* สีเขียวสำหรับการจอง */
+  color: white;
+  text-align: center;
 }
 
 * {
