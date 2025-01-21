@@ -83,8 +83,10 @@
             <td
               v-for="(room, roomIndex) in rooms3"
               :key="roomIndex"
-              class="room5-column"
-              :class="getCellClass(room.roomId, time)"
+              class="room6-column"
+              :class="getCellClass(room.roomId, time)?.class"
+              :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden"
               @click="selectRoom(roomIndex, 3, time)"
             >
               <a
@@ -132,6 +134,9 @@
               v-for="(room, roomIndex) in rooms4"
               :key="roomIndex"
               class="room5-column"
+              :class="getCellClass(room.roomId, time)?.class"
+              :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden"
               @click="selectRoom(roomIndex, 4, time)"
             >
               <a
@@ -179,6 +184,9 @@
               v-for="(room, roomIndex) in rooms5"
               :key="roomIndex"
               class="room5-column"
+              :class="getCellClass(room.roomId, time)?.class"
+              :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden"
               @click="selectRoom(roomIndex, 5, time)"
             >
               <a
@@ -210,6 +218,7 @@ const roomStore = useRoomStore();
 const nrbStore = useNormalRoomBookStore();
 const holidayStore = useHolidayStore();
 const currentReserveDate = ref<string>(); // เก็บวันที่ปัจจุบัน หรือ วันที่ๆ เลือกใหม่และมีการอัพเดทตามตารางตลอด
+
 // const fetchHolidays = async (years: string[]) => {
 //   const holidayPromises = years.map(async (year) => {
 //     const response = await fetch(
@@ -466,32 +475,59 @@ function getCurrentReserveDate() {
 async function loadedReserveRoom(selectedDate: string) {
   const loadedRoom = await nrbStore.getStatusReserve(selectedDate);
   nrbStore.bookings = loadedRoom;
-
 }
-
 function getCellClass(roomId: number, time: string) {
   const bookings = nrbStore.bookings; // ดึงรายการจองทั้งหมด
-  const isBooked = bookings.some(
-    (booking) =>
-      booking.room_id === roomId &&
-      time >= booking.start_time &&
-      time <= booking.end_time
+  const isBook = bookings.find(
+    (b) => b.room_id === roomId && time >= b.start_time && time <= b.end_time
   );
+
+  // หา index ของเวลาเริ่มต้นและสิ้นสุด
+  const startIndex = timeSlots.indexOf(isBook?.start_time!);
+  const endIndex = timeSlots.indexOf(isBook?.end_time!);
+  const currentIndex = timeSlots.indexOf(time);
+
   // ถ้าไม่มีการจอง
-  if (!isBooked) {
+  if (!isBook) {
     return null; // ไม่ต้องเพิ่มคลาสพิเศษ
   }
-  if (
-    bookings.find(
-      (book) => book.room_id === roomId && book.re_status == "อนุมัติ"
-    )
-  ) {
-    return "confirmed";
-  } else if (
-    bookings.find((book) => book.room_id === roomId && book.re_status == "รอ")
-  ) {
-    return "booked";
+  if (currentIndex === startIndex) {
+    if (
+      bookings.find(
+        (book) => book.room_id === roomId && book.re_status == "อนุมัติ"
+      )
+    ) {
+      return {
+        class: "confirmed", // กำหนดสีของเซลล์
+        rowspan: endIndex - startIndex + 1, // คำนวณจำนวนแถวที่ต้องรวม
+        isStart: true, // ระบุว่าเป็นแถวแรก
+        isHidden: false, // ไม่ต้องซ่อนแถว
+        text: "จองแล้ว", // ข้อความที่แสดงในเซลล์
+      };
+    } else if (
+      bookings.find((book) => book.room_id === roomId && book.re_status == "รอ")
+    ) {
+      return {
+        class: "booked", // กำหนดสีของเซลล์
+        rowspan: endIndex - startIndex + 1, // คำนวณจำนวนแถวที่ต้องรวม
+        isStart: true, // ระบุว่าเป็นแถวแรก
+        isHidden: false, // ไม่ต้องซ่อนแถว
+        text: "จองแล้ว", // ข้อความที่แสดงในเซลล์
+      };
+    }
   }
+  // ถ้าอยู่ภายใต้ช่วงที่ถูกรวมแล้ว
+  if (currentIndex > startIndex && currentIndex <= endIndex) {
+    return {
+      class: "", // ไม่ต้องเปลี่ยนสี เพราะถูกครอบคลุมโดย rowspan
+      rowspan: 1, // ค่าเริ่มต้น เพราะเซลล์นี้จะถูกซ่อน
+      isStart: false,
+      isHidden: true, // ต้องซ่อนเซลล์นี้
+      text: "",
+    };
+  }
+  // คืนค่าเริ่มต้นหากไม่มีการจอง
+  return { class: "", rowspan: 1, isStart: false, isHidden: false, text: "" };
 }
 
 watch(selectedDate, (newDate, oldDate) => {
