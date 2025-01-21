@@ -21,7 +21,13 @@
     </v-breadcrumbs>
 
     <v-row>
-      <v-col cols="10" />
+      <v-col class="d-flex justify-center" cols="10">
+        <vue-flatpickr
+          v-model="selectedDate"
+          class="text-center btn-date"
+          :config="flatpickrConfig"
+        />
+      </v-col>
       <v-col cols="2">
         <v-btn
           class="close-service-btn ms-5 mb-5"
@@ -97,20 +103,6 @@
             density="compact"
             variant="outlined"
           />
-
-          <v-radio-group v-model="selectedDayType" label="เลือกวัน">
-            <v-row class="d-flex align-center">
-              <v-col cols="6">
-                <v-radio label="วันปกติ" value="วันปกติ"></v-radio>
-              </v-col>
-              <v-col cols="6">
-                <v-radio
-                  label="วันเสาร์-อาทิตย์"
-                  value="วันเสาร์-อาทิตย์"
-                ></v-radio>
-              </v-col>
-            </v-row>
-          </v-radio-group>
 
           <!-- วันที่และเวลา -->
           <v-row>
@@ -211,6 +203,20 @@
             variant="outlined"
           />
 
+          <v-radio-group v-model="selectedDayType" label="เลือกวัน">
+            <v-row class="d-flex align-center">
+              <v-col cols="6">
+                <v-radio label="วันปกติ" value="วันปกติ"></v-radio>
+              </v-col>
+              <v-col cols="6">
+                <v-radio
+                  label="วันเสาร์-อาทิตย์"
+                  value="วันเสาร์-อาทิตย์"
+                ></v-radio>
+              </v-col>
+            </v-row>
+          </v-radio-group>
+
           <v-row>
             <v-col cols="6">
               <v-text-field
@@ -271,8 +277,36 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import VueFlatpickr from "vue-flatpickr-component";
+import "flatpickr/dist/flatpickr.css";
+import { Thai } from "flatpickr/dist/l10n/th.js";
 const selectedDayType = ref("วันปกติ");
-
+const selectedDate = ref<string | null>(null);
+const flatpickrConfig = ref({
+  locale: Thai,
+  dateFormat: "d-m-Y",
+  defaultDate: new Date(),
+  minDate: new Date(new Date().getFullYear(), 0, 1),
+  maxDate: new Date(new Date().getFullYear(), 11, 31),
+  formatDate: (date: Date) => {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    };
+    const thaiYear = date.getFullYear() + 543;
+    return new Intl.DateTimeFormat("th-TH", options)
+      .format(date)
+      .replace(date.getFullYear().toString(), thaiYear.toString());
+  },
+  onChange: (selectedDates: Date[], dateStr: string) => {
+    if (selectedDates.length > 0) {
+      selectedDate.value = dateStr;
+      console.log("Selected date:", dateStr);
+    }
+  },
+});
 const closeServiceDialog = ref(false);
 
 watch(selectedDayType, (newValue) => {
@@ -407,10 +441,10 @@ interface FloorRooms {
 
 const remark = ref("");
 const status = ref("เปิด");
-const startDate = ref("2024-11-13");
+const startDate = ref(new Date().toISOString().split("T")[0]);
+const endDate = ref(new Date().toISOString().split("T")[0]);
 const startTime = ref("08:00");
-const endDate = ref("2024-11-13");
-const endTime = ref("08:00");
+const endTime = ref("20:30");
 
 const saveChanges = () => {
   console.log("หมายเหตุ:", remark.value);
@@ -505,6 +539,7 @@ th {
   background-color: #f5eded;
   border-radius: 10px;
   border: 1px solid #493628;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
 }
 
 .rd-btncancel {
@@ -542,16 +577,29 @@ th {
 }
 
 .close-service-btn {
-  font-weight: bold;
-  background-color: #edf5ee;
-  color: #493628;
-  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-  font-size: 16px;
   font-weight: 400;
+  font-size: 16px;
+  color: #493628;
+  background-color: #f5eded;
+  border: 1px solid #493628;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  width: 170px;
+  height: 57px;
 }
 
 .close-service-btn:hover {
   background-color: #f5eded;
+}
+
+.btn-date {
+  width: 300px;
+  background-color: #f5eded;
+  border: 1px solid #493628;
+  height: 57px;
+  border-radius: 5px;
+  z-index: 1000;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+  margin-left: 900px;
 }
 </style>
