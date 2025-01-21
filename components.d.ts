@@ -9,6 +9,8 @@ declare module 'vue' {
   export interface GlobalComponents {
     Booking_meeting: typeof import('./src/components/booking/booking_meeting.vue')['default']
     Booking_study: typeof import('./src/components/booking/booking_study.vue')['default']
+    copy: typeof import('./src/components/status/manage_room copy.vue')['default']
+    DatePicker_page: typeof import('./src/components/status/DatePicker_page.vue')['default']
     Detail_room: typeof import('./src/components/home/detail_room.vue')['default']
     Footer_page: typeof import('./src/components/footer/footer_page.vue')['default']
     Form_equipment: typeof import('./src/components/form/form_equipment.vue')['default']

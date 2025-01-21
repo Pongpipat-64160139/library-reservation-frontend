@@ -1,6 +1,6 @@
 <template>
   <Header_page />
-  <v-container fluid class="back-ground ms-kob">
+  <v-container fluid class="back-ground mg-toppage">
     <v-container>
       <v-row justify="center" align="center">
         <!-- Dropdown เลือกประเภทห้อง -->
@@ -11,7 +11,7 @@
         >
           <v-select
             v-model="selectedPage"
-            class="width-dd v-selectcolor"
+            class="wth-typeroom v-selectcolor"
             label="ประเภทห้อง"
             :items="typeroom"
             @update:model-value="onSelectChange"
@@ -20,43 +20,21 @@
 
         <!-- ช่องสำหรับปุ่มแสดงวันที่ -->
         <v-col class="d-flex justify-center" cols="auto">
-          <v-btn class="btn-date" @click="showDatePicker = !showDatePicker">
-            {{
-              selectedDate
-                ? new Date(selectedDate).toLocaleDateString("th-TH", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })
-                : new Date().toLocaleDateString("th-TH", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })
-            }}
-            <v-icon class="calendar-icon"> mdi-calendar </v-icon>
-          </v-btn>
-
-          <v-date-picker
-            v-if="showDatePicker"
+          <vue-flatpickr
             v-model="selectedDate"
-            class="date-picker-position"
-            :allowed-dates="allowedDates"
-            :day-class="getDayClass"
-            @update:model-value="handleDateSelect"
-            @click:clear="selectedDate = null"
+            class="text-center btn-date"
+            :config="flatpickrConfig"
           />
         </v-col>
       </v-row>
     </v-container>
-    <!-- ตารางสำหรับชั้น 3 -->
-    <h1 class="pt-5 head-title pb-10 ml-left">
+
+    <!-- ตารางจองห้องชั้น 3 -->
+    <h1 class="font-head mg-left">
       ชั้น 3 ห้อง ศึกษากลุ่ม
-      <v-icon class="mb-1 ms-2"> mdi-account-group </v-icon>
+      <v-icon class="mg-icon"> mdi-account-group </v-icon>
     </h1>
-    <v-container class="ms-minustop">
+    <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
@@ -67,7 +45,7 @@
               class="room-column font-table"
             >
               {{ room.roomName }}
-              <v-icon class="ms-2"> mdi-television </v-icon>
+              <v-icon class="mg-icontbl"> mdi-television </v-icon>
             </th>
           </tr>
         </thead>
@@ -100,12 +78,12 @@
       </v-simple-table>
     </v-container>
 
-    <!-- ตารางสำหรับชั้น 4 -->
-    <h1 class="pt-5 head-title pb-10 ml-left">
+    <!-- ตารางจองห้องชั้น 4 -->
+    <h1 class="font-head mg-left">
       ชั้น 4 ห้อง ศึกษากลุ่ม
-      <v-icon class="mb-1 ms-2"> mdi-account-group </v-icon>
+      <v-icon class="mg-icon"> mdi-account-group </v-icon>
     </h1>
-    <v-container class="ms-minustop">
+    <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
@@ -151,12 +129,12 @@
       </v-simple-table>
     </v-container>
 
-    <!-- ตารางสำหรับชั้น 5 -->
-    <h1 class="pt-5 head-title pb-10 ml-left">
+    <!-- ตารางจองห้องชั้น 5 -->
+    <h1 class="font-head mg-left">
       ชั้น 5 ห้อง ศึกษากลุ่ม
-      <v-icon class="mb-1 ms-2"> mdi-account-group </v-icon>
+      <v-icon class="mg-icon"> mdi-account-group </v-icon>
     </h1>
-    <v-container class="ms-minustop">
+    <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
@@ -211,16 +189,155 @@ import { useRouter } from "vue-router";
 import Footer_page from "../footer/footer_page.vue";
 import { useRoomStore } from "@/stores/roomStore";
 import { useHolidayStore } from "@/stores/holidayStore";
-import type { CurrentRoom } from "@/types/currentRoom";
 import { useNormalRoomBookStore } from "@/stores/nrbStore";
-const showDatePicker = ref(false);
-const currentDate = ref("");
-const selectedDate = ref<string | null>(null);
+
+import VueFlatpickr from "vue-flatpickr-component";
+import "flatpickr/dist/flatpickr.css";
+import { Thai } from "flatpickr/dist/l10n/th.js";
+
 const holidays = ref<string[]>([]);
 const roomStore = useRoomStore();
 const nrbStore = useNormalRoomBookStore();
 const holidayStore = useHolidayStore();
 const currentReserveDate = ref<string>(); // เก็บวันที่ปัจจุบัน หรือ วันที่ๆ เลือกใหม่และมีการอัพเดทตามตารางตลอด
+const router = useRouter();
+const selectedPage = ref("Group Study Room");
+const typeroom = [
+  {
+    title: "Group Study Room",
+    icon: "mdi-account-group",
+    to: "/table_study",
+  },
+  {
+    title: "Entertain Room",
+    icon: "mdi-movie-roll",
+    link: "/table_entertain",
+  },
+  {
+    title: "Meeting Room",
+    icon: "mdi-laptop-account",
+    link: "/table_meeting",
+  },
+];
+
+const onSelectChange = (value: string) => {
+  console.log("Selected value:", value);
+  if (value === "Group Study Room") {
+    console.log("Navigating to HelloWorld");
+    router.push("/table_study");
+  } else if (value === "Entertain Room") {
+    console.log("Navigating to page2");
+    router.push("/table_entertain");
+  } else if (value === "Meeting Room") {
+    console.log("Navigating to page2");
+    router.push("/table_meeting");
+  }
+};
+
+const selectedDate = ref<string | null>(null);
+
+const flatpickrConfig = ref({
+  locale: Thai,
+  dateFormat: "d-m-Y",
+  defaultDate: new Date(),
+  minDate: new Date(new Date().getFullYear(), 0, 1),
+  maxDate: new Date(new Date().getFullYear(), 11, 31),
+  formatDate: (date: Date) => {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    };
+    const thaiYear = date.getFullYear() + 543;
+    return new Intl.DateTimeFormat("th-TH", options)
+      .format(date)
+      .replace(date.getFullYear().toString(), thaiYear.toString());
+  },
+  onChange: (selectedDates: Date[], dateStr: string) => {
+    if (selectedDates.length > 0) {
+      selectedDate.value = dateStr;
+      console.log("Selected date:", dateStr);
+    }
+  },
+});
+
+function parseThaiDate(thaiDateString: string): Date | null {
+  const thaiMonths = [
+    "มกราคม",
+    "กุมภาพันธ์",
+    "มีนาคม",
+    "เมษายน",
+    "พฤษภาคม",
+    "มิถุนายน",
+    "กรกฎาคม",
+    "สิงหาคม",
+    "กันยายน",
+    "ตุลาคม",
+    "พฤศจิกายน",
+    "ธันวาคม",
+  ];
+
+  const regex = /(\d{1,2}) (\S+) (\d{4})/;
+  const match = thaiDateString.match(regex);
+
+  if (!match) return null;
+
+  const [, day, month, year] = match;
+  const monthIndex = thaiMonths.indexOf(month);
+
+  if (monthIndex === -1) return null;
+
+  // แปลงปีพุทธศักราชเป็นคริสต์ศักราช
+  const christianYear = parseInt(year) - 543;
+
+  return new Date(christianYear, monthIndex, parseInt(day));
+}
+
+watch(selectedDate, (newDate) => {
+  if (newDate) {
+    const parsedDate = parseThaiDate(newDate);
+    if (parsedDate && !isNaN(parsedDate.getTime())) {
+      const formattedDate = formatDate(parsedDate);
+      currentReserveDate.value = formattedDate;
+      console.log("Selected New date:", currentReserveDate.value);
+      loadedReserveRoom(currentReserveDate.value);
+    } else {
+      console.error("Invalid date format:", newDate);
+    }
+  } else {
+    console.error("No date selected");
+  }
+});
+
+function formatDate(date: Date | string) {
+  const d = new Date(date);
+  if (isNaN(d.getTime())) {
+    console.error("Invalid date input for formatDate:", date);
+    return "Invalid date";
+  }
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getCurrentReserveDate() {
+  if (selectedDate.value === null) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    currentReserveDate.value = `${year}-${month}-${day}`;
+    console.log("Reserve Date: " + currentReserveDate.value);
+    return currentReserveDate;
+  }
+}
+
+async function loadedReserveRoom(selectedDate: string) {
+  const loadedRoom = await nrbStore.getStatusReserve(selectedDate);
+  nrbStore.bookings = loadedRoom;
+}
 
 // const fetchHolidays = async (years: string[]) => {
 //   const holidayPromises = years.map(async (year) => {
@@ -254,18 +371,38 @@ const currentReserveDate = ref<string>(); // เก็บวันที่ป�
 //   holidays.value = results.flat(); // รวมวันหยุดจากทุกปี
 // };
 
-const allowedDates = (date: unknown) => {
-  if (!(date instanceof Date)) return false;
+const rooms3 = computed(() => roomStore.studyFloor3);
+const rooms4 = computed(() => roomStore.studyFloor4);
+const rooms5 = computed(() => roomStore.studyFloor5);
 
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const formattedDate = `${year}-${month}-${day}`;
+function selectRoom(roomIndex: number, floor: number, time: string) {
+  const rooms =
+    floor === 3
+      ? roomStore.studyFloor3
+      : floor === 4
+      ? roomStore.studyFloor4
+      : floor === 5
+      ? roomStore.studyFloor5
+      : [];
 
-  const isHoliday = holidays.value.includes(formattedDate);
-
-  return !isHoliday;
-};
+  const room = rooms[roomIndex];
+  if (room) {
+    roomStore.setCurrentRoom({
+      roomId: room.roomId,
+      roomName: room.roomName,
+      capacity: room.capacity,
+      maxHours: room.maxHours,
+      roomStatus: room.roomStatus,
+      roomType: room.roomType,
+      roomMinimum: room.roomMinimum,
+      orderFood: room.orderFood,
+      floorId: room.floorId,
+    });
+    console.log("Selected Room:", roomStore.currentTypeRoom);
+  } else {
+    console.error(`Room not found: floor=${floor}, roomIndex=${roomIndex}`);
+  }
+}
 
 onMounted(async () => {
   try {
@@ -297,136 +434,6 @@ onMounted(async () => {
   }
 });
 
-const getDayClass = (day: { date: Date }) => {
-  const date = new Date(day.date);
-  const formattedDay = `${date.getFullYear()}-${String(
-    date.getMonth() + 1
-  ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-
-  const isHoliday = holidays.value.includes(formattedDay);
-  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-
-  return isHoliday || isWeekend ? "holiday" : "";
-};
-
-const handleDateSelect = (date: string | null) => {
-  selectedDate.value = date;
-  showDatePicker.value = false;
-};
-
-const getCurrentDate = () => {
-  const date = new Date();
-
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  };
-
-  const formatter = new Intl.DateTimeFormat("th-TH", options);
-  currentDate.value = formatter.format(date);
-};
-
-getCurrentDate();
-
-const router = useRouter();
-const selectedPage = ref("Group Study Room");
-
-const timeSlots = [
-  "08:00",
-  "08:30",
-  "09:00",
-  "09:30",
-  "10:00",
-  "10:30",
-  "11:00",
-  "11:30",
-  "12:00",
-  "12:30",
-  "13:00",
-  "13:30",
-  "14:00",
-  "14:30",
-  "15:00",
-  "15:30",
-  "16:00",
-  "16:30",
-  "17:00",
-  "17:30",
-  "18:00",
-  "18:30",
-  "19:00",
-  "19:30",
-  "20:00",
-];
-
-const typeroom = [
-  {
-    title: "Group Study Room",
-    icon: "mdi-account-group",
-    to: "/table_study",
-  },
-  {
-    title: "Entertain Room",
-    icon: "mdi-movie-roll",
-    link: "/table_entertain",
-  },
-  {
-    title: "Meeting Room",
-    icon: "mdi-laptop-account",
-    link: "/table_meeting",
-  },
-];
-
-const rooms3 = computed(() => roomStore.studyFloor3);
-const rooms4 = computed(() => roomStore.studyFloor4);
-const rooms5 = computed(() => roomStore.studyFloor5);
-
-const onSelectChange = (value: string) => {
-  console.log("Selected value:", value);
-  if (value === "Group Study Room") {
-    console.log("Navigating to HelloWorld");
-    router.push("/table_study");
-  } else if (value === "Entertain Room") {
-    console.log("Navigating to page2");
-    router.push("/table_entertain");
-  } else if (value === "Meeting Room") {
-    console.log("Navigating to page2");
-    router.push("/table_meeting");
-  }
-};
-function selectRoom(roomIndex: number, floor: number, time: string) {
-  const rooms =
-    floor === 3
-      ? roomStore.studyFloor3
-      : floor === 4
-      ? roomStore.studyFloor4
-      : floor === 5
-      ? roomStore.studyFloor5
-      : [];
-
-  const room = rooms[roomIndex];
-  if (room) {
-    roomStore.setCurrentRoom({
-      roomId: room.roomId,
-      roomName: room.roomName,
-      capacity: room.capacity,
-      maxHours: room.maxHours,
-      roomStatus: room.roomStatus,
-      roomType: room.roomType,
-      roomMinimum: room.roomMinimum,
-      orderFood: room.orderFood,
-      floorId: room.floorId,
-    });
-    console.log("Selected Room:", roomStore.currentTypeRoom);
-  } else {
-    console.error(`Room not found: floor=${floor}, roomIndex=${roomIndex}`);
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-
 const generateBookingLink = (
   roomIndex: number,
   time: string,
@@ -457,28 +464,35 @@ const generateBookingLink = (
     roomIndex + 1
   }&time=${time}&roomName=${encodeURIComponent(roomName)}`;
 };
-function formatDate(date: string) {
-  const d = new Date(date);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-function getCurrentReserveDate() {
-  if (selectedDate.value === null) {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-    currentReserveDate.value = `${year}-${month}-${day}`;
-    console.log("Reserve Date: " + currentReserveDate.value);
-    return currentReserveDate;
-  }
-}
-async function loadedReserveRoom(selectedDate: string) {
-  const loadedRoom = await nrbStore.getStatusReserve(selectedDate);
-  nrbStore.bookings = loadedRoom;
-}
+
+const timeSlots = [
+  "08:00",
+  "08:30",
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11:30",
+  "12:00",
+  "12:30",
+  "13:00",
+  "13:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+  "16:00",
+  "16:30",
+  "17:00",
+  "17:30",
+  "18:00",
+  "18:30",
+  "19:00",
+  "19:30",
+  "20:00",
+];
+
 function getCellClass(roomId: number, time: string) {
   const bookings = nrbStore.bookings; // ดึงรายการจองทั้งหมด
   const isBook = bookings.find(
@@ -502,21 +516,21 @@ function getCellClass(roomId: number, time: string) {
       )
     ) {
       return {
-        class: "confirmed text-username", // กำหนดสีของเซลล์
+        class: "confirmed text-username",
         rowspan: endIndex - startIndex + 1, // คำนวณจำนวนแถวที่ต้องรวม
         isStart: true, // ระบุว่าเป็นแถวแรก
         isHidden: false, // ไม่ต้องซ่อนแถว
-        text: `ผู้จอง : ${isBook.user_name}`, // ข้อความที่แสดงในเซลล์
+        text: `${isBook.user_name}`, // ข้อความที่แสดงในเซลล์
       };
     } else if (
       bookings.find((book) => book.room_id === roomId && book.re_status == "รอ")
     ) {
       return {
-        class: "booked text-username", // กำหนดสีของเซลล์
+        class: "booked text-username",
         rowspan: endIndex - startIndex + 1, // คำนวณจำนวนแถวที่ต้องรวม
         isStart: true, // ระบุว่าเป็นแถวแรก
         isHidden: false, // ไม่ต้องซ่อนแถว
-        text: `ผู้จอง : ${isBook.user_name}`, // ข้อความที่แสดงในเซลล์
+        text: `${isBook.user_name}`,
       };
     }
   }
@@ -527,57 +541,57 @@ function getCellClass(roomId: number, time: string) {
       rowspan: 1, // ค่าเริ่มต้น เพราะเซลล์นี้จะถูกซ่อน
       isStart: false,
       isHidden: true, // ต้องซ่อนเซลล์นี้
-      text: "", // ข้อความที่แสดงในเซลล์
+      text: "", //
     };
   }
 }
 
-watch(selectedDate, (newDate, oldDate) => {
-  const year = formatDate(newDate!);
-  currentReserveDate.value = year;
-  console.log("Selected New date  :", currentReserveDate.value);
-  loadedReserveRoom(currentReserveDate.value);
-});
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 </script>
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
-
-.text-username {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 12px;
-}
-.booked {
-  background-color: gray; /* สีสำหรับสถานะ "รอ" */
-  color: white; /* ข้อความเป็นสีขาว */
-  text-align: center !important; /* จัดกลางแนวนอน */
-  vertical-align: middle !important; /* จัดกลางแนวตั้ง */
-  display: table-cell !important; /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
-  height: 100% !important; /* ใช้พื้นที่เต็ม */
-}
-
-.confirmed {
-  background-color: #4caf50; /* สีเขียวสำหรับการจอง */
-  color: white;
-  text-align: center;
-  vertical-align: middle !important; /* จัดกลางแนวตั้ง */
-  display: table-cell !important; /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
-  height: 100% !important; /* ใช้พื้นที่เต็ม */
-}
 
 * {
   font-family: "Kanit", sans-serif;
   color: #493628;
 }
 
-.head-title {
+.font-head {
   font-weight: 600;
   font-size: 20px;
+  padding-top: 20px;
+  padding-bottom: 35px;
 }
 
 .font-table {
   font-weight: 400;
   font-size: 12px;
+}
+
+.mg-icon {
+  margin-bottom: 10px;
+  margin-left: 5px;
+}
+
+.mg-toppage {
+  margin-top: -600px;
+}
+
+.mg-btmtbl {
+  margin-top: -40px;
+}
+
+.mg-left {
+  margin-left: 170px;
+}
+
+.mg-icontbl {
+  margin-left: 7px;
+}
+
+.wth-typeroom {
+  width: 300px;
 }
 
 .table-bordered {
@@ -592,18 +606,6 @@ watch(selectedDate, (newDate, oldDate) => {
   padding: 0px;
 }
 
-.time-column {
-  width: 300px;
-  background-color: #ead8c0;
-}
-.room6-column {
-  width: calc(100% / 6);
-}
-
-.room5-column {
-  width: calc(100% / 5);
-}
-
 .table-bordered td {
   height: 20px; /* ความสูงของเซลล์ */
   padding: 0; /* กำจัด Padding */
@@ -611,6 +613,11 @@ watch(selectedDate, (newDate, oldDate) => {
   vertical-align: middle; /* จัดข้อความให้อยู่กลาง */
   overflow: hidden;
   position: relative; /* เพื่อให้ลูกของ td อยู่ในตำแหน่งที่สัมพันธ์กัน */
+}
+
+.table-bordered thead th {
+  background-color: #ead8c0;
+  font-weight: bold;
 }
 
 .table-link {
@@ -626,14 +633,17 @@ watch(selectedDate, (newDate, oldDate) => {
   background-color: #edb3bc; /* สีพื้นหลังเมื่อชี้เมาส์ */
 }
 
-.table-bordered thead th {
+.time-column {
+  width: 300px;
   background-color: #ead8c0;
-  font-weight: bold;
 }
 
-.table-bordered td {
-  position: relative;
-  z-index: 1;
+.room6-column {
+  width: calc(100% / 6);
+}
+
+.room5-column {
+  width: calc(100% / 5);
 }
 
 .row-even {
@@ -647,22 +657,6 @@ watch(selectedDate, (newDate, oldDate) => {
 .row-even,
 .row-odd {
   cursor: pointer;
-}
-
-.ms-kob {
-  margin-top: -600px;
-}
-
-.ms-minustop {
-  margin-top: -40px;
-}
-
-.ml-left {
-  margin-left: 240px;
-}
-
-.width-dd {
-  width: 300px;
 }
 
 .v-select .v-input__control {
@@ -684,42 +678,34 @@ watch(selectedDate, (newDate, oldDate) => {
   border-radius: 5px;
 }
 
-.date-picker-position {
-  position: absolute;
-  top: 190px;
-  left: 500;
-  z-index: 1000;
-  background-color: #f5eded;
-  box-shadow: 0px 10px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #493628;
-  width: 300px;
-  height: 440px;
-  color: #493628;
-}
-
 .btn-date {
   width: 300px;
   background-color: #f5eded;
   border: 1px solid #493628;
   height: 57px;
   border-radius: 5px;
+  z-index: 1000;
 }
 
-.calendar-icon {
-  margin-left: 10px;
-  font-size: 20px;
-  color: #493628;
+.text-username {
+  font-size: 14px;
 }
 
-.v-date-picker :deep(.v-btn) {
-  font-size: 10px !important;
-  width: 20px !important;
-  height: 20px !important;
-  border-radius: 100% !important;
+.booked {
+  background-color: rgb(196, 196, 196); /* สีสำหรับสถานะ "รอ" */
+  color: #493628; /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
+  text-align: center !important; /* จัดกลางแนวนอน */
+  vertical-align: middle !important; /* จัดกลางแนวตั้ง */
+  display: table-cell !important; /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
+  height: 100% !important; /* ใช้พื้นที่เต็ม */
 }
 
-.v-date-picker :deep(.v-picker-title) {
-  font-size: 15px !important;
-  margin-top: 10px;
+.confirmed {
+  background-color: #b5cfb7; /* สีเขียวสำหรับการจอง */
+  color: #493628; /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
+  text-align: center;
+  vertical-align: middle !important; /* จัดกลางแนวตั้ง */
+  display: table-cell !important; /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
+  height: 100% !important; /* ใช้พื้นที่เต็ม */
 }
 </style>
