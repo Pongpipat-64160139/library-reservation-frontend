@@ -89,6 +89,7 @@
               v-show="!getCellClass(room.roomId, time)?.isHidden"
               @click="selectRoom(roomIndex, 3, time)"
             >
+              {{ getCellClass(room.roomId, time)?.text }}
               <a
                 :href="generateBookingLink(roomIndex, time, 3)"
                 class="table-link"
@@ -139,6 +140,7 @@
               v-show="!getCellClass(room.roomId, time)?.isHidden"
               @click="selectRoom(roomIndex, 4, time)"
             >
+              {{ getCellClass(room.roomId, time)?.text }}
               <a
                 :href="generateBookingLink(roomIndex, time, 4)"
                 class="table-link"
@@ -189,6 +191,7 @@
               v-show="!getCellClass(room.roomId, time)?.isHidden"
               @click="selectRoom(roomIndex, 5, time)"
             >
+              {{ getCellClass(room.roomId, time)?.text }}
               <a
                 :href="generateBookingLink(roomIndex, time, 5)"
                 class="table-link"
@@ -489,7 +492,8 @@ function getCellClass(roomId: number, time: string) {
 
   // ถ้าไม่มีการจอง
   if (!isBook) {
-    return null; // ไม่ต้องเพิ่มคลาสพิเศษ
+    // คืนค่าเริ่มต้นหากไม่มีการจอง
+    return { class: "", rowspan: 1, isStart: false, isHidden: false, text: "" };
   }
   if (currentIndex === startIndex) {
     if (
@@ -498,21 +502,21 @@ function getCellClass(roomId: number, time: string) {
       )
     ) {
       return {
-        class: "confirmed", // กำหนดสีของเซลล์
+        class: "confirmed text-username", // กำหนดสีของเซลล์
         rowspan: endIndex - startIndex + 1, // คำนวณจำนวนแถวที่ต้องรวม
         isStart: true, // ระบุว่าเป็นแถวแรก
         isHidden: false, // ไม่ต้องซ่อนแถว
-        text: "จองแล้ว", // ข้อความที่แสดงในเซลล์
+        text: `ผู้จอง : ${isBook.user_name}`, // ข้อความที่แสดงในเซลล์
       };
     } else if (
       bookings.find((book) => book.room_id === roomId && book.re_status == "รอ")
     ) {
       return {
-        class: "booked", // กำหนดสีของเซลล์
+        class: "booked text-username", // กำหนดสีของเซลล์
         rowspan: endIndex - startIndex + 1, // คำนวณจำนวนแถวที่ต้องรวม
         isStart: true, // ระบุว่าเป็นแถวแรก
         isHidden: false, // ไม่ต้องซ่อนแถว
-        text: "จองแล้ว", // ข้อความที่แสดงในเซลล์
+        text: `ผู้จอง : ${isBook.user_name}`, // ข้อความที่แสดงในเซลล์
       };
     }
   }
@@ -523,11 +527,9 @@ function getCellClass(roomId: number, time: string) {
       rowspan: 1, // ค่าเริ่มต้น เพราะเซลล์นี้จะถูกซ่อน
       isStart: false,
       isHidden: true, // ต้องซ่อนเซลล์นี้
-      text: "",
+      text: "", // ข้อความที่แสดงในเซลล์
     };
   }
-  // คืนค่าเริ่มต้นหากไม่มีการจอง
-  return { class: "", rowspan: 1, isStart: false, isHidden: false, text: "" };
 }
 
 watch(selectedDate, (newDate, oldDate) => {
@@ -541,15 +543,26 @@ watch(selectedDate, (newDate, oldDate) => {
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 
+.text-username {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
 .booked {
   background-color: gray; /* สีสำหรับสถานะ "รอ" */
   color: white; /* ข้อความเป็นสีขาว */
+  text-align: center !important; /* จัดกลางแนวนอน */
+  vertical-align: middle !important; /* จัดกลางแนวตั้ง */
+  display: table-cell !important; /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
+  height: 100% !important; /* ใช้พื้นที่เต็ม */
 }
 
 .confirmed {
   background-color: #4caf50; /* สีเขียวสำหรับการจอง */
   color: white;
   text-align: center;
+  vertical-align: middle !important; /* จัดกลางแนวตั้ง */
+  display: table-cell !important; /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
+  height: 100% !important; /* ใช้พื้นที่เต็ม */
 }
 
 * {
@@ -583,7 +596,6 @@ watch(selectedDate, (newDate, oldDate) => {
   width: 300px;
   background-color: #ead8c0;
 }
-
 .room6-column {
   width: calc(100% / 6);
 }
