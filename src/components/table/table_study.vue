@@ -3,7 +3,7 @@
   <v-container fluid class="back-ground mg-toppage">
     <v-container>
       <v-row justify="center" align="center">
-        <!-- Dropdown เลือกประเภทห้อง -->
+        <!-- Dropdown สำหรับเลือกประเภทของห้อง -->
         <v-col
           class="d-flex justify-center"
           cols="auto"
@@ -18,7 +18,7 @@
           />
         </v-col>
 
-        <!-- ช่องสำหรับปุ่มแสดงวันที่ -->
+        <!-- ปฏิทินสำหรับเลือกวันที่การจองห้อง -->
         <v-col class="d-flex justify-center" cols="auto">
           <vue-flatpickr
             v-model="selectedDate"
@@ -220,6 +220,7 @@ const typeroom = [
   },
 ];
 
+// ฟังก์ชันเปลี่ยนหน้าเมื่อเลือกประเภทห้องใน Dropdown
 const onSelectChange = (value: string) => {
   console.log("Selected value:", value);
   if (value === "Group Study Room") {
@@ -240,8 +241,8 @@ const flatpickrConfig = ref({
   locale: Thai,
   dateFormat: "d-m-Y",
   defaultDate: new Date(),
-  minDate: new Date(new Date().getFullYear(), 0, 1),
-  maxDate: new Date(new Date().getFullYear(), 11, 31),
+  minDate: new Date(new Date().getFullYear(), -1, 1),
+  maxDate: new Date(new Date().getFullYear() + 1, 11, 31),
   formatDate: (date: Date) => {
     const options: Intl.DateTimeFormatOptions = {
       weekday: "long",
@@ -250,15 +251,97 @@ const flatpickrConfig = ref({
       year: "numeric",
     };
     const thaiYear = date.getFullYear() + 543;
-    return new Intl.DateTimeFormat("th-TH", options)
-      .format(date)
-      .replace(date.getFullYear().toString(), thaiYear.toString());
+    const formattedDate = new Intl.DateTimeFormat("th-TH", options).format(
+      date
+    );
+    return formattedDate.replace(
+      date.getFullYear().toString(),
+      thaiYear.toString()
+    );
   },
-  onChange: (selectedDates: Date[], dateStr: string) => {
+  onChange: (
+    selectedDates: Date[],
+    dateStr: string,
+    instance: { yearElements: any[]; currentYear: number }
+  ) => {
     if (selectedDates.length > 0) {
       selectedDate.value = dateStr;
       console.log("Selected date:", dateStr);
     }
+
+    // อัปเดต Dropdown ของปีให้แสดงปีพุทธศักราช (พ.ศ.)
+    const updateYearDropdown = () => {
+      const yearSelect = instance?.yearElements?.[0]; // ตรวจสอบว่า instance และ yearElements มีค่าหรือไม่
+      if (yearSelect && yearSelect.options) {
+        yearSelect.value = (instance.currentYear + 543).toString();
+        Array.from(yearSelect.options).forEach((option) => {
+          const optionYear = parseInt(option.value, 10);
+          option.textContent = (optionYear + 543).toString();
+        });
+      }
+    };
+
+    updateYearDropdown();
+  },
+  onReady: (selectedDates: Date[], dateStr: string, instance: any) => {
+    const prevButton = instance.calendarContainer.querySelector(
+      ".flatpickr-prev-month"
+    );
+    const nextButton = instance.calendarContainer.querySelector(
+      ".flatpickr-next-month"
+    );
+    if (prevButton) prevButton.style.display = "none";
+    if (nextButton) nextButton.style.display = "none";
+
+    const yearDropdown = instance.calendarContainer.querySelector(
+      ".flatpickr-monthDropdown-months ~ .numInputWrapper input"
+    );
+    if (yearDropdown) {
+      const updateYearsToThai = () => {
+        const currentYear = parseInt(yearDropdown.value, 10);
+        yearDropdown.value = (currentYear + 543).toString();
+      };
+
+      updateYearsToThai();
+      yearDropdown.addEventListener("change", updateYearsToThai);
+    }
+  },
+  onYearChange: (
+    selectedDates: any,
+    dateStr: any,
+    instance: { yearElements: any[]; currentYear: number }
+  ) => {
+    const updateYearDropdown = () => {
+      const yearSelect = instance.yearElements[0];
+      if (yearSelect) {
+        // ปรับค่าปีใน dropdown เป็น พ.ศ.
+        yearSelect.value = (instance.currentYear + 543).toString();
+        Array.from(yearSelect.options).forEach((option) => {
+          const optionYear = parseInt(option.value, 10);
+          option.textContent = (optionYear + 543).toString();
+        });
+      }
+    };
+
+    updateYearDropdown();
+  },
+  onMonthChange: (
+    selectedDates: any,
+    dateStr: any,
+    instance: { yearElements: any[]; currentYear: number }
+  ) => {
+    const updateYearDropdown = () => {
+      const yearSelect = instance.yearElements[0];
+      if (yearSelect) {
+        yearSelect.value = (instance.currentYear + 543).toString();
+        Array.from(yearSelect.options).forEach((option) => {
+          const optionYear = parseInt(option.value, 10);
+          option.textContent = (optionYear + 543).toString();
+        });
+      }
+    };
+
+    updateYearDropdown();
   },
 });
 

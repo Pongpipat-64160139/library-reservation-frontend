@@ -1,10 +1,9 @@
 <template>
   <Header_page />
-  <v-container fluid class="back-ground ms-kob">
+  <v-container fluid class="back-ground mg-toppage">
     <!-- Breadcrumbs -->
     <v-breadcrumbs :items="items" divider=">" class="head-title mg-table">
       <template #item="{ item }" class="head-title">
-        <!-- ลิงก์ที่สามารถคลิกได้ -->
         <router-link
           v-if="!item.disabled && item.href"
           :to="item.href"
@@ -13,7 +12,6 @@
           {{ item.title }}
         </router-link>
 
-        <!-- ลิงก์ที่ไม่สามารถคลิกได้ -->
         <span v-else class="breadcrumb-disabled head-title">
           {{ item.title }}
         </span>
@@ -21,13 +19,17 @@
     </v-breadcrumbs>
 
     <v-row>
+      <!-- ปฏิทิน Flatpickr ใช้เลือกวันที่ -->
       <v-col class="d-flex justify-center" cols="10">
         <vue-flatpickr
           v-model="selectedDate"
           class="text-center btn-date"
           :config="flatpickrConfig"
+          :key="$route.fullPath"
         />
       </v-col>
+
+      <!-- ปุ่มสำหรับเปิด Dialog เพื่อปิดบริการจองห้อง (ทุกห้อง) -->
       <v-col cols="2">
         <v-btn
           class="close-service-btn ms-5 mb-5"
@@ -65,6 +67,7 @@
             <td>{{ item.user }}</td>
             <td>{{ item.time }}</td>
             <td>{{ item.status }}</td>
+            <!-- ปุ่มสำหรับเปิด Dialog เพื่อปิดบริการจองห้อง (รายห้อง) -->
             <td>
               <v-btn
                 icon
@@ -81,13 +84,13 @@
       </v-data-table>
     </div>
 
+    <!-- Dialog ปิดให้บริการจองห้อง (รายห้อง) -->
     <v-dialog v-model="dialog" max-width="500px" max-height="600px">
       <v-card>
         <v-card-title class="head-dialog text-center mt-5">
           ปิดให้บริการจองห้อง (รายห้อง)
         </v-card-title>
         <v-card-text>
-          <!-- หมายเหตุ -->
           <v-text-field
             v-model="remark"
             label="หมายเหตุ"
@@ -95,7 +98,6 @@
             variant="outlined"
           />
 
-          <!-- Dropdown เปิด-ปิด -->
           <v-select
             v-model="status"
             label="สถานะ"
@@ -104,7 +106,6 @@
             variant="outlined"
           />
 
-          <!-- วันที่และเวลา -->
           <v-row>
             <v-col cols="6">
               <v-text-field
@@ -147,7 +148,6 @@
             </v-col>
           </v-row>
 
-          <!-- ชั้น/ห้อง -->
           <v-row>
             <v-col cols="6">
               <v-select
@@ -182,10 +182,11 @@
       </v-card>
     </v-dialog>
 
+    <!-- Dialog ปิดให้บริการจองห้อง (ทุกห้อง) -->
     <v-dialog v-model="closeServiceDialog" max-width="500px" max-height="600px">
       <v-card>
         <v-card-title class="head-dialog text-center mt-5">
-          ยืนยันการปิดให้บริการ
+          ปิดให้บริการจองห้อง (ทุกห้อง)
         </v-card-title>
         <v-card-text>
           <v-text-field
@@ -282,12 +283,13 @@ import "flatpickr/dist/flatpickr.css";
 import { Thai } from "flatpickr/dist/l10n/th.js";
 const selectedDayType = ref("วันปกติ");
 const selectedDate = ref<string | null>(null);
+
 const flatpickrConfig = ref({
   locale: Thai,
   dateFormat: "d-m-Y",
   defaultDate: new Date(),
-  minDate: new Date(new Date().getFullYear(), 0, 1),
-  maxDate: new Date(new Date().getFullYear(), 11, 31),
+  minDate: new Date(new Date().getFullYear(), -1, 1),
+  maxDate: new Date(new Date().getFullYear() + 1, 11, 31),
   formatDate: (date: Date) => {
     const options: Intl.DateTimeFormatOptions = {
       weekday: "long",
@@ -296,17 +298,111 @@ const flatpickrConfig = ref({
       year: "numeric",
     };
     const thaiYear = date.getFullYear() + 543;
-    return new Intl.DateTimeFormat("th-TH", options)
-      .format(date)
-      .replace(date.getFullYear().toString(), thaiYear.toString());
+    const formattedDate = new Intl.DateTimeFormat("th-TH", options).format(
+      date
+    );
+    return formattedDate.replace(
+      date.getFullYear().toString(),
+      thaiYear.toString()
+    );
   },
-  onChange: (selectedDates: Date[], dateStr: string) => {
+  parseDate: (dateStr: string, format: string) => {
+    const parts = dateStr.split("-");
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const year = parseInt(parts[2], 10) - 543;
+      return new Date(year, month, day);
+    }
+    return null;
+  },
+
+  onReady: (selectedDates: Date[], dateStr: string, instance: any) => {
+    const updateYearDropdown = () => {
+      const yearSelect = instance?.yearElements?.[0]; // ตรวจสอบว่ามีค่าอยู่จริง
+      if (yearSelect) {
+        yearSelect.value = (instance.currentYear + 543).toString();
+        Array.from(yearSelect.options).forEach((option) => {
+          const optionYear = parseInt(option.value, 10);
+          option.textContent = (optionYear + 543).toString();
+        });
+      }
+    };
+
+    const prevButton = instance.calendarContainer.querySelector(
+      ".flatpickr-prev-month"
+    );
+    const nextButton = instance.calendarContainer.querySelector(
+      ".flatpickr-next-month"
+    );
+    if (prevButton) prevButton.style.display = "none";
+    if (nextButton) nextButton.style.display = "none";
+
+    const yearDropdown = instance.calendarContainer.querySelector(
+      ".flatpickr-monthDropdown-months ~ .numInputWrapper input"
+    );
+    if (yearDropdown) {
+      const updateYearsToThai = () => {
+        const currentYear = parseInt(yearDropdown.value, 10);
+        if (!isNaN(currentYear)) {
+          yearDropdown.value = (currentYear + 543).toString();
+        }
+      };
+
+      updateYearsToThai();
+      yearDropdown.addEventListener("change", updateYearsToThai);
+    }
+  },
+
+  onChange: (
+    selectedDates: Date[],
+    dateStr: string,
+    instance: { yearElements: any[]; currentYear: number }
+  ) => {
     if (selectedDates.length > 0) {
       selectedDate.value = dateStr;
       console.log("Selected date:", dateStr);
     }
   },
+
+  onYearChange: (
+    selectedDates: any,
+    dateStr: any,
+    instance: { yearElements: any[]; currentYear: number }
+  ) => {
+    const updateYearDropdown = () => {
+      const yearSelect = instance.yearElements[0];
+      if (yearSelect) {
+        yearSelect.value = (instance.currentYear + 543).toString();
+        Array.from(yearSelect.options).forEach((option) => {
+          const optionYear = parseInt(option.value, 10);
+          option.textContent = (optionYear + 543).toString();
+        });
+      }
+    };
+
+    updateYearDropdown();
+  },
+  onMonthChange: (
+    selectedDates: any,
+    dateStr: any,
+    instance: { yearElements: any[]; currentYear: number }
+  ) => {
+    const updateYearDropdown = () => {
+      const yearSelect = instance.yearElements[0];
+      if (yearSelect) {
+        yearSelect.value = (instance.currentYear + 543).toString();
+        Array.from(yearSelect.options).forEach((option) => {
+          const optionYear = parseInt(option.value, 10);
+          option.textContent = (optionYear + 543).toString();
+        });
+      }
+    };
+
+    updateYearDropdown();
+  },
 });
+
 const closeServiceDialog = ref(false);
 
 watch(selectedDayType, (newValue) => {
@@ -497,7 +593,7 @@ const updateRoomOptions = () => {
   background-position: top left;
 }
 
-.ms-kob {
+.mg-toppage {
   position: absolute;
   top: 0;
   left: 0;
