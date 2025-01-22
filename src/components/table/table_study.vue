@@ -506,7 +506,7 @@ onMounted(async () => {
 
     // เรียก API เพื่อดึงข้อมูลวันหยุดย้อนหลัง
     await holidayStore.getAllHolidayInYear(years);
-    console.log("Current year: " + currentYear);
+    console.log("Current year: ", currentYear);
     await getCurrentReserveDate();
     await loadedReserveRoom(currentReserveDate.value!);
     // เปลี่ยน CurrentType

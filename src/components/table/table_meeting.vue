@@ -62,7 +62,7 @@
           <tr>
             <th class="font-table">เวลา</th>
             <th
-              v-for="(room,index) in twozo"
+              v-for="(room, index) in twozo"
               :key="room.roomId"
               class="room-column font-table"
             >
@@ -145,7 +145,11 @@
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th v-for="room in smartboard" :key="room.roomId" class="font-table">
+            <th
+              v-for="room in smartboard"
+              :key="room.roomId"
+              class="font-table"
+            >
               {{ room.roomName }}
             </th>
           </tr>
@@ -184,7 +188,11 @@
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th v-for="room in ministudio" :key="room.roomId" class="font-table">
+            <th
+              v-for="room in ministudio"
+              :key="room.roomId"
+              class="font-table"
+            >
               {{ room.roomName }}
             </th>
           </tr>
@@ -262,7 +270,11 @@
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th v-for="room in liveforlife" :key="room.roomId" class="font-table">
+            <th
+              v-for="room in liveforlife"
+              :key="room.roomId"
+              class="font-table"
+            >
               {{ room.roomName }}
             </th>
           </tr>
@@ -301,7 +313,11 @@
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th v-for="room in sevenfloor" :key="room.roomId" class="font-table">
+            <th
+              v-for="room in sevenfloor"
+              :key="room.roomId"
+              class="font-table"
+            >
               {{ room.roomName }}
             </th>
           </tr>
@@ -383,7 +399,10 @@ const allowedDates = (date: unknown) => {
 onMounted(async () => {
   try {
     const currentYear = new Date().getFullYear().toString();
-    await Promise.all([fetchHolidays(currentYear), roomStore.filteredMeetingRooms()]);
+    await Promise.all([
+      fetchHolidays(currentYear),
+      roomStore.filteredMeetingRooms(),
+    ]);
   } catch (error) {
     console.error("Error loading data:", error);
   }

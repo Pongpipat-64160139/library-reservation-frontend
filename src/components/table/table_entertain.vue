@@ -83,7 +83,12 @@
               v-for="(room, roomIndex) in stv"
               :key="roomIndex"
               class="room9-column"
+              :class="getCellClass(room.roomId, time)?.class"
+              :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden"
+              @click="selectRoom(room.roomId)"
             >
+              {{ getCellClass(room.roomId, time)?.text }}
               <a
                 :href="generateBookingLink(roomIndex, time, 6, 'stv')"
                 class="table-link"
@@ -122,11 +127,16 @@
               v-for="(room, roomIndex) in oke"
               :key="roomIndex"
               class="room2-column"
+              :class="getCellClass(room.roomId, time)?.class"
+              :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden"
+              @click="selectRoom(room.roomId)"
             >
-            <a
-    :href="generateBookingLink(roomIndex, time, 6, 'oke')"
-    class="table-link"
-  ></a>
+              {{ getCellClass(room.roomId, time)?.text }}
+              <a
+                :href="generateBookingLink(roomIndex, time, 6, 'oke')"
+                class="table-link"
+              ></a>
             </td>
           </tr>
         </tbody>
@@ -166,11 +176,16 @@
               v-for="(room, roomIndex) in minitheater"
               :key="roomIndex"
               class="room1-column"
+              :class="getCellClass(room.roomId, time)?.class"
+              :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden"
+              @click="selectRoom(room.roomId)"
             >
-            <a
-    :href="generateBookingLink(roomIndex, time, 6, 'minitheater')"
-    class="table-link"
-  ></a>
+              {{ getCellClass(room.roomId, time)?.text }}
+              <a
+                :href="generateBookingLink(roomIndex, time, 6, 'minitheater')"
+                class="table-link"
+              ></a>
             </td>
           </tr>
         </tbody>
@@ -181,14 +196,49 @@
 </template>
 
 <script lang="ts" setup>
-import { useRoomStore } from "@/stores/roomStore";
-import { ref, onMounted, computed } from "vue";
+// ---------------------
+// Import Modules
+// ---------------------
+
+// Vue Composition API - ใช้สำหรับการจัดการสถานะภายใน Component
+import { ref, onMounted, computed, watch } from "vue";
+
+// Vue Router - ใช้สำหรับการนำทางในแอปพลิเคชัน
 import { useRouter } from "vue-router";
+
+// Stores - ใช้สำหรับดึงข้อมูลและจัดการสถานะเกี่ยวกับห้องและการจอง
+import { useRoomStore } from "@/stores/roomStore";
+import { useNormalRoomBookStore } from "@/stores/nrbStore";
+
+/* ---------------------
+   Reactive Data Properties
+   --------------------- */
+
+// ตัวแปรควบคุมการแสดง DatePicker
 const showDatePicker = ref(false);
+
+// ตัวแปรเก็บวันที่ปัจจุบันในรูปแบบของ string
 const currentDate = ref("");
+
+// ตัวแปรเก็บวันที่ที่ผู้ใช้เลือกในรูปแบบ string หรือ null
 const selectedDate = ref<string | null>(null);
+
+// ตัวแปรเก็บวันหยุดที่ได้รับจาก API หรือข้อมูล
 const holidays = ref<string[]>([]);
+
+// ตัวแปรเก็บวันที่ที่ทำการจองปัจจุบัน
+const currentReserveDate = ref<string>();
+
+/* ---------------------
+   Store Initialization
+   --------------------- */
+
+// ใช้ store เพื่อดึงข้อมูลเกี่ยวกับห้องประชุม
 const roomStore = useRoomStore();
+
+// ใช้ store เพื่อจัดการการจองห้องประชุม
+const nrbStore = useNormalRoomBookStore();
+
 const fetchHolidays = async (year: string) => {
   const response = await fetch(
     `https://apigw1.bot.or.th/bot/public/financial-institutions-holidays/?year=2024`,
@@ -230,13 +280,134 @@ const allowedDates = (date: unknown) => {
 onMounted(async () => {
   try {
     const currentYear = new Date().getFullYear().toString();
-    await Promise.all([
-      fetchHolidays(currentYear),
-      roomStore.filteredEntertainRooms(),
-    ]);
+    fetchHolidays(currentYear);
+    await roomStore.filteredEntertainRooms();
+    await getCurrentReserveDate();
+    await loadedReserveRoom(currentReserveDate.value!);
   } catch (error) {
     console.error("Error loading data:", error);
   }
+});
+
+// จะกำหนดวันที่ปัจจุบันให้กับ currentReserveDate ถ้ายังไม่ได้เลือกวันที่
+function getCurrentReserveDate() {
+  if (selectedDate.value === null) {
+    const today = new Date(); // สร้างออบเจ็กต์วันที่ปัจจุบัน
+    const year = today.getFullYear(); // ดึงค่าปีปัจจุบัน (เช่น 2024)
+    const month = String(today.getMonth() + 1).padStart(2, "0"); // ดึงค่าเดือน (เริ่มที่ 0 จึงต้อง +1) และแปลงให้เป็น 2 หลัก
+    const day = String(today.getDate()).padStart(2, "0"); // ดึงค่าวัน และแปลงให้เป็น 2 หลัก
+
+    // จัดรูปแบบวันที่ในรูปแบบ "YYYY-MM-DD" และกำหนดให้ตัวแปร currentReserveDate
+    currentReserveDate.value = `${year}-${month}-${day}`;
+
+    // แสดงผลวันที่ที่จองในคอนโซล
+    console.log("Reserve Date: " + currentReserveDate.value);
+
+    // ส่งค่ากลับ currentReserveDate เพื่อใช้ในภายหลัง
+    return currentReserveDate;
+  }
+}
+// โหลดข้อมูลการจองห้องของวัน เดือน ปี นั้นๆ
+async function loadedReserveRoom(selectedDate: string) {
+  const loadedRoom = await nrbStore.getStatusReserve(selectedDate);
+  nrbStore.bookings = loadedRoom;
+}
+// แสดงข้อมูลการจองห้อง ทั้งหมดในตารางนั้นๆ
+function getCellClass(roomId: number, time: string) {
+  const bookings = nrbStore.bookings; // ดึงรายการจองทั้งหมด
+  const isBook = bookings.find(
+    (b) => b.room_id === roomId && time >= b.start_time && time <= b.end_time
+  );
+
+  // หา index ของเวลาเริ่มต้นและสิ้นสุด
+  const startIndex = timeSlots.indexOf(isBook?.start_time!);
+  const endIndex = timeSlots.indexOf(isBook?.end_time!);
+  const currentIndex = timeSlots.indexOf(time);
+
+  // ถ้าไม่มีการจอง
+  if (!isBook) {
+    // คืนค่าเริ่มต้นหากไม่มีการจอง
+    return { class: "", rowspan: 1, isStart: false, isHidden: false, text: "" };
+  }
+  if (currentIndex === startIndex) {
+    if (
+      bookings.find(
+        (book) => book.room_id === roomId && book.re_status == "อนุมัติ"
+      )
+    ) {
+      return {
+        class: "confirmed text-username",
+        rowspan: endIndex - startIndex + 1, // คำนวณจำนวนแถวที่ต้องรวม
+        isStart: true, // ระบุว่าเป็นแถวแรก
+        isHidden: false, // ไม่ต้องซ่อนแถว
+        text: `${isBook.user_name}`, // ข้อความที่แสดงในเซลล์
+      };
+    } else if (
+      bookings.find((book) => book.room_id === roomId && book.re_status == "รอ")
+    ) {
+      return {
+        class: "booked text-username",
+        rowspan: endIndex - startIndex + 1, // คำนวณจำนวนแถวที่ต้องรวม
+        isStart: true, // ระบุว่าเป็นแถวแรก
+        isHidden: false, // ไม่ต้องซ่อนแถว
+        text: `${isBook.user_name}`,
+      };
+    }
+  }
+  // ถ้าอยู่ภายใต้ช่วงที่ถูกรวมแล้ว
+  if (currentIndex > startIndex && currentIndex <= endIndex) {
+    return {
+      class: "", // ไม่ต้องเปลี่ยนสี เพราะถูกครอบคลุมโดย rowspan
+      rowspan: 1, // ค่าเริ่มต้น เพราะเซลล์นี้จะถูกซ่อน
+      isStart: false,
+      isHidden: true, // ต้องซ่อนเซลล์นี้
+      text: "", //
+    };
+  }
+}
+
+// ฟังก์ชันแปลงรูปแบบวันที่ให้เป็นรูปแบบ YYYY-MM-DD จาก input ประเภท Date หรือ string
+function formatDate(date: Date | string) {
+  // แปลงค่า input ให้เป็นออบเจ็กต์ Date
+  const d = new Date(date);
+
+  // ตรวจสอบว่าค่าวันที่ถูกต้องหรือไม่ ถ้าไม่ใช่จะส่งข้อความแจ้งข้อผิดพลาดและคืนค่า "Invalid date"
+  if (isNaN(d.getTime())) {
+    console.error("Invalid date input for formatDate:", date);
+    return "Invalid date"; // กรณีวันที่ไม่ถูกต้อง ส่งค่า error string กลับ
+  }
+
+  // ดึงค่า "ปี" ค.ศ. จากวันที่
+  const year = d.getFullYear();
+
+  // ดึงค่า "เดือน" โดยต้อง +1 เพราะ getMonth() ให้ค่าเดือนเริ่มต้นที่ 0 (มกราคม = 0)
+  // และใช้ padStart(2, "0") เพื่อให้ได้รูปแบบสองหลัก เช่น "01", "02"
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+
+  // ดึงค่า "วัน" และแปลงให้อยู่ในรูปแบบสองหลัก เช่น "01", "02"
+  const day = String(d.getDate()).padStart(2, "0");
+
+  // คืนค่ารูปแบบวันที่ในรูปแบบ "YYYY-MM-DD"
+  return `${year}-${month}-${day}`;
+}
+
+/* ---------------------------------
+   Watcher: ตรวจสอบการเปลี่ยนแปลงของ selectedDate
+--------------------------------- */
+
+// ฟังก์ชัน watch() จะทำงานเมื่อ selectedDate มีการเปลี่ยนแปลงค่า
+watch(selectedDate, (newDate) => {
+  // เรียกใช้ฟังก์ชัน formatDate เพื่อแปลงวันที่ใหม่ให้อยู่ในรูปแบบที่กำหนด
+  const formattedDate = formatDate(newDate!);
+
+  // อัปเดตค่าของตัวแปร currentReserveDate ด้วยวันที่ที่แปลงแล้ว
+  currentReserveDate.value = formattedDate;
+
+  // แสดงผลวันที่ที่ถูกเลือกและแปลงแล้วในคอนโซลเพื่อใช้ตรวจสอบ
+  console.log(currentReserveDate.value);
+
+  // เรียกฟังก์ชันโหลดข้อมูลการจองใหม่ตามวันที่ที่ผู้ใช้เลือก
+  loadedReserveRoom(formattedDate);
 });
 
 const getDayClass = (day: { date: Date }) => {
@@ -342,6 +513,34 @@ const onSelectChange = (value: string) => {
 const goToFormStudy = () => {
   router.push("/booking_study");
 };
+async function selectRoom(roomIndex: number) {
+  const rooms = roomStore.entertainRooms;
+
+  // ตรวจสอบว่า rooms มีค่าและเป็นอาร์เรย์
+  if (!rooms || !Array.isArray(rooms)) {
+    console.error("roomStore.entertainRooms is undefined or not an array");
+    return;
+  }
+
+  const selectedRoom = rooms.find((room) => room?.roomId === roomIndex);
+
+  if (selectedRoom) {
+    roomStore.setCurrentRoom({
+      roomId: selectedRoom.roomId,
+      roomName: selectedRoom.roomName,
+      capacity: selectedRoom.capacity,
+      maxHours: selectedRoom.maxHours,
+      roomStatus: selectedRoom.roomStatus,
+      roomType: selectedRoom.roomType,
+      roomMinimum: selectedRoom.roomMinimum,
+      orderFood: selectedRoom.orderFood,
+      floorId: selectedRoom.floorId,
+    });
+    console.log("Selected Room:", roomStore.currentTypeRoom);
+  } else {
+    console.warn(`Room with ID ${roomIndex} not found!`);
+  }
+}
 
 const generateBookingLink = (
   roomIndex: number,
@@ -374,7 +573,6 @@ const generateBookingLink = (
     roomName
   )}&time=${time}&roomType=Entertain`;
 };
-
 </script>
 -
 
@@ -384,6 +582,28 @@ const generateBookingLink = (
 * {
   font-family: "Kanit", sans-serif;
   color: #493628;
+}
+
+.text-username {
+  font-size: 14px;
+}
+
+.booked {
+  background-color: rgb(196, 196, 196); /* สีสำหรับสถานะ "รอ" */
+  color: #493628; /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
+  text-align: center !important; /* จัดกลางแนวนอน */
+  vertical-align: middle !important; /* จัดกลางแนวตั้ง */
+  display: table-cell !important; /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
+  height: 100% !important; /* ใช้พื้นที่เต็ม */
+}
+
+.confirmed {
+  background-color: #b5cfb7; /* สีเขียวสำหรับการจอง */
+  color: #493628; /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
+  text-align: center;
+  vertical-align: middle !important; /* จัดกลางแนวตั้ง */
+  display: table-cell !important; /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
+  height: 100% !important; /* ใช้พื้นที่เต็ม */
 }
 
 .head-title {

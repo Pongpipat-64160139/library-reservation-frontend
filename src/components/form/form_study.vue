@@ -33,11 +33,15 @@
             v-model="listparticipants[index]"
             single-line
             outlined
-            :rules="[(v) => !!v || '']"
+            :rules="[
+              (v) => !!v || 'กรุณากรอกชื่อ', // ตรวจสอบว่าต้องไม่ว่าง
+              (v) => (v && v.trim().length > 0) || 'ห้ามใช้ช่องว่างล้วนๆ', // ตรวจสอบห้ามมีแค่ช่องว่าง
+            ]"
             label=""
           />
         </span>
       </div>
+
       <!-- span2 -->
       <span class="d-flex">
         <h1 class="mg-date1 head1-title">วันที่เริ่ม</h1>
@@ -226,7 +230,6 @@ import type { UBPostpayload, UserBooking } from "@/types/userBooking";
 import type { User } from "@/types/user";
 import type { ParticipantPostPayload } from "@/types/participant";
 
-
 // ---------------------
 // Store Initialization
 // ---------------------
@@ -267,7 +270,6 @@ const user = ref<User>(); // ข้อมูลผู้ใช้
 // ---------------------
 // สามารถเพิ่ม watcher, methods หรือ computed properties ตามความเหมาะสม
 
-
 async function setLeaderUser() {
   await userStore.getUserById(1);
   user.value = userStore.leaderUser;
@@ -297,6 +299,8 @@ const currentRoom = roomStore.currentTypeRoom;
 const availableFloors = computed(() => {
   if (currentRoom.roomType === "Group study") {
     return [3, 4, 5];
+  } else if (currentRoom.roomType === "Entertain") {
+    return [6];
   }
 });
 
@@ -309,6 +313,9 @@ const availableRooms = computed(() => {
     } else if (floor.value === 5) {
       return roomStore.studyFloor5.map((room) => room.roomName);
     }
+  } else if (currentRoom.roomType === "Entertain") {
+    const room = roomStore.entertainRooms;
+    return room.map((room) => room.roomName);
   }
 });
 // Methods
@@ -316,7 +323,7 @@ const filteredEndTimes = () => {
   const maxHours = roomStore.currentTypeRoom.maxHours;
   const times = ref<string[]>([]);
   const clossingTime = "20:30";
-  if (maxHours == 2) {
+  if (maxHours) {
     times.value = [];
     timeStore.generateEndTimeSlots(startTime.value, maxHours, clossingTime);
     times.value = timeStore.endTimeSlots;
@@ -382,6 +389,7 @@ const fetchHolidays = async () => {
     console.error("Failed to fetch holidays:", error);
   }
 };
+// หาข้อมูลของห้องนั้นๆตาม
 async function selectRoom(floor: number, roomName: string) {
   if (currentRoom.roomType === "Group study") {
     if (floor === 3) {
@@ -406,6 +414,13 @@ async function selectRoom(floor: number, roomName: string) {
       saveSelectRoom.value = updateRoom;
       return saveSelectRoom.value;
     }
+  } else if (currentRoom.roomType === "Entertain") {
+    const findRoom = roomStore.entertainRooms.find(
+      (r) => r.roomName === roomName
+    );
+    const updateRoom = (roomStore.currentTypeRoom = findRoom!);
+    saveSelectRoom.value = updateRoom;
+    return saveSelectRoom.value;
   }
 }
 
@@ -467,6 +482,7 @@ async function submitBookingRoom() {
       reason: "",
       roomId: saveSelectRoom.value?.roomId!,
     };
+    console.log(normalRoomBooking.value);
     const res = await nrbStore.createNewBooking(normalRoomBooking.value);
     createdUserBookAndParticipant(res);
   } else if (startDate.value != null) {
@@ -483,21 +499,24 @@ async function submitBookingRoom() {
       reason: "",
       roomId: saveSelectRoom.value?.roomId!,
     };
+    console.log(normalRoomBooking.value);
     const res = await nrbStore.createNewBooking(normalRoomBooking.value);
     createdUserBookAndParticipant(res);
   }
 }
 // Lifecycle hooks
 onMounted(async () => {
-  Promise.all([
-    await roomStore.filteredEntertainRooms(),
-    await roomStore.initializeRooms(),
-    (floor.value = roomStore.currentTypeRoom.floorId + 1),
-    await filteredEndTimes(),
-    getCurrentDate(),
-    (saveSelectRoom.value = roomStore.currentTypeRoom),
-    await setLeaderUser(),
-  ]);
+  try {
+    await roomStore.filteredEntertainRooms();
+    await roomStore.initializeRooms();
+    floor.value = roomStore.currentTypeRoom.floorId + 1;
+    await filteredEndTimes();
+    getCurrentDate();
+    saveSelectRoom.value = roomStore.currentTypeRoom;
+    await setLeaderUser();
+  } catch (error) {
+    console.error("Error loading data:", error);
+  }
 });
 
 // Watchers

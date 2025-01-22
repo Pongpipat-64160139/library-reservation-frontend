@@ -64,7 +64,7 @@ export const useRoomStore = defineStore("room", () => {
     );
     miniStudioRoom.value = rooms.filter(
       (room: { roomName: string | string[] }) =>
-        room.roomName.includes("Mimi Studios")
+        room.roomName.includes("Mini Studio")
     );
     liveForLifeRoom.value = rooms.filter(
       (room: { roomName: string | string[] }) =>
@@ -116,14 +116,29 @@ export const useRoomStore = defineStore("room", () => {
   async function filteredEntertainRooms() {
     const response = await roomservice.getRoomTypes("Entertain");
     const rooms = response.data;
+    entertainRooms.value = [];
+    //
     okeRooms.value = rooms.filter((room: { roomName: string | string[] }) =>
-      room.roomName.includes("คาราโอเกะ")
+      room.roomName.includes("LIBRA OKE")
     );
     stvRooms.value = rooms.filter((room: { roomName: string | string[] }) =>
-      room.roomName.includes("Room STV")
+      room.roomName.includes("STV")
     );
     miniTheater.value = rooms.filter((room: { roomName: string | string[] }) =>
       room.roomName.includes("Mini theater")
+    );
+    for (let i = 0; i <= stvRooms.value.length; i++) {
+      entertainRooms.value.push(stvRooms.value[i]);
+    }
+    for (let i = 0; i <= okeRooms.value.length; i++) {
+      entertainRooms.value.push(okeRooms.value[i]);
+    }
+    for (let i = 0; i <= miniTheater.value.length; i++) {
+      entertainRooms.value.push(miniTheater.value[i]);
+    }
+    //แยกค่่า undefined ออกจาก Array entertainments
+    entertainRooms.value = entertainRooms.value.filter(
+      (r) => r != undefined && r.roomName
     );
   }
 
@@ -201,5 +216,6 @@ export const useRoomStore = defineStore("room", () => {
     setCurrentRoom,
     getCurrentRoom,
     getRoomByID,
+    getMeetingRooms,
   };
 });
