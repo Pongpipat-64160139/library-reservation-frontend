@@ -12,9 +12,10 @@ export function createNRB(nrb: NormalRoomBooking) {
   return http.post("/normal-room-booking", nrb);
 }
 
-export function updateNRB(id: number, nrb: NormalRoomBooking) {
-  return http.patch(`/normal-room-booking/${id}`, nrb);
+export function updateNRB(id: number, updateData: Partial<NormalRoomBooking>) {
+  return http.patch(`/normal-room-booking/${id}`, updateData);
 }
+
 
 export function deleteNRB(id: number) {
   return http.delete(`/normal-room-booking/${id}`);

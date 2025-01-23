@@ -58,6 +58,16 @@ export const useNormalRoomBookStore = defineStore("normal-room-booking", () => {
     const res = await nrbService.getReservedRoom(currentDate);
     return res.data;
   }
+  async function updateStatus(id: number, status: string) {
+    try {
+      const updatedBooking = await nrbService.updateNRB(id, { reseve_status: status });
+      return updatedBooking.data;
+    } catch (error) {
+      console.error(`Error updating status for booking ID ${id}:`, error);
+      throw error;
+    }
+  }
+  
   return {
     createNewBooking,
     getAllReserve,
@@ -66,5 +76,6 @@ export const useNormalRoomBookStore = defineStore("normal-room-booking", () => {
     deleteReserve,
     getStatusReserve,
     bookings,
+    updateStatus
   };
 });
