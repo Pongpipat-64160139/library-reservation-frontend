@@ -49,6 +49,7 @@ export const useRoomStore = defineStore("room", () => {
     const response = await roomservice.getRoomTypes("Meeting");
 
     const rooms = response.data;
+    meetingRooms.value = rooms;
     cyberZoneRooms.value = rooms.filter(
       (room: { roomName: string | string[] }) =>
         room.roomName.includes("CYBER ZONE")
@@ -74,7 +75,7 @@ export const useRoomStore = defineStore("room", () => {
       (room: { roomName: string }) =>
         room.roomName === "ห้อง 706" || room.roomName === "ห้อง 707"
     );
-    return cyberZoneRooms;
+    return meetingRooms;
   }
 
   async function getAllRooms() {

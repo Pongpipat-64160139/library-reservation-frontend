@@ -294,13 +294,18 @@ const timeOptions = timeStore.timeSlots;
 
 // Room type and related computed properties
 // const roomType = ref((route.query.roomType as string) || "Group Study");
-const roomName = ref(decodeURIComponent(route.query.roomName as string) || "");
 const currentRoom = roomStore.currentTypeRoom;
+const roomName = ref(decodeURIComponent(currentRoom.roomName as string) || "5");
 const availableFloors = computed(() => {
   if (currentRoom.roomType === "Group study") {
     return [3, 4, 5];
   } else if (currentRoom.roomType === "Entertain") {
     return [6];
+  } else if (
+    (currentRoom.roomType === "Meeting" && currentRoom.floorId === 4) ||
+    5
+  ) {
+    return [5, 6];
   }
 });
 
@@ -316,6 +321,15 @@ const availableRooms = computed(() => {
   } else if (currentRoom.roomType === "Entertain") {
     const room = roomStore.entertainRooms;
     return room.map((room) => room.roomName);
+  } else if (currentRoom.roomType === "Meeting") {
+    const room = roomStore.meetingRooms;
+    const classifyFloor5 = room.filter((r) => r.floorId === 4);
+    const classifyFloor6 = room.filter((r) => r.floorId === 5);
+    if (floor.value === 5) {
+      return classifyFloor5.map((r) => r.roomName);
+    } else if (floor.value === 6) {
+      return classifyFloor6.map((r) => r.roomName);
+    }
   }
 });
 // Methods
@@ -421,6 +435,24 @@ async function selectRoom(floor: number, roomName: string) {
     const updateRoom = (roomStore.currentTypeRoom = findRoom!);
     saveSelectRoom.value = updateRoom;
     return saveSelectRoom.value;
+  } else if (currentRoom.roomType === "Meeting") {
+    if (floor === 5) {
+      const findRoom = roomStore.meetingRooms.find(
+        (r) => r.roomName === roomName
+      );
+      const updateRoom = (roomStore.currentTypeRoom = findRoom!);
+      console.log("Current room : ", updateRoom);
+      saveSelectRoom.value = updateRoom;
+      return saveSelectRoom.value;
+    } else if (floor === 6) {
+      const findRoom = roomStore.meetingRooms.find(
+        (r) => r.roomName === roomName
+      );
+      const updateRoom = (roomStore.currentTypeRoom = findRoom!);
+      console.log("Current room : ", updateRoom);
+      saveSelectRoom.value = updateRoom;
+      return saveSelectRoom.value;
+    }
   }
 }
 
