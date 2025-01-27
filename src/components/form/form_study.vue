@@ -271,7 +271,7 @@ const user = ref<User>(); // ข้อมูลผู้ใช้
 // สามารถเพิ่ม watcher, methods หรือ computed properties ตามความเหมาะสม
 
 async function setLeaderUser() {
-  await userStore.getUserById(1);
+  await userStore.getUserById(64160100);
   user.value = userStore.leaderUser;
   numPeople.value = `${user.value?.firstName} ${user.value?.lastName}`;
 }

@@ -1,24 +1,24 @@
 <template>
   <Header_page />
-  <v-container
-    fluid
-    class="back-ground ms-kob"
-  >
+  <v-container fluid class="back-ground ms-kob">
     <Form_meeting />
     <Form_equipment class="mt-1" />
-    <v-btn
-      to="/table_meeting"
-      type="submit"
-      class="save-btn custom-btn"
-    >
-      <v-icon left>
-        mdi-content-save
-      </v-icon>
+    <!-- to="/table_meeting" -->
+    <v-btn @click="saveReserved()" type="submit" class="save-btn custom-btn">
+      <v-icon left> mdi-content-save </v-icon>
       จองห้อง
     </v-btn>
   </v-container>
 </template>
+<script setup lang="ts">
+import { useEquipmentStore } from "@/stores/equipmentStore";
 
+const eqStore = useEquipmentStore();
+async function saveReserved() {
+  const eq = await eqStore.selectedEQForm;
+  await console.log("Selected :", eq);
+}
+</script>
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
 

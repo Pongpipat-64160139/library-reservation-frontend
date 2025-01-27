@@ -25,6 +25,7 @@ export interface NormalRoomBooking {
   reason?: string;
 }
 export interface getStatusReserved {
+  userId: number;
   user_name: string;
   room_id: number;
   normal_room_booking: number;

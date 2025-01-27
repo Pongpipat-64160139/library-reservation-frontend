@@ -1,81 +1,53 @@
 <template class="back-ground">
-  <v-container
-    fluid
-    class="back-ground ms-kob"
-  >
-    <!-- Sheet1 จองห้อง -->
+  <!-- ส่วน container หลักที่ครอบทุกองค์ประกอบ -->
+  <v-container fluid class="back-ground ms-kob">
+    <!-- Sheet1: ส่วนของฟอร์มการจองห้อง -->
     <v-sheet
       class="mx-auto mt-10"
       elevation="8"
       max-width="1200"
       style="background-color: #dfd3c3; border-radius: 16px"
     >
-      <h1 class="pt-7 head-equipment ms-10">
-        อุปกรณ์ที่ต้องการ
-      </h1>
-      <h1 class="head-plsselect ms-10 pb-5">
-        กรุณาเลือกอุปกรณ์ที่ต้องการ
-      </h1>
+      <!-- หัวข้อหลัก -->
+      <h1 class="pt-7 head-equipment ms-10">อุปกรณ์ที่ต้องการ</h1>
+      <h1 class="head-plsselect ms-10 pb-5">กรุณาเลือกอุปกรณ์ที่ต้องการ</h1>
 
-      <span class="d-flex">
-        <v-checkbox
-          v-model="selected"
-          class="head-selectequipment width-formcheckbox"
-          label="โปรเจคเตอร์"
-          value="1"
-        />
-        <v-checkbox
-          v-model="selected"
-          class="head-selectequipment width-formcheckbox"
-          label="เครื่องคอมพิวเตอร์ (วิทยากร)"
-          value="2"
-        />
-        <v-checkbox
-          v-model="selected"
-          class="head-selectequipment width-formcheckbox"
-          label="โต๊ะลงทะเบียน"
-          value="3"
-        />
-        <v-checkbox
-          v-model="selected"
-          class="head-selectequipment width-formcheckbox"
-          label="ระบบเครื่องเสียง"
-          value="4"
-        />
-      </span>
-      <span class="d-flex">
-        <v-checkbox
-          v-model="selected"
-          class="head-selectequipment width-formcheckbox"
-          label="ระบบ ZOOM Meeting"
-          value="5"
-        />
-        <v-checkbox
-          v-model="selected"
-          class="head-selectequipment width-formcheckbox"
-          label="ระบบถ่ายทอดการประชุม"
-          value="6"
-        />
-        <v-checkbox
-          v-model="selected"
-          class="head-selectequipment width-formcheckbox"
-          label="ห้องอาหาร ชั้น 3 ตึกใหม่"
-          value="7"
-        />
-        <h1 class="head-selectequipment width-formcheckbox" />
-      </span>
+      <!-- ส่วน checkbox สำหรับเลือกอุปกรณ์แบบวนลูป -->
+      <v-container>
+        <v-row cols="12">
+          <v-col
+            v-for="(item, index) in equipmentList"
+            :key="item.eq_Id"
+            cols="4"
+          >
+            <v-checkbox
+              class="head-selectequipment width-formcheckbox"
+              :label="item.equip_Name"
+              :value="item.eq_Id"
+              @click="selectedEquipment(index)"
+            />
+          </v-col>
+        </v-row>
+      </v-container>
+
+      <!-- ส่วนฟอร์มสำหรับอุปกรณ์เพิ่มเติม -->
       <span>
         <h1 class="head-another ms-10">อื่น ๆ</h1>
         <v-textarea
+          v-model="eqother"
           label=""
           rows="3"
           outlined
           class="ms-13 text-field-rounded me-7 mt-2"
         />
       </span>
+
+      <!-- คอมโพเนนต์สำหรับเลือกร้านอาหาร -->
       <span>
         <Form_restaurant />
       </span>
+
+      <!-- ส่วนการแนบไฟล์เพิ่มเติม -->
       <span>
         <h1 class="head-more ms-10 mt-5">ไฟล์เอกสารเพิ่มเติม</h1>
         <v-file-input
@@ -89,15 +61,41 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { useEquipmentStore } from "@/stores/equipmentStore";
+import type { Equipment } from "@/types/equipment";
+import { ref, computed, onMounted } from "vue";
 
-export default defineComponent({
-  data() {
-    return {
-      selected: [""] as string[],
-    };
-  },
+const equipmentStore = useEquipmentStore();
+// อาร์เรย์ของรายการอุปกรณ์
+const equipmentList = ref<Equipment[]>([]);
+const eqother = ref<string>();
+async function selectedEquipment(itemIndex: number) {
+  const findEQ = equipmentList.value.find((eq) => eq.eq_Id === itemIndex + 1);
+  let selected = equipmentStore.selectedEQForm;
+  const checkDuplicate = selected.some((eq) => eq.eq_Id === findEQ?.eq_Id);
+  if (!checkDuplicate) {
+    selected.push(equipmentList.value[itemIndex]);
+    equipmentStore.selectedEQForm = selected;
+    console.log("Selected equipment : ", equipmentStore.selectedEQForm);
+  } else {
+    selected = selected.filter((eq) => eq.equip_Name !== findEQ?.equip_Name);
+    equipmentStore.selectedEQForm = selected;
+    console.log("Selected equipment : ", equipmentStore.selectedEQForm);
+  }
+}
+async function loadDataEquipment() {
+  const loadData = await equipmentStore.getAllEquipment();
+  equipmentList.value = equipmentStore.allEquipment;
+}
+
+onMounted(async () => {
+  try {
+    await loadDataEquipment();
+    await equipmentStore.resetSelcetedEquipment();
+  } catch (error) {
+    console.error("Error loading data:", error);
+  }
 });
 </script>
 

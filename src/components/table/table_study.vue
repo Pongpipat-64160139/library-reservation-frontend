@@ -603,7 +603,7 @@ function getCellClass(roomId: number, time: string) {
         rowspan: endIndex - startIndex + 1, // คำนวณจำนวนแถวที่ต้องรวม
         isStart: true, // ระบุว่าเป็นแถวแรก
         isHidden: false, // ไม่ต้องซ่อนแถว
-        text: `${isBook.user_name}`, // ข้อความที่แสดงในเซลล์
+        text: `${isBook.userId}`, // ข้อความที่แสดงในเซลล์
       };
     } else if (
       bookings.find((book) => book.room_id === roomId && book.re_status == "รอ")
@@ -613,7 +613,7 @@ function getCellClass(roomId: number, time: string) {
         rowspan: endIndex - startIndex + 1, // คำนวณจำนวนแถวที่ต้องรวม
         isStart: true, // ระบุว่าเป็นแถวแรก
         isHidden: false, // ไม่ต้องซ่อนแถว
-        text: `${isBook.user_name}`,
+        text: `${isBook.userId}`,
       };
     }
   }
