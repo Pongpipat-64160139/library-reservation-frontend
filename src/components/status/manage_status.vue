@@ -5,7 +5,11 @@
     <v-breadcrumbs :items="items" divider=">" class="mg-toptable">
       <!-- Manage Room -->
       <template #item="{ item }">
-        <router-link v-if="!item.disabled && item.href" :to="item.href" class="breadcrumb-link">
+        <router-link
+          v-if="!item.disabled && item.href"
+          :to="item.href"
+          class="breadcrumb-link"
+        >
           {{ item.title }}
         </router-link>
 
@@ -18,22 +22,31 @@
 
     <!-- Tabs for Floors -->
     <v-tabs v-model="selectedFloor" background-color="#cdbba7">
-      <v-tab v-for="floor in [2, 3, 4, 5, 6, 7]" :key="floor" class="tab-text" :value="floor">
+      <v-tab
+        v-for="floor in [2, 3, 4, 5, 6, 7]"
+        :key="floor"
+        class="tab-text"
+        :value="floor"
+      >
         ชั้น {{ floor }}
       </v-tab>
     </v-tabs>
 
     <!-- Data Table -->
-    <v-data-table v-model:sort-by="sortBy" :headers="headers" :items="filteredData" style="background-color: #cdbba7"
-      class="rd-datatable table-text">
+    <v-data-table
+      v-model:sort-by="sortBy"
+      :headers="headers"
+      :items="filteredData"
+       :sort-desc="[true]"
+      style="background-color: #cdbba7"
+      class="rd-datatable table-text"
+    >
       <template #item="{ item, index }">
         <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
           <td>
             {{ index + 1 }}
           </td>
-          <td>
-            {{ item.details }}
-          </td>
+          <td>-</td>
           <td>
             {{ item.floorNumber }}
           </td>
@@ -45,17 +58,25 @@
           </td>
           <td>{{ item.startTime }} - {{ item.endTime }}</td>
           <td class="align-center justify-center">
-            <v-select :model-value="item.status" :items="['รอ', 'อนุมัติ', 'ยกเลิก']" variant="outlined"
-              density="compact" class="size-selectstatus"
-              @update:model-value="(val) => handleStatusChange(item, val)" />
+            <v-select
+              :model-value="item.status"
+              :items="['รอ', 'อนุมัติ', 'ยกเลิก']"
+              variant="outlined"
+              density="compact"
+              class="size-selectstatus"
+              :disabled="item.status === 'อนุมัติ' || item.status === 'ยกเลิก'"
+              @update:model-value="(val) => handleStatusChange(item, val)"
+            />
           </td>
           <td>
-            {{ getDetailMessage(item.status, item) }}
-          </td>
-
-          <td>
-            <v-btn color="#F5EDED" icon="mdi-magnify" width="40" height="40" class="btn-diadetail"
-              @click="showDialog(item)" />
+            <v-btn
+              color="#F5EDED"
+              icon="mdi-magnify"
+              width="40"
+              height="40"
+              class="btn-diadetail"
+              @click="showDialog(item)"
+            />
           </td>
         </tr>
       </template>
@@ -63,7 +84,7 @@
   </v-container>
 
   <!-- Dialog Detail -->
-  <v-dialog v-model="dialog" max-width="690px" max-height="600px">
+  <v-dialog v-model="dialog" max-width="630px" max-height="600px">
     <v-card class="dialog-detail">
       <span class="text-userdetail">
         <div class="text-headdetail">
@@ -87,8 +108,14 @@
           <v-col>
             <div class="text-headdetail size-selecttime d-flex">
               <strong class="me-1">เวลาเริ่ม</strong>
-              <v-select v-if="editMode" v-model="editedStartTime" :items="startTimeOptions" variant="outlined"
-                density="compact" class="mg-toptime" />
+              <v-select
+                v-if="editMode"
+                v-model="editedStartTime"
+                :items="startTimeOptions"
+                variant="outlined"
+                density="compact"
+                class="mg-toptime"
+              />
               <span v-else>{{ selectedItem?.startTime }}</span>
             </div>
           </v-col>
@@ -105,8 +132,14 @@
           <v-col>
             <div class="text-headdetail size-selecttime d-flex">
               <strong class="me-1">เวลาจบ</strong>
-              <v-select v-if="editMode" v-model="editedEndTime" :items="endTimeOptions" density="compact"
-                variant="outlined" class="mg-toptime" />
+              <v-select
+                v-if="editMode"
+                v-model="editedEndTime"
+                :items="endTimeOptions"
+                density="compact"
+                variant="outlined"
+                class="mg-toptime"
+              />
               <span v-else>{{ selectedItem?.endTime }}</span>
             </div>
           </v-col>
@@ -118,55 +151,62 @@
           <v-col cols="6">
             <div class="text-headdetail size-selectfloor">
               <strong class="me-1">ชั้น</strong>
-              <v-select v-if="editMode" v-model="editedFloor" :items="Object.keys(floorRooms)" density="compact"
-                variant="outlined" @update:model-value="updateAvailableRooms" />
+              <v-select
+                v-if="editMode"
+                v-model="editedFloor"
+                :items="Object.keys(floorRooms)"
+                density="compact"
+                variant="outlined"
+                @update:model-value="updateAvailableRooms"
+              />
               <span v-else>{{ selectedItem?.floorNumber }}</span>
             </div>
           </v-col>
           <v-col>
             <div class="text-headdetail size-selectroom">
               <strong class="me-1">ห้อง</strong>
-              <v-select v-if="editMode" v-model="editedRoom" :items="availableRooms" density="compact"
-                variant="outlined" />
+              <v-select
+                v-if="editMode"
+                v-model="editedRoom"
+                :items="availableRooms"
+                density="compact"
+                variant="outlined"
+              />
               <span v-else>{{ selectedItem?.roomName }}</span>
             </div>
           </v-col>
         </v-row>
       </span>
 
-      <span class="d-flex text-repeatdetail">
-        <v-row>
-          <v-col cols="6">
-            <div class="text-headdetail"><strong>ทำซ้ำ</strong> ไม่</div>
-          </v-col>
-          <v-col>
-            <div class="text-repeatenddetail">
-              <strong>สิ้นสุด</strong> {{ selectedItem?.date }}
-            </div>
-          </v-col>
-        </v-row>
-      </span>
-
       <span class="d-flex text-headdetail">
-        <div class="text-headdetail">
+        <div class="text-moredetail">
           <strong>รายละเอียด</strong> {{ selectedItem?.details }}
         </div>
       </span>
 
-      <span v-if="selectedItem?.status === 'ยกเลิก'" class="d-flex text-headdetail">
+      <span
+        v-if="selectedItem?.status === 'ยกเลิก'"
+        class="d-flex text-headdetail"
+      >
         <div class="text-headdetail">
           <strong>เหตุผลการยกเลิก</strong>
           {{ selectedItem?.cancelReason || "ยกเลิกการจอง" }}
         </div>
       </span>
 
-      <span v-if="selectedItem?.status === 'ยกเลิก'" class="d-flex mg-leftreason">
+      <span
+        v-if="selectedItem?.status === 'ยกเลิก'"
+        class="d-flex mg-leftreason"
+      >
         <div class="text-headdetail">
           <strong>ยกเลิกโดย</strong>
         </div>
       </span>
 
-      <span v-if="selectedItem?.status === 'ยกเลิก'" class="d-flex mg-leftreason">
+      <span
+        v-if="selectedItem?.status === 'ยกเลิก'"
+        class="d-flex mg-leftreason"
+      >
         <div class="text-headdetail">
           <strong>เวลาที่ยกเลิก</strong>
           {{ selectedItem?.cancelTime || "ไม่มีข้อมูล" }}
@@ -176,17 +216,25 @@
       <!-- Button in Dialog -->
       <v-card-text />
       <v-card-actions class="d-flex justify-center mg-btmdiastatus">
-        <v-btn class="btn-close-canceldialog" :style="{
-          backgroundColor: editMode ? '#ea8a8a' : '#dad0c2',
-          color: '#493628',
-        }" @click="handleCancel">
+        <v-btn
+          class="btn-close-canceldialog"
+          :style="{
+            backgroundColor: editMode ? '#ea8a8a' : '#dad0c2',
+            color: '#493628',
+          }"
+          @click="handleCancel"
+        >
           {{ editMode ? "ยกเลิก" : "ปิด" }}
         </v-btn>
 
-        <v-btn class="btn-save-editdialog" :style="{
-          backgroundColor: editMode ? '#B5CFB7' : '#f0c8a4',
-          color: '#493628',
-        }" @click="toggleEditMode">
+        <v-btn
+          class="btn-save-editdialog"
+          :style="{
+            backgroundColor: editMode ? '#B5CFB7' : '#f0c8a4',
+            color: '#493628',
+          }"
+          @click="toggleEditMode"
+        >
           {{ editMode ? "บันทึก" : "แก้ไข" }}
         </v-btn>
       </v-card-actions>
@@ -201,15 +249,24 @@
           ต้องการเปลี่ยนสถานะเป็น "{{ newStatus }}" ใช่หรือไม่ ?
         </div>
 
-        <v-text-field v-if="newStatus === 'ยกเลิก'" v-model="cancelReason" label="กรอกเหตุผลในการยกเลิก"
-          variant="outlined" :rules="[(v) => !!v || '']" class="mg-topdiastatus" />
+        <v-text-field
+          v-if="newStatus === 'ยกเลิก'"
+          v-model="cancelReason"
+          label="กรอกเหตุผลในการยกเลิก"
+          variant="outlined"
+          :rules="[(v) => !!v || '']"
+          class="mg-topdiastatus"
+        />
       </v-card-text>
       <v-card-actions class="d-flex justify-center mg-topdiastatus">
         <v-btn class="btn-cancelreason" text @click="clearCancelReason">
           ยกเลิก
         </v-btn>
-        <v-btn class="btn-confirmreason" :disabled="newStatus === 'ยกเลิก' && !cancelReason"
-          @click="confirmStatusChange">
+        <v-btn
+          class="btn-confirmreason"
+          :disabled="newStatus === 'ยกเลิก' && !cancelReason"
+          @click="confirmStatusChange"
+        >
           ยืนยัน
         </v-btn>
       </v-card-actions>
@@ -242,6 +299,7 @@ const nrbStore = useNormalRoomBookStore(); // เชื่อม store การ
 const bookingDetails = ref<BookingDetail[]>([]);
 
 const sortBy = ref([
+  { key: "numb", order: "desc" },
   { key: "numb", order: "asc" },
   { key: "details", order: "asc" },
   { key: "floor", order: "asc" },
@@ -259,7 +317,6 @@ const headers = ref([
   { title: "วันที่", key: "startDate" },
   { title: "เวลา", key: "startTime" },
   { title: "สถานะ", key: "status" },
-  { title: "รายละเอียด", key: "details" },
   { title: "เพิ่มเติม", key: "more" },
 ]);
 
@@ -310,10 +367,82 @@ onMounted(async () => {
         }
       }
     }
+ 
   } catch (error) {
     console.error("Error fetching data:", error);
   }
 });
+
+onMounted(() => {
+  // ตรวจสอบเวลาทุกวินาที
+  setInterval(() => {
+  const now = new Date();
+
+  bookingDetails.value.forEach(async (item) => {
+    if (item.status === "รอ") {
+      try {
+        // ตรวจสอบรูปแบบ startDate และแปลงเป็น Date Object
+        const startDateParts = item.startDate.split(" "); // แยกวันที่
+        const [day, month, year] = [
+          startDateParts[1], // วันที่
+          startDateParts[2], // เดือน
+          startDateParts[3], // ปี
+        ];
+
+        const thaiMonths = [
+          "มกราคม",
+          "กุมภาพันธ์",
+          "มีนาคม",
+          "เมษายน",
+          "พฤษภาคม",
+          "มิถุนายน",
+          "กรกฎาคม",
+          "สิงหาคม",
+          "กันยายน",
+          "ตุลาคม",
+          "พฤศจิกายน",
+          "ธันวาคม",
+        ];
+
+        const monthIndex = thaiMonths.indexOf(month); // แปลงเดือนภาษาไทยเป็น index
+        if (monthIndex === -1) throw new Error("Invalid month in startDate");
+
+        // สร้าง Date Object
+        const startDate = new Date(
+          parseInt(year) - 543, // แปลง พ.ศ. เป็น ค.ศ.
+          monthIndex,
+          parseInt(day)
+        );
+
+        // แปลง startTime เป็นชั่วโมงและนาที
+        const [hours, minutes] = item.startTime.split(":").map(Number);
+
+        startDate.setHours(hours, minutes); // เพิ่มเวลาเริ่มในวันที่
+
+        // คำนวณเวลาที่เหลือ
+        const diff = now.getTime() - startDate.getTime(); // คำนวณ ms
+        const diffMinutes = diff / (1000 * 60); // แปลงเป็นนาที
+
+   
+        // หากเวลาผ่านไปเกิน 2 นาที
+        if (diffMinutes > 15) {
+          // อัปเดตสถานะใน backend
+          await nrbStore.updateStatus(item.numb, "ยกเลิก");
+
+          // อัปเดตสถานะใน local state
+          item.status = "ยกเลิก";
+          item.cancelReason = "หมดเวลาที่กำหนด"; // เพิ่มเหตุผล
+          item.cancelTime = now.toTimeString().slice(0, 5); // เวลา cancel
+        }
+      } catch (error) {
+        console.error(`Error processing item ${item.numb}:`, error);
+      }
+    }
+  });
+}, 1000);
+
+});
+
 
 watch(
   () => editedFloor.value,
@@ -322,6 +451,8 @@ watch(
     editedRoom.value = rooms ? rooms[0] : "";
   }
 );
+
+
 
 const formatThaiDate = (dateString: string | number | Date) => {
   const dateObj = new Date(dateString);
@@ -363,7 +494,7 @@ const formatTime = (time: string): string => {
 };
 
 const getDetailMessage = (status: string, currentItem: any) => {
-  if (status === "รอ") {
+  if (status === "ยกเลิก") {
     return "รอดำเนินการ";
   } else if (status === "อนุมัติ") {
     return "กำลังใช้งาน";
@@ -681,7 +812,7 @@ const handleCancel = () => {
 
 .text-headdetail {
   font-weight: 300;
-  font-size: 20px;
+  font-size: 19px;
   margin-top: 20px;
   margin-left: 25px;
 }
@@ -705,21 +836,21 @@ th {
 .text-userdetail {
   font-weight: 300;
   font-size: 18px;
-  margin-top: 20px;
+  margin-top: 15px;
   margin-left: 25px;
 }
 
 .text-namedetail {
   font-weight: 300;
   font-size: 18px;
-  margin-top: 20px;
+  margin-top: 10px;
   margin-left: 25px;
 }
 
 .text-startdatedetail {
   font-weight: 300;
   font-size: 18px;
-  margin-top: 20px;
+  margin-top: 10px;
   margin-left: 25px;
 }
 
@@ -740,7 +871,7 @@ th {
 }
 
 .text-floor-roomdetail {
-  margin-top: 20px;
+  margin-top: 10px;
   margin-left: 25px;
 }
 
@@ -753,18 +884,9 @@ th {
   margin-left: 40px;
 }
 
-.text-repeatdetail {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: -10px;
+.text-moredetail {
+  margin-top: 10px;
   margin-left: 25px;
-}
-
-.text-repeatenddetail {
-  font-weight: 300;
-  font-size: 20px;
-  margin-top: 20px;
-  margin-left: 40px;
 }
 
 .mg-leftreason {
@@ -779,6 +901,7 @@ th {
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
   margin-right: 30px;
+  margin-bottom: 20px;
 }
 
 .btn-save-editdialog {
@@ -788,6 +911,8 @@ th {
   width: 100px;
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+
 }
 
 .btn-cancelreason {
