@@ -1,6 +1,6 @@
 <template>
   <Header_page />
-  <v-container fluid class="back-ground ms-kob">
+  <v-container fluid class="back-ground mg-toppage">
     <v-container>
       <v-row justify="center" align="center">
         <!-- Dropdown เลือกประเภทห้อง -->
@@ -18,45 +18,23 @@
           />
         </v-col>
 
-        <!-- ช่องสำหรับปุ่มแสดงวันที่ -->
+        <!-- ปฏิทินสำหรับเลือกวันที่การจองห้อง -->
         <v-col class="d-flex justify-center" cols="auto">
-          <v-btn class="btn-date" @click="showDatePicker = !showDatePicker">
-            {{
-              selectedDate
-                ? new Date(selectedDate).toLocaleDateString("th-TH", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })
-                : new Date().toLocaleDateString("th-TH", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })
-            }}
-            <v-icon class="calendar-icon"> mdi-calendar </v-icon>
-          </v-btn>
-
-          <v-date-picker
-            v-if="showDatePicker"
+          <vue-flatpickr
             v-model="selectedDate"
-            class="date-picker-position"
-            :allowed-dates="allowedDates"
-            :day-class="getDayClass"
-            @update:model-value="handleDateSelect"
-            @click:clear="selectedDate = null"
+            class="text-center btn-date"
+            :config="flatpickrConfig"
           />
         </v-col>
       </v-row>
     </v-container>
+
     <!-- ตารางสำหรับชั้น 6 ห้อง ศึกษากลุ่มมัลติมีเดีย (STV) -->
-    <h1 class="pt-5 head-title pb-10 ml-left">
+    <h1 class="font-head mg-left">
       ชั้น 6 ห้อง ศึกษากลุ่มมัลติมีเดีย (STV)
-      <v-icon class="mb-1 ms-2"> mdi-multimedia </v-icon>
+      <v-icon class="mg-icon"> mdi-multimedia </v-icon>
     </h1>
-    <v-container class="ms-minustop">
+    <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
@@ -100,11 +78,11 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง LIBRA OKE -->
-    <h1 class="pt-5 head-title pb-10 ml-left">
+    <h1 class="font-head mg-left">
       ชั้น 6 ห้อง LIBRA OKE
-      <v-icon class="mb-1 ms-2"> mdi-microphone-variant </v-icon>
+      <v-icon class="mg-icon"> mdi-microphone-variant </v-icon>
     </h1>
-    <v-container class="ms-minustop">
+    <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
@@ -144,12 +122,12 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง Mini Theater -->
-    <h1 class="pt-5 head-title pb-10 ml-left">
+    <h1 class="font-head mg-left">
       ชั้น 6 ห้อง MINI THEATER
-      <v-icon class="mb-1 ms-2"> mdi-theater </v-icon>
+      <v-icon class="mg-icon"> mdi-theater </v-icon>
     </h1>
 
-    <v-container class="ms-minustop">
+    <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
@@ -210,6 +188,9 @@ import { useRouter } from "vue-router";
 import { useRoomStore } from "@/stores/roomStore";
 import { useNormalRoomBookStore } from "@/stores/nrbStore";
 
+import VueFlatpickr from "vue-flatpickr-component";
+import "flatpickr/dist/flatpickr.css";
+import { Thai } from "flatpickr/dist/l10n/th.js";
 /* ---------------------
    Reactive Data Properties
    --------------------- */
@@ -219,9 +200,6 @@ const showDatePicker = ref(false);
 
 // ตัวแปรเก็บวันที่ปัจจุบันในรูปแบบของ string
 const currentDate = ref("");
-
-// ตัวแปรเก็บวันที่ที่ผู้ใช้เลือกในรูปแบบ string หรือ null
-const selectedDate = ref<string | null>(null);
 
 // ตัวแปรเก็บวันหยุดที่ได้รับจาก API หรือข้อมูล
 const holidays = ref<string[]>([]);
@@ -238,6 +216,188 @@ const roomStore = useRoomStore();
 
 // ใช้ store เพื่อจัดการการจองห้องประชุม
 const nrbStore = useNormalRoomBookStore();
+
+const selectedDate = ref<string | null>(null);
+
+const flatpickrConfig = ref({
+  locale: Thai,
+  dateFormat: "d-m-Y",
+  defaultDate: new Date(),
+  minDate: new Date(new Date().getFullYear(), -1, 1),
+  maxDate: new Date(new Date().getFullYear() + 1, 11, 31),
+  formatDate: (date: Date) => {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    };
+    const thaiYear = date.getFullYear() + 543;
+    const formattedDate = new Intl.DateTimeFormat("th-TH", options).format(
+      date
+    );
+    return formattedDate.replace(
+      date.getFullYear().toString(),
+      thaiYear.toString()
+    );
+  },
+  onChange: (
+    selectedDates: Date[],
+    dateStr: string,
+    instance: { yearElements: any[]; currentYear: number }
+  ) => {
+    if (selectedDates.length > 0) {
+      selectedDate.value = dateStr;
+      console.log("Selected date:", dateStr);
+    }
+
+    // อัปเดต Dropdown ของปีให้แสดงปีพุทธศักราช (พ.ศ.)
+    const updateYearDropdown = () => {
+      const yearSelect = instance?.yearElements?.[0]; // ตรวจสอบว่า instance และ yearElements มีค่าหรือไม่
+      if (yearSelect && yearSelect.options) {
+        yearSelect.value = (instance.currentYear + 543).toString();
+        Array.from(yearSelect.options).forEach((option) => {
+          const optionYear = parseInt(option.value, 10);
+          option.textContent = (optionYear + 543).toString();
+        });
+      }
+    };
+
+    updateYearDropdown();
+  },
+  onReady: (selectedDates: Date[], dateStr: string, instance: any) => {
+    const prevButton = instance.calendarContainer.querySelector(
+      ".flatpickr-prev-month"
+    );
+    const nextButton = instance.calendarContainer.querySelector(
+      ".flatpickr-next-month"
+    );
+    if (prevButton) prevButton.style.display = "none";
+    if (nextButton) nextButton.style.display = "none";
+
+    const yearDropdown = instance.calendarContainer.querySelector(
+      ".flatpickr-monthDropdown-months ~ .numInputWrapper input"
+    );
+    if (yearDropdown) {
+      const updateYearsToThai = () => {
+        const currentYear = parseInt(yearDropdown.value, 10);
+        yearDropdown.value = (currentYear + 543).toString();
+      };
+
+      updateYearsToThai();
+      yearDropdown.addEventListener("change", updateYearsToThai);
+    }
+  },
+  onYearChange: (
+    selectedDates: any,
+    dateStr: any,
+    instance: { yearElements: any[]; currentYear: number }
+  ) => {
+    const updateYearDropdown = () => {
+      const yearSelect = instance.yearElements[0];
+      if (yearSelect) {
+        // ปรับค่าปีใน dropdown เป็น พ.ศ.
+        yearSelect.value = (instance.currentYear + 543).toString();
+        Array.from(yearSelect.options).forEach((option) => {
+          const optionYear = parseInt(option.value, 10);
+          option.textContent = (optionYear + 543).toString();
+        });
+      }
+    };
+
+    updateYearDropdown();
+  },
+  onMonthChange: (
+    selectedDates: any,
+    dateStr: any,
+    instance: { yearElements: any[]; currentYear: number }
+  ) => {
+    const updateYearDropdown = () => {
+      const yearSelect = instance.yearElements[0];
+      if (yearSelect) {
+        yearSelect.value = (instance.currentYear + 543).toString();
+        Array.from(yearSelect.options).forEach((option) => {
+          const optionYear = parseInt(option.value, 10);
+          option.textContent = (optionYear + 543).toString();
+        });
+      }
+    };
+
+    updateYearDropdown();
+  },
+});
+
+function parseThaiDate(thaiDateString: string): Date | null {
+  const thaiMonths = [
+    "มกราคม",
+    "กุมภาพันธ์",
+    "มีนาคม",
+    "เมษายน",
+    "พฤษภาคม",
+    "มิถุนายน",
+    "กรกฎาคม",
+    "สิงหาคม",
+    "กันยายน",
+    "ตุลาคม",
+    "พฤศจิกายน",
+    "ธันวาคม",
+  ];
+
+  const regex = /(\d{1,2}) (\S+) (\d{4})/;
+  const match = thaiDateString.match(regex);
+
+  if (!match) return null;
+
+  const [, day, month, year] = match;
+  const monthIndex = thaiMonths.indexOf(month);
+
+  if (monthIndex === -1) return null;
+
+  // แปลงปีพุทธศักราชเป็นคริสต์ศักราช
+  const christianYear = parseInt(year) - 543;
+
+  return new Date(christianYear, monthIndex, parseInt(day));
+}
+
+watch(selectedDate, (newDate) => {
+  if (newDate) {
+    const parsedDate = parseThaiDate(newDate);
+    if (parsedDate && !isNaN(parsedDate.getTime())) {
+      const formattedDate = formatDate(parsedDate);
+      currentReserveDate.value = formattedDate;
+      console.log("Selected New date:", currentReserveDate.value);
+      loadedReserveRoom(currentReserveDate.value);
+    } else {
+      console.error("Invalid date format:", newDate);
+    }
+  } else {
+    console.error("No date selected");
+  }
+});
+
+function formatDate(date: Date | string) {
+  const d = new Date(date);
+  if (isNaN(d.getTime())) {
+    console.error("Invalid date input for formatDate:", date);
+    return "Invalid date";
+  }
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getCurrentReserveDate() {
+  if (selectedDate.value === null) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    currentReserveDate.value = `${year}-${month}-${day}`;
+    console.log("Reserve Date: " + currentReserveDate.value);
+    return currentReserveDate;
+  }
+}
 
 const fetchHolidays = async (year: string) => {
   const response = await fetch(
@@ -289,24 +449,6 @@ onMounted(async () => {
   }
 });
 
-// จะกำหนดวันที่ปัจจุบันให้กับ currentReserveDate ถ้ายังไม่ได้เลือกวันที่
-function getCurrentReserveDate() {
-  if (selectedDate.value === null) {
-    const today = new Date(); // สร้างออบเจ็กต์วันที่ปัจจุบัน
-    const year = today.getFullYear(); // ดึงค่าปีปัจจุบัน (เช่น 2024)
-    const month = String(today.getMonth() + 1).padStart(2, "0"); // ดึงค่าเดือน (เริ่มที่ 0 จึงต้อง +1) และแปลงให้เป็น 2 หลัก
-    const day = String(today.getDate()).padStart(2, "0"); // ดึงค่าวัน และแปลงให้เป็น 2 หลัก
-
-    // จัดรูปแบบวันที่ในรูปแบบ "YYYY-MM-DD" และกำหนดให้ตัวแปร currentReserveDate
-    currentReserveDate.value = `${year}-${month}-${day}`;
-
-    // แสดงผลวันที่ที่จองในคอนโซล
-    console.log("Reserve Date: " + currentReserveDate.value);
-
-    // ส่งค่ากลับ currentReserveDate เพื่อใช้ในภายหลัง
-    return currentReserveDate;
-  }
-}
 // โหลดข้อมูลการจองห้องของวัน เดือน ปี นั้นๆ
 async function loadedReserveRoom(selectedDate: string) {
   const loadedRoom = await nrbStore.getStatusReserve(selectedDate);
@@ -365,50 +507,6 @@ function getCellClass(roomId: number, time: string) {
     };
   }
 }
-
-// ฟังก์ชันแปลงรูปแบบวันที่ให้เป็นรูปแบบ YYYY-MM-DD จาก input ประเภท Date หรือ string
-function formatDate(date: Date | string) {
-  // แปลงค่า input ให้เป็นออบเจ็กต์ Date
-  const d = new Date(date);
-
-  // ตรวจสอบว่าค่าวันที่ถูกต้องหรือไม่ ถ้าไม่ใช่จะส่งข้อความแจ้งข้อผิดพลาดและคืนค่า "Invalid date"
-  if (isNaN(d.getTime())) {
-    console.error("Invalid date input for formatDate:", date);
-    return "Invalid date"; // กรณีวันที่ไม่ถูกต้อง ส่งค่า error string กลับ
-  }
-
-  // ดึงค่า "ปี" ค.ศ. จากวันที่
-  const year = d.getFullYear();
-
-  // ดึงค่า "เดือน" โดยต้อง +1 เพราะ getMonth() ให้ค่าเดือนเริ่มต้นที่ 0 (มกราคม = 0)
-  // และใช้ padStart(2, "0") เพื่อให้ได้รูปแบบสองหลัก เช่น "01", "02"
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-
-  // ดึงค่า "วัน" และแปลงให้อยู่ในรูปแบบสองหลัก เช่น "01", "02"
-  const day = String(d.getDate()).padStart(2, "0");
-
-  // คืนค่ารูปแบบวันที่ในรูปแบบ "YYYY-MM-DD"
-  return `${year}-${month}-${day}`;
-}
-
-/* ---------------------------------
-   Watcher: ตรวจสอบการเปลี่ยนแปลงของ selectedDate
---------------------------------- */
-
-// ฟังก์ชัน watch() จะทำงานเมื่อ selectedDate มีการเปลี่ยนแปลงค่า
-watch(selectedDate, (newDate) => {
-  // เรียกใช้ฟังก์ชัน formatDate เพื่อแปลงวันที่ใหม่ให้อยู่ในรูปแบบที่กำหนด
-  const formattedDate = formatDate(newDate!);
-
-  // อัปเดตค่าของตัวแปร currentReserveDate ด้วยวันที่ที่แปลงแล้ว
-  currentReserveDate.value = formattedDate;
-
-  // แสดงผลวันที่ที่ถูกเลือกและแปลงแล้วในคอนโซลเพื่อใช้ตรวจสอบ
-  console.log(currentReserveDate.value);
-
-  // เรียกฟังก์ชันโหลดข้อมูลการจองใหม่ตามวันที่ที่ผู้ใช้เลือก
-  loadedReserveRoom(formattedDate);
-});
 
 const getDayClass = (day: { date: Date }) => {
   const date = new Date(day.date);
@@ -606,9 +704,11 @@ const generateBookingLink = (
   height: 100% !important; /* ใช้พื้นที่เต็ม */
 }
 
-.head-title {
+.font-head {
   font-weight: 600;
   font-size: 20px;
+  padding-top: 20px;
+  padding-bottom: 35px;
 }
 
 .font-table {
@@ -698,16 +798,16 @@ const generateBookingLink = (
   background-color: #e2dad6;
 }
 
-.ms-kob {
+.mg-toppage {
   margin-top: -600px;
 }
 
-.ms-minustop {
+.mg-btmtbl {
   margin-top: -40px;
 }
 
-.ml-left {
-  margin-left: 240px;
+.mg-left {
+  margin-left: 170px;
 }
 
 .table-bordered td {
@@ -783,5 +883,19 @@ const generateBookingLink = (
 .v-date-picker :deep(.v-picker-title) {
   font-size: 15px !important;
   margin-top: 10px;
+}
+
+.btn-date {
+  width: 300px;
+  background-color: #f5eded;
+  border: 1px solid #493628;
+  height: 57px;
+  border-radius: 5px;
+  z-index: 1000;
+}
+
+.mg-icon {
+  margin-bottom: 10px;
+  margin-left: 5px;
 }
 </style>
