@@ -4,20 +4,32 @@
   <v-container fluid class="back-ground ms-kob">
     <h1 class="pt-5 head-title text-center pb-10">สถานะการจอง</h1>
 
+    <!-- Tabs for floors -->
+    <v-tabs v-model="selectedFloor" background-color="#cdbba7">
+      <v-tab
+        v-for="floor in availableFloors"
+        :key="floor"
+        class="tab-text"
+        :value="floor"
+      >
+        ชั้น {{ floor }}
+      </v-tab>
+    </v-tabs>
+
+    <!-- Data Table -->
     <v-data-table
-      v-model:sort-by="sortBy"
       :headers="headers"
-      :items="data"
+      :items="filteredData"
       style="background-color: #cdbba7"
       class="rd-test"
     >
       <template #item="{ item, index }">
         <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
-          <td>{{ item.index }}</td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.floor }}</td>
-          <td>{{ item.room }}</td>
-          <td>{{ item.date }}</td>
+          <td>{{ index + 1 }}</td>
+          <td>{{ item.firstName }} - {{ item.lastName }}</td>
+          <td>{{ item.floorNumber }}</td>
+          <td>{{ item.roomName }}</td>
+          <td>{{ item.startDate }}</td>
           <td>{{ item.startTime }} - {{ item.endTime }}</td>
           <td>{{ item.status }}</td>
           <td>
@@ -37,25 +49,21 @@
 
   <!-- Dialog รายละเอียดการจองห้อง -->
 
-  <v-dialog v-model="dialog" max-width="500px">
+  <v-dialog v-model="dialog" max-width="600px">
     <v-card class="rd-dialog">
       <span class="head-detailuser">
-        <div class="head-detail">
-          <strong>ผู้ใช้</strong> {{ selectedItem?.user }}
-        </div>
+        <div class="head-detail"><strong>ผู้ใช้</strong> -</div>
       </span>
 
       <span class="head-detailname">
-        <div class="head-detail">
-          <strong>ชื่อ</strong> {{ selectedItem?.name }}
-        </div>
+        <div class="head-detail"><strong>ชื่อ</strong> -</div>
       </span>
 
       <span class="d-flex head-detaildate1">
         <v-row>
           <v-col cols="5">
             <div class="head-detail">
-              <strong>วันที่เริ่ม</strong> {{ selectedItem?.date }}
+              <strong>วันที่เริ่ม</strong> {{ selectedItem?.startDate }}
             </div>
           </v-col>
           <v-col>
@@ -70,7 +78,7 @@
         <v-row>
           <v-col cols="5">
             <div class="head-detail">
-              <strong>วันที่จบ</strong> {{ selectedItem?.date }}
+              <strong>วันที่จบ</strong> {{ selectedItem?.endDate }}
             </div>
           </v-col>
           <v-col>
@@ -85,25 +93,12 @@
         <v-row>
           <v-col cols="5">
             <div class="head-detail">
-              <strong>ชั้น</strong> {{ selectedItem?.floor }}
+              <strong>ชั้น</strong> {{ selectedItem?.floorNumber }}
             </div>
           </v-col>
           <v-col>
             <div class="head-detail ms-10">
-              <strong>ห้อง</strong> {{ selectedItem?.room }}
-            </div>
-          </v-col>
-        </v-row>
-      </span>
-
-      <span class="d-flex head-detailrepeat">
-        <v-row>
-          <v-col cols="5">
-            <div class="head-detail"><strong>ทำซ้ำ</strong> ไม่</div>
-          </v-col>
-          <v-col>
-            <div class="head-detail ms-10">
-              <strong>สิ้นสุด</strong> {{ selectedItem?.date }}
+              <strong>ห้อง</strong> {{ selectedItem?.roomName }}
             </div>
           </v-col>
         </v-row>
@@ -111,13 +106,13 @@
 
       <span class="d-flex head-detail">
         <div class="head-detail">
-          <strong>รายละเอียด</strong>
+          <strong>รายละเอียด</strong> {{ selectedItem?.details }}
         </div>
       </span>
 
-      <span v-if="selectedItem?.reason" class="d-flex head-detail">
+      <span v-if="selectedItem?.cancelReason" class="d-flex head-detail">
         <div class="head-detail">
-          <strong>เหตุผลการยกเลิก</strong> {{ selectedItem.reason }}
+          <strong>เหตุผลการยกเลิก</strong> {{ selectedItem.cancelReason }}
         </div>
       </span>
 
@@ -175,231 +170,140 @@
   </v-snackbar>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+<script lang="ts" setup>
+import { ref, computed, onMounted } from "vue";
+import { useRoomStore } from "@/stores/roomStore";
+import { useNormalRoomBookStore } from "@/stores/nrbStore";
 
-const sortBy = ref([
-  { key: "index", order: "asc" },
-  { key: "name", order: "asc" },
-  { key: "floor", order: "asc" },
-  { key: "room", order: "asc" },
-  { key: "date", order: "asc" },
-  { key: "time", order: "asc" },
-  { key: "status", order: "asc" },
-]);
+interface BookingDetail {
+  numb: number;
+  floorNumber: string;
+  roomName: string;
+  startDate: string;
+  startTime: string;
+  endDate: string;
+  endTime: string;
+  status: string;
+  details: string;
+  cancelReason: string;
+  cancelTime?: string; // ฟิลด์สำหรับเก็บเวลายกเลิก
+}
 
-const headers = ref([
-  { title: "ลำดับ", align: "start", key: "index" },
-  { title: "ชื่อ", key: "name" },
-  { title: "ชั้น", key: "floor" },
-  { title: "ห้อง", key: "room" },
-  { title: "วันที่", key: "date" },
-  { title: "เวลา", key: "time" },
-  { title: "สถานะ", key: "status" },
-  { title: "เพิ่มเติม", key: "more" },
-]);
+// Store
+const roomStore = useRoomStore();
+const nrbStore = useNormalRoomBookStore();
 
-const data = ref([
-  {
-    index: 1,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 3,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-11",
-    startTime: "08:00",
-    endTime: "09:30",
-    status: "รอ",
-    reason: "",
-  },
-  {
-    index: 2,
-    user: "64160136",
-    name: "นวพรรษ",
-    floor: 4,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-12",
-    startTime: "08:00",
-    endTime: "09:30",
-    status: "อนุมัติ",
-    reason: "",
-  },
-  {
-    index: 3,
-    user: "64160136",
-    name: "นางสาวนวพรรษ สีหาบุตร",
-    floor: 5,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-13",
-    startTime: "08:00",
-    endTime: "09:30",
-    status: "ยกเลิก",
-    reason: "",
-  },
-  {
-    index: 4,
-    user: "64160136",
-    name: "Nawapat Seehabut",
-    floor: 3,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-14",
-    startTime: "08:00",
-    endTime: "09:30",
-    status: "รอ",
-    reason: "",
-  },
-  {
-    index: 5,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 6,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-15",
-    startTime: "08:00",
-    endTime: "09:30",
-    status: "อนุมัติ",
-    reason: "",
-  },
-  {
-    index: 6,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 4,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-16",
-    startTime: "08:00",
-    endTime: "09:30",
-    status: "รอ",
-    reason: "",
-  },
-  {
-    index: 7,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 5,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-17",
-    startTime: "08:00",
-    endTime: "09:30",
-    status: "ยกเลิก",
-    reason: "เปลี่ยนแผนการใช้งาน",
-  },
-  {
-    index: 8,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 3,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-18",
-    startTime: "08:00",
-    endTime: "09:30",
-    status: "อนุมัติ",
-    reason: "",
-  },
-  {
-    index: 9,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 6,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-19",
-    startTime: "08:00",
-    endTime: "09:30",
-    status: "รอ",
-    reason: "",
-  },
-  {
-    index: 10,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 4,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-20",
-    startTime: "08:00",
-    endTime: "09:30",
-    status: "อนุมัติ",
-    reason: "",
-  },
-  {
-    index: 11,
-    user: "64160136",
-    name: "นวพรรษ สีหาบุตร",
-    floor: 4,
-    room: "ศึกษากลุ่ม 1",
-    date: "2024-12-20",
-    startTime: "08:00",
-    endTime: "09:30",
-    status: "อนุมัติ",
-    reason: "",
-  },
-]);
-
-const sortedData = computed(() => {
-  return [...data.value].sort((a, b) => {
-    if (a.status === "รอ" && b.status !== "รอ") return -1;
-    if (a.status !== "รอ" && b.status === "รอ") return 1;
-    return 0;
-  });
-});
-
+// State
+const bookingDetails = ref<BookingDetail[]>([]);
 const dialog = ref(false);
-const selectedItem = ref<any>(null);
-
+const selectedItem = ref<BookingDetail | null>(null);
 const reasonDialog = ref(false);
 const cancelReason = ref("");
 const snackbar = ref(false);
+const selectedFloor = ref(2); // ค่าเริ่มต้นของแท็บ (2)
+const availableFloors = ref<number[]>([2, 3, 4, 5, 6, 7]); // รายการชั้นที่มี
 
-const showDialog = (item: any) => {
+// ฟังก์ชันช่วย
+const formatTime = (time: string): string => {
+  return time.slice(0, 5);
+};
+
+const formatThaiDate = (dateString: string | number | Date) => {
+  const dateObj = new Date(dateString);
+  const days = [
+    "อาทิตย์",
+    "จันทร์",
+    "อังคาร",
+    "พุธ",
+    "พฤหัสบดี",
+    "ศุกร์",
+    "เสาร์",
+  ];
+
+  const months = [
+    "มกราคม",
+    "กุมภาพันธ์",
+    "มีนาคม",
+    "เมษายน",
+    "พฤษภาคม",
+    "มิถุนายน",
+    "กรกฎาคม",
+    "สิงหาคม",
+    "กันยายน",
+    "ตุลาคม",
+    "พฤศจิกายน",
+    "ธันวาคม",
+  ];
+
+  const day = days[dateObj.getDay()];
+  const date = dateObj.getDate();
+  const month = months[dateObj.getMonth()];
+  const year = dateObj.getFullYear() + 543; // แปลงเป็น พ.ศ.
+
+  return `${day} ${date} ${month} ${year}`;
+};
+
+// Data Table Headers
+const headers = [
+  { title: "ลำดับ", align: "start", key: "numb" },
+  { title: "ชื่อ", key: "details" },
+  { title: "ชั้น", key: "floorNumber" },
+  { title: "ห้อง", key: "roomName" },
+  { title: "วันที่", key: "startDate" },
+  { title: "เวลา", key: "startTime" },
+  { title: "สถานะ", key: "status" },
+];
+
+// Computed Data
+const filteredData = computed(() => {
+  return bookingDetails.value.filter(
+    (item) => parseInt(item.floorNumber) === selectedFloor.value
+  );
+});
+
+// Lifecycle Hook
+onMounted(async () => {
+  try {
+    const reserveResponse = await nrbStore.getAllReserve();
+    if (reserveResponse.data && reserveResponse.data.length > 0) {
+      for (const booking of reserveResponse.data) {
+        const roomId = booking.roomBooking?.roomId;
+        if (roomId) {
+          const roomResponse = await roomStore.getRoomByID(roomId);
+          bookingDetails.value.push({
+            numb: booking.nrbId,
+            floorNumber: roomResponse.floor?.floor_Number || "ไม่มีข้อมูลชั้น",
+            roomName: roomResponse.room_Name || "ไม่มีชื่อห้อง",
+            startDate: formatThaiDate(booking.startDate),
+            startTime: formatTime(booking.startTime),
+            endDate: formatThaiDate(booking.endDate),
+            endTime: formatTime(booking.endTime),
+            status: booking.reseve_status || "ไม่มีสถานะ",
+            details: booking.details || "ไม่มีรายละเอียด",
+            cancelReason: booking.reason || "",
+          });
+        }
+      }
+      bookingDetails.value.sort((a, b) => b.numb - a.numb);
+      // สร้างรายการชั้นอัตโนมัติ
+      const floors = Array.from(
+        new Set(bookingDetails.value.map((item) => parseInt(item.floorNumber)))
+      ).sort((a, b) => a - b);
+      availableFloors.value = floors;
+      if (!floors.includes(selectedFloor.value)) {
+        selectedFloor.value = floors[0];
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+});
+
+// ฟังก์ชันแสดง Dialog
+const showDialog = (item: BookingDetail) => {
   selectedItem.value = item;
   dialog.value = true;
 };
-
-const cancelBooking = () => {
-  if (selectedItem.value && selectedItem.value.status === "รอ") {
-    const itemIndex = data.value.findIndex(
-      (item) => item.index === selectedItem.value.index
-    );
-    if (itemIndex !== -1) {
-      data.value[itemIndex].status = "ยกเลิก";
-      dialog.value = false;
-    }
-  }
-};
-
-const confirmCancel = () => {
-  if (selectedItem.value && cancelReason.value.trim()) {
-    const itemIndex = data.value.findIndex(
-      (item) => item.index === selectedItem.value.index
-    );
-    if (itemIndex !== -1) {
-      data.value[itemIndex].status = "ยกเลิก";
-      data.value[itemIndex].reason = cancelReason.value; // บันทึกเหตุผล
-      snackbar.value = true; // แสดง Snackbar
-    }
-    reasonDialog.value = false;
-    cancelReason.value = "";
-  } else {
-    alert("กรุณากรอกเหตุผลในการยกเลิก");
-  }
-};
-
-export default defineComponent({
-  setup() {
-    return {
-      sortBy,
-      headers,
-      data: sortedData,
-      dialog,
-      selectedItem,
-      showDialog,
-      cancelBooking,
-      reasonDialog,
-      cancelReason,
-      confirmCancel,
-      snackbar,
-    };
-  },
-});
 </script>
 
 <style scoped>
@@ -555,5 +459,10 @@ th {
   border-radius: 10px;
   border: 1px solid #cdbba7; /* กำหนดกรอบของตาราง */
   border-collapse: collapse; /* ให้กรอบรวมกัน */
+}
+
+.tab-text {
+  font-weight: 400;
+  font-size: 15px;
 }
 </style>
