@@ -2,17 +2,21 @@
   <Header_page />
   <v-container fluid class="back-ground mg-toppage">
     <!-- Breadcrumbs -->
-    <v-breadcrumbs :items="items" divider=">" class="head-title mg-table">
-      <template #item="{ item }" class="head-title">
+    <v-breadcrumbs
+      :items="items"
+      divider=">"
+      class="text-breadcrumbs mg-toptable"
+    >
+      <template #item="{ item }" class="">
         <router-link
           v-if="!item.disabled && item.href"
           :to="item.href"
-          class="breadcrumb-link head-title"
+          class="breadcrumb-link"
         >
           {{ item.title }}
         </router-link>
 
-        <span v-else class="breadcrumb-disabled head-title">
+        <span v-else class="breadcrumb-disabled">
           {{ item.title }}
         </span>
       </template>
@@ -29,26 +33,26 @@
         />
       </v-col>
 
-      <!-- ปุ่มสำหรับเปิด Dialog เพื่อปิดบริการจองห้อง (ทุกห้อง) -->
+      <!-- ปุ่มสำหรับเปิด Dialog เพื่อตั้งค่าการเปิด-ปิดห้อง (ทุกห้อง) -->
       <v-col cols="2">
         <v-btn
-          class="close-service-btn ms-5 mb-5"
+          class="btn-settingroom"
           rounded
           large
           @click="closeServiceDialog = true"
         >
           <v-icon left> mdi-close </v-icon>
-          ปิดบริการ
+          ตั้งค่าการเปิด-ปิดห้อง
         </v-btn>
       </v-col>
     </v-row>
 
-    <div v-for="floor in 6" :key="floor" class="mb-10">
-      <h2 class="text-h5 font-weight-bold ms-5 mb-2">ชั้น {{ floor + 1 }}</h2>
+    <div v-for="floor in 6" :key="floor" class="mg-bttable">
+      <h2 class="text-floor">ชั้น {{ floor + 1 }}</h2>
       <v-data-table
         :headers="headers"
         :items="filteredRooms(floor + 1)"
-        class="rd-test"
+        class="rd-table"
         style="table-layout: fixed; width: 100%"
         hide-default-footer
       >
@@ -71,7 +75,7 @@
             <td>
               <v-btn
                 icon
-                class="rd-btndetail"
+                class="btn-setting-oneroom"
                 width="40"
                 height="40"
                 @click="showDialog(item)"
@@ -87,8 +91,8 @@
     <!-- Dialog ปิดให้บริการจองห้อง (รายห้อง) -->
     <v-dialog v-model="dialog" max-width="500px" max-height="600px">
       <v-card>
-        <v-card-title class="head-dialog text-center mt-5">
-          ปิดให้บริการจองห้อง (รายห้อง)
+        <v-card-title class="dialog-setting text-center mt-5">
+          ตั้งค่าการเปิด-ปิดบริการ (รายห้อง)
         </v-card-title>
         <v-card-text>
           <v-text-field
@@ -175,7 +179,7 @@
           <v-btn class="rd-btncancel" variant="flat" @click="dialog = false">
             ยกเลิก
           </v-btn>
-          <v-btn class="rd-btnclose" variant="flat" @click="saveChanges">
+          <v-btn class="btn-cancel" variant="flat" @click="saveChanges">
             ตกลง
           </v-btn>
         </v-card-actions>
@@ -185,8 +189,8 @@
     <!-- Dialog ปิดให้บริการจองห้อง (ทุกห้อง) -->
     <v-dialog v-model="closeServiceDialog" max-width="500px" max-height="600px">
       <v-card>
-        <v-card-title class="head-dialog text-center mt-5">
-          ปิดให้บริการจองห้อง (ทุกห้อง)
+        <v-card-title class="dialog-setting text-center mt-5">
+          ตั้งค่าการเปิด-ปิดบริการ (ทุกห้อง)
         </v-card-title>
         <v-card-text>
           <v-text-field
@@ -267,7 +271,7 @@
           >
             ยกเลิก
           </v-btn>
-          <v-btn class="rd-btnclose" variant="flat" @click="saveCloseService">
+          <v-btn class="btn-cancel" variant="flat" @click="saveCloseService">
             ตกลง
           </v-btn>
         </v-card-actions>
@@ -570,21 +574,6 @@ const updateRoomOptions = () => {
   color: #493628;
 }
 
-.head-title {
-  font-weight: 600;
-  font-size: 24px;
-  margin-top: -1px;
-}
-
-.mg-table {
-  margin-bottom: -35px;
-}
-
-.head-dialog {
-  font-weight: 600;
-  font-size: 18px;
-}
-
 .back-ground {
   background-color: #f9f3ea;
   background-image: url("@/assets/subtle-dark-vertical.png");
@@ -602,6 +591,16 @@ const updateRoomOptions = () => {
   margin-top: 100px;
 }
 
+.text-breadcrumbs {
+  font-weight: 600;
+  font-size: 24px;
+  margin-top: -1px;
+}
+
+.mg-toptable {
+  margin-bottom: -25px;
+}
+
 .breadcrumb-link {
   text-decoration: none;
   color: #493628;
@@ -615,6 +614,55 @@ const updateRoomOptions = () => {
 .breadcrumb-disabled {
   color: #493628;
   font-weight: 600;
+}
+
+.btn-date {
+  width: 300px;
+  background-color: #f5eded;
+  border: 1px solid #493628;
+  height: 57px;
+  border-radius: 5px;
+  z-index: 1000;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+  margin-left: 900px;
+}
+
+.btn-settingroom {
+  font-weight: 400;
+  font-size: 16px;
+  color: #493628;
+  background-color: #f5eded;
+  border: 1px solid #493628;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  width: 270px;
+  height: 57px;
+}
+
+.btn-settingroom:hover {
+  background-color: #f5eded;
+}
+
+.mg-bttable {
+  margin-bottom: 25px;
+}
+
+.text-floor {
+  margin-bottom: 10px;
+  margin-left: 15px;
+}
+
+.rd-table {
+  background-color: #f5eded;
+  border-radius: 10px;
+  border: 1px solid #cdbba7; /* กำหนดกรอบของตาราง */
+  border-collapse: collapse; /* ให้กรอบรวมกัน */
+  font-size: 18px;
+}
+
+.dialog-setting {
+  font-weight: 600;
+  font-size: 18px;
 }
 
 .row-even {
@@ -631,7 +679,7 @@ th {
   font-size: 16px;
 }
 
-.rd-btndetail {
+.btn-setting-oneroom {
   background-color: #f5eded;
   border-radius: 10px;
   border: 1px solid #493628;
@@ -649,7 +697,7 @@ th {
   margin-right: 30px;
 }
 
-.rd-btnclose {
+.btn-cancel {
   font-weight: 400;
   font-size: 16px;
   background-color: #b5cfb7;
@@ -665,37 +713,5 @@ th {
   height: 55px;
 }
 
-.rd-test {
-  background-color: #f5eded;
-  border-radius: 10px;
-  border: 1px solid #cdbba7; /* กำหนดกรอบของตาราง */
-  border-collapse: collapse; /* ให้กรอบรวมกัน */
-}
 
-.close-service-btn {
-  font-weight: 400;
-  font-size: 16px;
-  color: #493628;
-  background-color: #f5eded;
-  border: 1px solid #493628;
-  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
-  width: 170px;
-  height: 57px;
-}
-
-.close-service-btn:hover {
-  background-color: #f5eded;
-}
-
-.btn-date {
-  width: 300px;
-  background-color: #f5eded;
-  border: 1px solid #493628;
-  height: 57px;
-  border-radius: 5px;
-  z-index: 1000;
-  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
-  margin-left: 900px;
-}
 </style>
