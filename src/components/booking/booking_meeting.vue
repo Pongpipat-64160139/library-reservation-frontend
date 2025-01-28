@@ -12,11 +12,23 @@
 </template>
 <script setup lang="ts">
 import { useEquipmentStore } from "@/stores/equipmentStore";
+import { useOrderDetialStore } from "@/stores/orderStore";
+import { onMounted } from "vue";
 
 const eqStore = useEquipmentStore();
+const orderStore = useOrderDetialStore();
+onMounted(() => {
+  try {
+  } catch (error) {
+    console.error("error load data ", error);
+  }
+});
 async function saveReserved() {
   const eq = await eqStore.selectedEQForm;
+  const orders = await orderStore.orders;
+  // orderStore.createdOrder(1);
   await console.log("Selected :", eq);
+  await console.log("Orders :", orders);
 }
 </script>
 <style scoped>

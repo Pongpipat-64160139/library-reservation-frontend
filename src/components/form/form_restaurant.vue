@@ -23,7 +23,7 @@
           <div class="d-flex flex-wrap">
             <!-- เลือกเวลาอาหารว่างช่วงเช้า -->
             <v-select
-              v-model="breakMorning.time"
+              v-model="breakMorning.Serve_Time"
               label="เวลา"
               :items="times"
               class="me-4 text-field-rounded width-time"
@@ -32,7 +32,7 @@
             />
             <!-- กรอกจำนวนคนสำหรับอาหารว่างช่วงเช้า -->
             <v-text-field
-              v-model="breakMorning.people"
+              v-model="breakMorning.Quantity"
               label="จำนวนคน"
               type="number"
               class="me-4 text-field-rounded width-amount"
@@ -40,14 +40,13 @@
             />
             <!-- กรอกงบประมาณต่อคนสำหรับอาหารว่างช่วงเช้า -->
             <v-text-field
-              v-model="breakMorning.budget"
+              v-model="breakMorning.CostPerson"
               class="text-field-rounded width-money"
               label="งบประมาณต่อคน"
               type="number"
               :disabled="!isEnableBreakMorning"
             />
           </div>
-
           <!-- Break กลางวัน -->
           <v-checkbox
             class="d-flex flex-wrap ms-8 mg-break"
@@ -57,7 +56,7 @@
           <div class="d-flex flex-wrap">
             <!-- เลือกเวลาอาหารว่างช่วงกลางวัน -->
             <v-select
-              v-model="breakLunch.time"
+              v-model="breakLunch.Serve_Time"
               label="เวลา"
               :items="times"
               class="me-4 text-field-rounded width-time"
@@ -66,7 +65,7 @@
             />
             <!-- กรอกจำนวนคนสำหรับอาหารว่างช่วงกลางวัน -->
             <v-text-field
-              v-model="breakLunch.people"
+              v-model="breakLunch.Quantity"
               label="จำนวนคน"
               type="number"
               class="me-4 text-field-rounded width-amount"
@@ -74,14 +73,13 @@
             />
             <!-- กรอกงบประมาณต่อคนสำหรับอาหารว่างช่วงกลางวัน -->
             <v-text-field
-              v-model="breakLunch.budget"
+              v-model="breakLunch.CostPerson"
               class="text-field-rounded width-money"
               label="งบประมาณต่อคน"
               type="number"
               :disabled="!isEnableBreakmidday"
             />
           </div>
-
           <!-- Break บ่าย -->
           <v-checkbox
             class="d-flex flex-wrap ms-8 mg-break"
@@ -91,7 +89,7 @@
           <div class="d-flex flex-wrap">
             <!-- เลือกเวลาอาหารว่างช่วงบ่าย -->
             <v-select
-              v-model="breakAfternoon.time"
+              v-model="breakAfternoon.Serve_Time"
               label="เวลา"
               :items="times"
               class="me-4 text-field-rounded width-time"
@@ -100,7 +98,7 @@
             />
             <!-- กรอกจำนวนคนสำหรับอาหารว่างช่วงบ่าย -->
             <v-text-field
-              v-model="breakAfternoon.people"
+              v-model="breakAfternoon.Quantity"
               label="จำนวนคน"
               type="number"
               class="me-4 text-field-rounded width-amount"
@@ -108,7 +106,7 @@
             />
             <!-- กรอกงบประมาณต่อคนสำหรับอาหารว่างช่วงบ่าย -->
             <v-text-field
-              v-model="breakAfternoon.budget"
+              v-model="breakAfternoon.CostPerson"
               class="text-field-rounded width-money"
               label="งบประมาณต่อคน"
               type="number"
@@ -117,32 +115,39 @@
           </div>
 
           <!-- ส่วนของตัวเลือกอาหารกลางวัน -->
-          <h4 class="ms-10 head-more mg-lunch">อาหารกลางวัน</h4>
+          <h4 class="ms-10 head-more">อาหารเที่ยง</h4>
+          <v-checkbox
+            class="d-flex flex-wrap ms-8 mg-break"
+            label="อาหารกลางวัน"
+            v-model="isEnableLunch"
+          />
           <div class="d-flex flex-wrap">
             <!-- เลือกเวลาอาหารกลางวัน -->
             <v-select
-              v-model="lunch.time"
+              v-model="lunch!.Serve_Time"
               label="เวลา"
               :items="times"
               class="me-4 text-field-rounded width-time mt-2"
               :menu-props="{ maxHeight: 200 }"
+              :disabled="!isEnableLunch"
             />
             <!-- กรอกจำนวนคนสำหรับอาหารกลางวัน -->
             <v-text-field
-              v-model="lunch.people"
+              v-model="lunch!.Quantity"
               label="จำนวนคน"
               type="number"
               class="me-4 text-field-rounded width-amount mt-2"
+              :disabled="!isEnableLunch"
             />
             <!-- กรอกงบประมาณต่อคนสำหรับอาหารกลางวัน -->
             <v-text-field
-              v-model="lunch.budget"
+              v-model="lunch!.CostPerson"
               class="text-field-rounded width-money mt-2"
               label="งบประมาณต่อคน"
               type="number"
+              :disabled="!isEnableLunch"
             />
           </div>
-
           <!-- ส่วนรายละเอียดเพิ่มเติม -->
           <div>
             <h1 class="head-more ms-10">รายละเอียดเพิ่มเติม</h1>
@@ -160,12 +165,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+// -----------------------------
+// Import Modules and Types
+// -----------------------------
+import { useOrderDetialStore } from "@/stores/orderStore"; // ใช้งาน store สำหรับจัดการ OrderDetail
+import type { OrderDetail } from "@/types/orderDetail"; // ประเภทข้อมูลสำหรับ OrderDetail
+import { computed, ref, watch } from "vue"; // เครื่องมือของ Vue สำหรับ reactive และการติดตามค่า
 
-const isEnableBreakMorning = ref(false);
-const isEnableBreakmidday = ref(false);
-const isEnableBreakAfternoon = ref(false);
-// ตัวเลือกเวลาที่สามารถเลือกได้ในฟอร์ม
+// -----------------------------
+// Store Initialization
+// -----------------------------
+const orderStore = useOrderDetialStore(); // สร้าง store สำหรับจัดการคำสั่งซื้อ
+
+// -----------------------------
+// Reactive Variables
+// -----------------------------
+// ตัวแปร boolean สำหรับเปิด-ปิดฟอร์มแต่ละส่วน
+const isEnableBreakMorning = ref(false); // สถานะเปิด/ปิดของอาหารว่างช่วงเช้า
+const isEnableBreakmidday = ref(false); // สถานะเปิด/ปิดของอาหารว่างช่วงกลางวัน
+const isEnableBreakAfternoon = ref(false); // สถานะเปิด/ปิดของอาหารว่างช่วงบ่าย
+const isEnableLunch = ref(false); // สถานะเปิด/ปิดของอาหารกลางวัน
+
+// ตัวเลือกเวลาที่สามารถเลือกได้
 const times = ref([
   "-",
   "08:00",
@@ -191,31 +212,92 @@ const times = ref([
   "18:00",
   "18:30",
 ]);
-// ตัวแปรเก็บข้อมูลสำหรับอาหารว่างช่วงเช้า กลางวัน บ่าย และอาหารกลางวัน
-const breakMorning = ref({
-  time: "-",
-  people: 0,
-  budget: 0,
+
+// ตัวแปร reactive สำหรับเก็บข้อมูลของอาหารแต่ละช่วงเวลา
+const breakMorning = ref<OrderDetail>({
+  Serve_Time: "-",
+  Serve_Name: "พักเบรคเช้า",
+  Serve_Categories: "อาหารว่าง",
 });
 
-const breakLunch = ref({
-  time: "-",
-  people: 0,
-  budget: 0,
+const breakLunch = ref<OrderDetail>({
+  Serve_Time: "-",
+  Serve_Name: "พักเบรคเที่ยง",
+  Serve_Categories: "อาหารว่าง",
 });
 
-const breakAfternoon = ref({
-  time: "-",
-  people: 0,
-  budget: 0,
+const breakAfternoon = ref<OrderDetail>({
+  Serve_Time: "-",
+  Serve_Name: "พักเบรคบ่าย",
+  Serve_Categories: "อาหารว่าง",
 });
 
-const lunch = ref({
-  time: "-",
-  people: 0,
-  budget: 0,
+const lunch = ref<OrderDetail>({
+  Serve_Time: "-",
+  Serve_Name: "อาหารเที่ยง",
+  Serve_Categories: "อาหารเที่ยง",
 });
+
+// -----------------------------
+// Watchers
+// -----------------------------
+// Watch สำหรับตรวจสอบการเปลี่ยนแปลงของตัวแปรเปิด/ปิดในแต่ละส่วน
+
+// ตรวจสอบสถานะอาหารว่างช่วงเช้า
+watch(isEnableBreakMorning, async (newValue, oldValue) => {
+  console.log(`เช็คเช้า: จาก ${oldValue} เป็น ${newValue}`);
+  if (newValue === true) {
+    console.log(typeof breakMorning.value.Quantity); // ตรวจสอบประเภทข้อมูล
+    await orderStore.orders.push(breakMorning.value); // เพิ่มข้อมูลเข้า orders
+  } else {
+    // ลบข้อมูลออกจาก orders
+    orderStore.orders = orderStore.orders.filter(
+      (order) => order.Serve_Name !== breakMorning.value.Serve_Name
+    );
+  }
+});
+
+// ตรวจสอบสถานะอาหารว่างช่วงกลางวัน
+watch(isEnableBreakmidday, async (newValue, oldValue) => {
+  console.log(`เช็คกลางวัน: จาก ${oldValue} เป็น ${newValue}`);
+  if (newValue === true) {
+    await orderStore.orders.push(breakLunch.value); // เพิ่มข้อมูลเข้า orders
+  } else {
+    // ลบข้อมูลออกจาก orders
+    orderStore.orders = orderStore.orders.filter(
+      (order) => order.Serve_Name !== breakLunch.value.Serve_Name
+    );
+  }
+});
+
+// ตรวจสอบสถานะอาหารว่างช่วงบ่าย
+watch(isEnableBreakAfternoon, async (newValue, oldValue) => {
+  console.log(`เช็คบ่าย: จาก ${oldValue} เป็น ${newValue}`);
+  if (newValue === true) {
+    await orderStore.orders.push(breakAfternoon.value); // เพิ่มข้อมูลเข้า orders
+  } else {
+    // ลบข้อมูลออกจาก orders
+    orderStore.orders = orderStore.orders.filter(
+      (order) => order.Serve_Name !== breakAfternoon.value.Serve_Name
+    );
+  }
+});
+
+// ตรวจสอบสถานะอาหารกลางวัน
+watch(isEnableLunch, async (newValue, oldValue) => {
+  console.log(`อาหารกลางวัน: จาก ${oldValue} เป็น ${newValue}`);
+  if (newValue === true) {
+    await orderStore.orders.push(lunch.value); // เพิ่มข้อมูลเข้า orders
+  } else {
+    // ลบข้อมูลออกจาก orders
+    orderStore.orders = orderStore.orders.filter(
+      (order) => order.Serve_Name !== lunch.value.Serve_Name
+    );
+  }
+});
+
 </script>
+
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
