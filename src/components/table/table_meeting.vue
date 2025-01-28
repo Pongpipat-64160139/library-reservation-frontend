@@ -654,7 +654,7 @@ async function loadedReserveRoom(selectedDate: string) {
 function getCellClass(roomId: number, time: string) {
   const bookings = nrbStore.bookings; // ดึงรายการจองทั้งหมด
   const isBook = bookings.find(
-    (b) => b.room_id === roomId && time >= b.start_time && time <= b.end_time
+    (b) => b.room_id === roomId && time >= b.start_time && time <= b.end_time && b.re_status !== "ยกเลิก"
   );
 
   // หา index ของเวลาเริ่มต้นและสิ้นสุด
@@ -678,7 +678,7 @@ function getCellClass(roomId: number, time: string) {
         rowspan: endIndex - startIndex + 1, // คำนวณจำนวนแถวที่ต้องรวม
         isStart: true, // ระบุว่าเป็นแถวแรก
         isHidden: false, // ไม่ต้องซ่อนแถว
-        text: `${isBook.user_name}`, // ข้อความที่แสดงในเซลล์
+        text: `${isBook.userId}`, // ข้อความที่แสดงในเซลล์
       };
     } else if (
       bookings.find((book) => book.room_id === roomId && book.re_status == "รอ")
@@ -688,7 +688,7 @@ function getCellClass(roomId: number, time: string) {
         rowspan: endIndex - startIndex + 1, // คำนวณจำนวนแถวที่ต้องรวม
         isStart: true, // ระบุว่าเป็นแถวแรก
         isHidden: false, // ไม่ต้องซ่อนแถว
-        text: `${isBook.user_name}`,
+        text: `${isBook.userId}`,
       };
     }
   }

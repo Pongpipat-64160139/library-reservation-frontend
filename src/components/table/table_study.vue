@@ -579,7 +579,7 @@ const timeSlots = [
 function getCellClass(roomId: number, time: string) {
   const bookings = nrbStore.bookings; // ดึงรายการจองทั้งหมด
   const isBook = bookings.find(
-    (b) => b.room_id === roomId && time >= b.start_time && time <= b.end_time
+    (b) => b.room_id === roomId && time >= b.start_time && time <= b.end_time && b.re_status !== "ยกเลิก"
   );
 
   // หา index ของเวลาเริ่มต้นและสิ้นสุด
