@@ -4,73 +4,53 @@
     <v-container>
       <v-row justify="center" align="center">
         <!-- Dropdown เลือกประเภทห้อง -->
-        <v-col
-          class="d-flex justify-center"
-          cols="auto"
-          style="margin-right: 100px"
-        >
-          <v-select
-            v-model="selectedPage"
-            class="width-dd v-selectcolor"
-            label="ประเภทห้อง"
-            :items="typeroom"
-            @update:model-value="onSelectChange"
-          />
+        <v-col class="d-flex justify-center" cols="auto" style="margin-right: 100px">
+          <v-select v-model="selectedPage" class="size-dropdown v-selectcolor" label="ประเภทห้อง" :items="typeroom"
+            @update:model-value="onSelectChange" />
         </v-col>
 
         <!-- ปฏิทินสำหรับเลือกวันที่การจองห้อง -->
         <v-col class="d-flex justify-center" cols="auto">
-          <vue-flatpickr
-            v-model="selectedDate"
-            class="text-center btn-date"
-            :config="flatpickrConfig"
-          />
+          <vue-flatpickr v-model="selectedDate" class="text-center btn-date" :config="flatpickrConfig" />
         </v-col>
       </v-row>
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง ศึกษากลุ่มมัลติมีเดีย (STV) -->
-    <h1 class="font-head mg-left">
-      ชั้น 6 ห้อง ศึกษากลุ่มมัลติมีเดีย (STV)
-      <v-icon class="mg-icon"> mdi-multimedia </v-icon>
+    <h1 class="text-head mg-left mg-leftfloor">
+      <div class="title-left">
+        ชั้น 6 ห้อง ศึกษากลุ่มมัลติมีเดีย (STV)
+        <v-icon class="mg-icon"> mdi-multimedia </v-icon>
+      </div>
+
+      <div class="mg-rightfloor">
+        <div class="color-currently"></div>
+        <span class="status-text">กำลังใช้งาน</span>
+        <div class="color-waiting ms-5"></div>
+        <span class="status-text">รอใช้งาน</span>
+      </div>
     </h1>
+
     <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="font-table">เวลา</th>
-            <th
-              v-for="room in stv"
-              :key="room.roomId"
-              class="room-column font-table"
-            >
+            <th class="text-table">เวลา</th>
+            <th v-for="room in stv" :key="room.roomId" class="room-column text-table">
               {{ room.roomName }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(time, timeIndex) in timeSlots"
-            :key="time"
-            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
-          >
-            <td class="time-column font-table">
+          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
+            <td class="time-column text-table">
               {{ time }}
             </td>
-            <td
-              v-for="(room, roomIndex) in stv"
-              :key="roomIndex"
-              class="room9-column"
-              :class="getCellClass(room.roomId, time)?.class"
-              :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden"
-              @click="selectRoom(room.roomId)"
-            >
+            <td v-for="(room, roomIndex) in stv" :key="roomIndex" class="room9-column"
+              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(room.roomId)">
               {{ getCellClass(room.roomId, time)?.text }}
-              <a
-                :href="generateBookingLink(roomIndex, time, 6, 'stv')"
-                class="table-link"
-              ></a>
+              <a :href="generateBookingLink(roomIndex, time, 6, 'stv')" class="table-link"></a>
             </td>
           </tr>
         </tbody>
@@ -78,43 +58,39 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง LIBRA OKE -->
-    <h1 class="font-head mg-left">
-      ชั้น 6 ห้อง LIBRA OKE
-      <v-icon class="mg-icon"> mdi-microphone-variant </v-icon>
+    <h1 class="text-head mg-left mg-leftfloor">
+      <div>
+        ชั้น 6 ห้อง LIBRA OKE
+        <v-icon class="mg-icon"> mdi-microphone-variant </v-icon>
+      </div>
+
+      <div class="mg-rightfloor">
+        <div class="color-currently"></div>
+        <span class="status-text">กำลังใช้งาน</span>
+        <div class="color-waiting ms-5"></div>
+        <span class="status-text">รอใช้งาน</span>
+      </div>
     </h1>
     <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="time-column font-table">เวลา</th>
-            <th v-for="room in oke" :key="room.roomId" class="font-table">
+            <th class="time-column text-table">เวลา</th>
+            <th v-for="room in oke" :key="room.roomId" class="text-table">
               {{ room.roomName }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(time, timeIndex) in timeSlots"
-            :key="time"
-            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
-          >
-            <td class="time-column font-table">
+          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
+            <td class="time-column text-table">
               {{ time }}
             </td>
-            <td
-              v-for="(room, roomIndex) in oke"
-              :key="roomIndex"
-              class="room2-column"
-              :class="getCellClass(room.roomId, time)?.class"
-              :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden"
-              @click="selectRoom(room.roomId)"
-            >
+            <td v-for="(room, roomIndex) in oke" :key="roomIndex" class="room2-column"
+              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(room.roomId)">
               {{ getCellClass(room.roomId, time)?.text }}
-              <a
-                :href="generateBookingLink(roomIndex, time, 6, 'oke')"
-                class="table-link"
-              ></a>
+              <a :href="generateBookingLink(roomIndex, time, 6, 'oke')" class="table-link"></a>
             </td>
           </tr>
         </tbody>
@@ -122,48 +98,40 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง Mini Theater -->
-    <h1 class="font-head mg-left">
-      ชั้น 6 ห้อง MINI THEATER
-      <v-icon class="mg-icon"> mdi-theater </v-icon>
+    <h1 class="text-head mg-left mg-leftfloor">
+      <div>
+        ชั้น 6 ห้อง MINI THEATER
+        <v-icon class="mg-icon"> mdi-theater </v-icon>
+      </div>
+
+      <div class="mg-rightfloor">
+        <div class="color-currently"></div>
+        <span class="status-text">กำลังใช้งาน</span>
+        <div class="color-waiting ms-5"></div>
+        <span class="status-text">รอใช้งาน</span>
+      </div>
     </h1>
 
     <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="time-column font-table">เวลา</th>
-            <th
-              v-for="room in minitheater"
-              :key="room.roomId"
-              class="font-table"
-            >
+            <th class="time-column text-table">เวลา</th>
+            <th v-for="room in minitheater" :key="room.roomId" class="text-table">
               {{ room.roomName }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(time, timeIndex) in timeSlots"
-            :key="time"
-            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
-          >
-            <td class="time-column font-table">
+          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
+            <td class="time-column text-table">
               {{ time }}
             </td>
-            <td
-              v-for="(room, roomIndex) in minitheater"
-              :key="roomIndex"
-              class="room1-column"
-              :class="getCellClass(room.roomId, time)?.class"
-              :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden"
-              @click="selectRoom(room.roomId)"
-            >
+            <td v-for="(room, roomIndex) in minitheater" :key="roomIndex" class="room1-column"
+              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(room.roomId)">
               {{ getCellClass(room.roomId, time)?.text }}
-              <a
-                :href="generateBookingLink(roomIndex, time, 6, 'minitheater')"
-                class="table-link"
-              ></a>
+              <a :href="generateBookingLink(roomIndex, time, 6, 'minitheater')" class="table-link"></a>
             </td>
           </tr>
         </tbody>
@@ -174,50 +142,78 @@
 </template>
 
 <script lang="ts" setup>
-// ---------------------
-// Import Modules
-// ---------------------
-
-// Vue Composition API - ใช้สำหรับการจัดการสถานะภายใน Component
 import { ref, onMounted, computed, watch } from "vue";
-
-// Vue Router - ใช้สำหรับการนำทางในแอปพลิเคชัน
 import { useRouter } from "vue-router";
 
-// Stores - ใช้สำหรับดึงข้อมูลและจัดการสถานะเกี่ยวกับห้องและการจอง
 import { useRoomStore } from "@/stores/roomStore";
 import { useNormalRoomBookStore } from "@/stores/nrbStore";
 
 import VueFlatpickr from "vue-flatpickr-component";
 import "flatpickr/dist/flatpickr.css";
 import { Thai } from "flatpickr/dist/l10n/th.js";
-/* ---------------------
-   Reactive Data Properties
-   --------------------- */
 
-// ตัวแปรควบคุมการแสดง DatePicker
-const showDatePicker = ref(false);
-
-// ตัวแปรเก็บวันที่ปัจจุบันในรูปแบบของ string
-const currentDate = ref("");
-
-// ตัวแปรเก็บวันหยุดที่ได้รับจาก API หรือข้อมูล
-const holidays = ref<string[]>([]);
-
-// ตัวแปรเก็บวันที่ที่ทำการจองปัจจุบัน
-const currentReserveDate = ref<string>();
-
-/* ---------------------
-   Store Initialization
-   --------------------- */
-
-// ใช้ store เพื่อดึงข้อมูลเกี่ยวกับห้องประชุม
+// Reactive Data Properties
+const router = useRouter();
 const roomStore = useRoomStore();
-
-// ใช้ store เพื่อจัดการการจองห้องประชุม
 const nrbStore = useNormalRoomBookStore();
 
 const selectedDate = ref<string | null>(null);
+const selectedPage = ref("Entertain Room");
+const currentReserveDate = ref<string>();
+const holidays = ref<string[]>([]);
+const showDatePicker = ref(false);
+const currentDate = ref("");
+
+// Computed Properties
+const stv = computed(() => roomStore.stvRooms);
+const oke = computed(() => roomStore.okeRooms);
+const minitheater = computed(() => roomStore.miniTheater);
+
+const timeSlots = [
+  "08:00",
+  "08:30",
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11:30",
+  "12:00",
+  "12:30",
+  "13:00",
+  "13:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+  "16:00",
+  "16:30",
+  "17:00",
+  "17:30",
+  "18:00",
+  "18:30",
+  "19:00",
+  "19:30",
+  "20:00",
+];
+
+const typeroom = [
+  {
+    title: "Group Study Room",
+    icon: "mdi-account-group",
+    to: "/table_study",
+  },
+  {
+    title: "Entertain Room",
+    icon: "mdi-movie-roll",
+    link: "/table_entertain",
+  },
+  {
+    title: "Meeting Room",
+    icon: "mdi-laptop-account",
+    link: "/table_meeting",
+  },
+];
 
 const flatpickrConfig = ref({
   locale: Thai,
@@ -327,6 +323,7 @@ const flatpickrConfig = ref({
   },
 });
 
+// Functions
 function parseThaiDate(thaiDateString: string): Date | null {
   const thaiMonths = [
     "มกราคม",
@@ -359,22 +356,6 @@ function parseThaiDate(thaiDateString: string): Date | null {
   return new Date(christianYear, monthIndex, parseInt(day));
 }
 
-watch(selectedDate, (newDate) => {
-  if (newDate) {
-    const parsedDate = parseThaiDate(newDate);
-    if (parsedDate && !isNaN(parsedDate.getTime())) {
-      const formattedDate = formatDate(parsedDate);
-      currentReserveDate.value = formattedDate;
-      console.log("Selected New date:", currentReserveDate.value);
-      loadedReserveRoom(currentReserveDate.value);
-    } else {
-      console.error("Invalid date format:", newDate);
-    }
-  } else {
-    console.error("No date selected");
-  }
-});
-
 function formatDate(date: Date | string) {
   const d = new Date(date);
   if (isNaN(d.getTime())) {
@@ -385,18 +366,6 @@ function formatDate(date: Date | string) {
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
-}
-
-function getCurrentReserveDate() {
-  if (selectedDate.value === null) {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-    currentReserveDate.value = `${year}-${month}-${day}`;
-    console.log("Reserve Date: " + currentReserveDate.value);
-    return currentReserveDate;
-  }
 }
 
 const fetchHolidays = async (year: string) => {
@@ -424,41 +393,19 @@ const fetchHolidays = async (year: string) => {
   }
 };
 
-const allowedDates = (date: unknown) => {
-  if (!(date instanceof Date)) return false;
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const formattedDate = `${year}-${month}-${day}`;
-
-  const isHoliday = holidays.value.includes(formattedDate);
-
-  return !isHoliday;
-};
-
-onMounted(async () => {
-  try {
-    const currentYear = new Date().getFullYear().toString();
-    fetchHolidays(currentYear);
-    await roomStore.filteredEntertainRooms();
-    await getCurrentReserveDate();
-    await loadedReserveRoom(currentReserveDate.value!);
-  } catch (error) {
-    console.error("Error loading data:", error);
-  }
-});
-
-// โหลดข้อมูลการจองห้องของวัน เดือน ปี นั้นๆ
 async function loadedReserveRoom(selectedDate: string) {
   const loadedRoom = await nrbStore.getStatusReserve(selectedDate);
   nrbStore.bookings = loadedRoom;
 }
-// แสดงข้อมูลการจองห้อง ทั้งหมดในตารางนั้นๆ
+
 function getCellClass(roomId: number, time: string) {
   const bookings = nrbStore.bookings; // ดึงรายการจองทั้งหมด
   const isBook = bookings.find(
-    (b) => b.room_id === roomId && time >= b.start_time && time <= b.end_time && b.re_status !== "ยกเลิก"
+    (b) =>
+      b.room_id === roomId &&
+      time >= b.start_time &&
+      time <= b.end_time &&
+      b.re_status !== "ยกเลิก"
   );
 
   // หา index ของเวลาเริ่มต้นและสิ้นสุด
@@ -508,92 +455,6 @@ function getCellClass(roomId: number, time: string) {
   }
 }
 
-const getDayClass = (day: { date: Date }) => {
-  const date = new Date(day.date);
-  const formattedDay = `${date.getFullYear()}-${String(
-    date.getMonth() + 1
-  ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-
-  const isHoliday = holidays.value.includes(formattedDay);
-  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-
-  return isHoliday || isWeekend ? "holiday" : "";
-};
-
-const handleDateSelect = (date: string | null) => {
-  selectedDate.value = date;
-  showDatePicker.value = false;
-};
-
-const getCurrentDate = () => {
-  const date = new Date();
-
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  };
-
-  const formatter = new Intl.DateTimeFormat("th-TH", options);
-  currentDate.value = formatter.format(date);
-};
-
-getCurrentDate();
-
-const router = useRouter();
-const selectedPage = ref("Entertain Room");
-
-const timeSlots = [
-  "08:00",
-  "08:30",
-  "09:00",
-  "09:30",
-  "10:00",
-  "10:30",
-  "11:00",
-  "11:30",
-  "12:00",
-  "12:30",
-  "13:00",
-  "13:30",
-  "14:00",
-  "14:30",
-  "15:00",
-  "15:30",
-  "16:00",
-  "16:30",
-  "17:00",
-  "17:30",
-  "18:00",
-  "18:30",
-  "19:00",
-  "19:30",
-  "20:00",
-];
-
-const typeroom = [
-  {
-    title: "Group Study Room",
-    icon: "mdi-account-group",
-    to: "/table_study",
-  },
-  {
-    title: "Entertain Room",
-    icon: "mdi-movie-roll",
-    link: "/table_entertain",
-  },
-  {
-    title: "Meeting Room",
-    icon: "mdi-laptop-account",
-    link: "/table_meeting",
-  },
-];
-
-const stv = computed(() => roomStore.stvRooms);
-const oke = computed(() => roomStore.okeRooms);
-const minitheater = computed(() => roomStore.miniTheater);
-
 const onSelectChange = (value: string) => {
   console.log("Selected value:", value);
   if (value === "Group Study Room") {
@@ -608,9 +469,6 @@ const onSelectChange = (value: string) => {
   }
 };
 
-const goToFormStudy = () => {
-  router.push("/booking_study");
-};
 async function selectRoom(roomIndex: number) {
   const rooms = roomStore.entertainRooms;
 
@@ -652,10 +510,10 @@ const generateBookingLink = (
     roomType === "stv"
       ? stv.value
       : roomType === "oke"
-      ? oke.value
-      : roomType === "minitheater"
-      ? minitheater.value
-      : [];
+        ? oke.value
+        : roomType === "minitheater"
+          ? minitheater.value
+          : [];
 
   if (rooms[roomIndex]?.roomName) {
     roomName = rooms[roomIndex].roomName;
@@ -671,6 +529,97 @@ const generateBookingLink = (
     roomName
   )}&time=${time}&roomType=Entertain`;
 };
+
+watch(selectedDate, (newDate) => {
+  if (newDate) {
+    const parsedDate = parseThaiDate(newDate);
+    if (parsedDate && !isNaN(parsedDate.getTime())) {
+      const formattedDate = formatDate(parsedDate);
+      currentReserveDate.value = formattedDate;
+      console.log("Selected New date:", currentReserveDate.value);
+      loadedReserveRoom(currentReserveDate.value);
+    } else {
+      console.error("Invalid date format:", newDate);
+    }
+  } else {
+    console.error("No date selected");
+  }
+});
+
+function getCurrentReserveDate() {
+  if (selectedDate.value === null) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    currentReserveDate.value = `${year}-${month}-${day}`;
+    console.log("Reserve Date: " + currentReserveDate.value);
+    return currentReserveDate;
+  }
+}
+
+const getCurrentDate = () => {
+  const date = new Date();
+
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  };
+
+  const formatter = new Intl.DateTimeFormat("th-TH", options);
+  currentDate.value = formatter.format(date);
+};
+
+getCurrentDate();
+
+// Lifecycle Hooks
+onMounted(async () => {
+  try {
+    const currentYear = new Date().getFullYear().toString();
+    fetchHolidays(currentYear);
+    await roomStore.filteredEntertainRooms();
+    await getCurrentReserveDate();
+    await loadedReserveRoom(currentReserveDate.value!);
+  } catch (error) {
+    console.error("Error loading data:", error);
+  }
+});
+
+// const allowedDates = (date: unknown) => {
+//   if (!(date instanceof Date)) return false;
+
+//   const year = date.getFullYear();
+//   const month = String(date.getMonth() + 1).padStart(2, "0");
+//   const day = String(date.getDate()).padStart(2, "0");
+//   const formattedDate = `${year}-${month}-${day}`;
+
+//   const isHoliday = holidays.value.includes(formattedDate);
+
+//   return !isHoliday;
+// };
+
+// const getDayClass = (day: { date: Date }) => {
+//   const date = new Date(day.date);
+//   const formattedDay = `${date.getFullYear()}-${String(
+//     date.getMonth() + 1
+//   ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+//   const isHoliday = holidays.value.includes(formattedDay);
+//   const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+
+//   return isHoliday || isWeekend ? "holiday" : "";
+// };
+
+// const handleDateSelect = (date: string | null) => {
+//   selectedDate.value = date;
+//   showDatePicker.value = false;
+// };
+
+// const goToFormStudy = () => {
+//   router.push("/booking_study");
+// };
 </script>
 -
 
@@ -687,31 +636,31 @@ const generateBookingLink = (
 }
 
 .booked {
-  background-color: rgb(196, 196, 196); /* สีสำหรับสถานะ "รอ" */
-  color: #493628; /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
-  text-align: center !important; /* จัดกลางแนวนอน */
-  vertical-align: middle !important; /* จัดกลางแนวตั้ง */
-  display: table-cell !important; /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
-  height: 100% !important; /* ใช้พื้นที่เต็ม */
+  background-color: rgb(196, 196, 196);
+  color: #493628;
+  text-align: center !important;
+  vertical-align: middle !important;
+  display: table-cell !important;
+  height: 100% !important;
 }
 
 .confirmed {
-  background-color: #b5cfb7; /* สีเขียวสำหรับการจอง */
-  color: #493628; /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
+  background-color: #b5cfb7;
+  color: #493628;
   text-align: center;
-  vertical-align: middle !important; /* จัดกลางแนวตั้ง */
-  display: table-cell !important; /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
-  height: 100% !important; /* ใช้พื้นที่เต็ม */
+  vertical-align: middle !important;
+  display: table-cell !important;
+  height: 100% !important;
 }
 
-.font-head {
+.text-head {
   font-weight: 600;
   font-size: 20px;
   padding-top: 20px;
   padding-bottom: 35px;
 }
 
-.font-table {
+.text-table {
   font-weight: 400;
   font-size: 12px;
 }
@@ -755,28 +704,19 @@ const generateBookingLink = (
 
 .table-bordered td {
   height: 20px;
-  /* ความสูงของเซลล์ */
   padding: 0;
-  /* กำจัด Padding */
   text-align: center;
   vertical-align: middle;
-  /* จัดข้อความให้อยู่กลาง */
   overflow: hidden;
   position: relative;
-  /* เพื่อให้ลูกของ td อยู่ในตำแหน่งที่สัมพันธ์กัน */
 }
 
 .table-link {
   display: block;
-  /* ให้คลุมพื้นที่ทั้งหมดของเซลล์ */
   height: 100%;
-  /* ความสูงเต็มเซลล์ */
   width: 100%;
-  /* ความกว้างเต็มเซลล์ */
   text-decoration: none;
-  /* ลบเส้นใต้ */
   background-color: transparent;
-  /* ไม่มีพื้นหลังเริ่มต้น */
   font-size: 12px;
 }
 
@@ -798,6 +738,11 @@ const generateBookingLink = (
   background-color: #e2dad6;
 }
 
+.row-even,
+.row-odd {
+  cursor: pointer;
+}
+
 .mg-toppage {
   margin-top: -600px;
 }
@@ -815,12 +760,7 @@ const generateBookingLink = (
   z-index: 1;
 }
 
-.row-even,
-.row-odd {
-  cursor: pointer;
-}
-
-.width-dd {
+.size-dropdown {
   width: 300px;
 }
 
@@ -860,19 +800,6 @@ const generateBookingLink = (
   color: #493628;
 }
 
-.btn-date {
-  width: 300px;
-  background-color: #f5eded;
-  border: 1px solid #493628;
-  height: 57px;
-  border-radius: 5px;
-}
-
-.calendar-icon {
-  margin-left: 50px;
-  font-size: 20px;
-}
-
 .v-date-picker :deep(.v-btn) {
   font-size: 10px !important;
   width: 20px !important;
@@ -897,5 +824,39 @@ const generateBookingLink = (
 .mg-icon {
   margin-bottom: 10px;
   margin-left: 5px;
+}
+
+.mg-leftfloor {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mg-rightfloor {
+  display: flex;
+  align-items: center;
+  margin-right: 170px;
+}
+
+.color-currently {
+  width: 15px;
+  height: 15px;
+  background-color: #b5cfb7;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.color-waiting {
+  width: 15px;
+  height: 15px;
+  background-color: rgb(196, 196, 196);
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.status-text {
+  font-size: 16px;
+  color: #493628;
+  font-weight: bold;
 }
 </style>
