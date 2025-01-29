@@ -11,7 +11,7 @@
         >
           <v-select
             v-model="selectedPage"
-            class="wth-typeroom v-selectcolor"
+            class="size-dropdown v-selectcolor"
             label="ประเภทห้อง"
             :items="typeroom"
             @update:model-value="onSelectChange"
@@ -30,19 +30,28 @@
     </v-container>
 
     <!-- ตารางจองห้องชั้น 3 -->
-    <h1 class="font-head mg-left">
-      ชั้น 3 ห้อง ศึกษากลุ่ม
-      <v-icon class="mg-icon"> mdi-account-group </v-icon>
+    <h1 class="text-head mg-left mg-leftfloor">
+      <div>
+        ชั้น 3 ห้อง ศึกษากลุ่ม
+        <v-icon class="mg-icon"> mdi-account-group </v-icon>
+      </div>
+
+      <div class="mg-rightfloor">
+        <div class="color-currently"></div>
+        <span class="status-text">กำลังใช้งาน</span>
+        <div class="color-waiting ms-5"></div>
+        <span class="status-text">รอใช้งาน</span>
+      </div>
     </h1>
     <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="font-table">เวลา</th>
+            <th class="text-table">เวลา</th>
             <th
               v-for="(room, index) in rooms3"
               :key="room.roomId"
-              class="room-column font-table"
+              class="room-column text-table"
             >
               {{ room.roomName }}
               <v-icon class="mg-icontbl"> mdi-television </v-icon>
@@ -55,7 +64,7 @@
             :key="time"
             :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
           >
-            <td class="time-column font-table">
+            <td class="time-column text-table">
               {{ time }}
             </td>
             <td
@@ -79,19 +88,28 @@
     </v-container>
 
     <!-- ตารางจองห้องชั้น 4 -->
-    <h1 class="font-head mg-left">
-      ชั้น 4 ห้อง ศึกษากลุ่ม
-      <v-icon class="mg-icon"> mdi-account-group </v-icon>
+    <h1 class="text-head mg-left mg-leftfloor">
+      <div>
+        ชั้น 4 ห้อง ศึกษากลุ่ม
+        <v-icon class="mg-icon"> mdi-account-group </v-icon>
+      </div>
+
+      <div class="mg-rightfloor">
+        <div class="color-currently"></div>
+        <span class="status-text">กำลังใช้งาน</span>
+        <div class="color-waiting ms-5"></div>
+        <span class="status-text">รอใช้งาน</span>
+      </div>
     </h1>
     <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="time-column font-table">เวลา</th>
+            <th class="time-column text-table">เวลา</th>
             <th
               v-for="(room, index) in rooms4"
               :key="room.roomId"
-              class="font-table"
+              class="text-table"
             >
               {{ room.roomName }}
               <v-icon v-if="index === 3 || index === 4" class="ms-2">
@@ -106,7 +124,7 @@
             :key="time"
             :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
           >
-            <td class="time-column font-table">
+            <td class="time-column text-table">
               {{ time }}
             </td>
             <td
@@ -130,19 +148,28 @@
     </v-container>
 
     <!-- ตารางจองห้องชั้น 5 -->
-    <h1 class="font-head mg-left">
-      ชั้น 5 ห้อง ศึกษากลุ่ม
-      <v-icon class="mg-icon"> mdi-account-group </v-icon>
+    <h1 class="text-head mg-left mg-leftfloor">
+      <div>
+        ชั้น 5 ห้อง ศึกษากลุ่ม
+        <v-icon class="mg-icon"> mdi-account-group </v-icon>
+      </div>
+
+      <div class="mg-rightfloor">
+        <div class="color-currently"></div>
+        <span class="status-text">กำลังใช้งาน</span>
+        <div class="color-waiting ms-5"></div>
+        <span class="status-text">รอใช้งาน</span>
+      </div>
     </h1>
     <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
-            <th class="time-column font-table">เวลา</th>
+            <th class="time-column text-table">เวลา</th>
             <th
               v-for="(room, index) in rooms5"
               :key="room.roomId"
-              class="font-table"
+              class="text-table"
             >
               {{ room.roomName }}
               <v-icon v-if="index === 3 || index === 4" class="ms-2">
@@ -157,7 +184,7 @@
             :key="time"
             :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
           >
-            <td class="time-column font-table">
+            <td class="time-column text-table">
               {{ time }}
             </td>
             <td
@@ -579,7 +606,11 @@ const timeSlots = [
 function getCellClass(roomId: number, time: string) {
   const bookings = nrbStore.bookings; // ดึงรายการจองทั้งหมด
   const isBook = bookings.find(
-    (b) => b.room_id === roomId && time >= b.start_time && time <= b.end_time && b.re_status !== "ยกเลิก"
+    (b) =>
+      b.room_id === roomId &&
+      time >= b.start_time &&
+      time <= b.end_time &&
+      b.re_status !== "ยกเลิก"
   );
 
   // หา index ของเวลาเริ่มต้นและสิ้นสุด
@@ -640,14 +671,14 @@ function getCellClass(roomId: number, time: string) {
   color: #493628;
 }
 
-.font-head {
+.text-head {
   font-weight: 600;
   font-size: 20px;
   padding-top: 20px;
   padding-bottom: 35px;
 }
 
-.font-table {
+.text-table {
   font-weight: 400;
   font-size: 12px;
 }
@@ -673,7 +704,7 @@ function getCellClass(roomId: number, time: string) {
   margin-left: 7px;
 }
 
-.wth-typeroom {
+.size-dropdown {
   width: 300px;
 }
 
@@ -690,12 +721,16 @@ function getCellClass(roomId: number, time: string) {
 }
 
 .table-bordered td {
-  height: 20px; /* ความสูงของเซลล์ */
-  padding: 0; /* กำจัด Padding */
+  height: 20px;
+  /* ความสูงของเซลล์ */
+  padding: 0;
+  /* กำจัด Padding */
   text-align: center;
-  vertical-align: middle; /* จัดข้อความให้อยู่กลาง */
+  vertical-align: middle;
+  /* จัดข้อความให้อยู่กลาง */
   overflow: hidden;
-  position: relative; /* เพื่อให้ลูกของ td อยู่ในตำแหน่งที่สัมพันธ์กัน */
+  position: relative;
+  /* เพื่อให้ลูกของ td อยู่ในตำแหน่งที่สัมพันธ์กัน */
 }
 
 .table-bordered thead th {
@@ -704,16 +739,22 @@ function getCellClass(roomId: number, time: string) {
 }
 
 .table-link {
-  display: block; /* ให้คลุมพื้นที่ทั้งหมดของเซลล์ */
-  height: 100%; /* ความสูงเต็มเซลล์ */
-  width: 100%; /* ความกว้างเต็มเซลล์ */
-  text-decoration: none; /* ลบเส้นใต้ */
-  background-color: transparent; /* ไม่มีพื้นหลังเริ่มต้น */
+  display: block;
+  /* ให้คลุมพื้นที่ทั้งหมดของเซลล์ */
+  height: 100%;
+  /* ความสูงเต็มเซลล์ */
+  width: 100%;
+  /* ความกว้างเต็มเซลล์ */
+  text-decoration: none;
+  /* ลบเส้นใต้ */
+  background-color: transparent;
+  /* ไม่มีพื้นหลังเริ่มต้น */
   font-size: 12px;
 }
 
 .table-link:hover {
-  background-color: #edb3bc; /* สีพื้นหลังเมื่อชี้เมาส์ */
+  background-color: #edb3bc;
+  /* สีพื้นหลังเมื่อชี้เมาส์ */
 }
 
 .time-column {
@@ -775,20 +816,87 @@ function getCellClass(roomId: number, time: string) {
 }
 
 .booked {
-  background-color: rgb(196, 196, 196); /* สีสำหรับสถานะ "รอ" */
-  color: #493628; /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
-  text-align: center !important; /* จัดกลางแนวนอน */
-  vertical-align: middle !important; /* จัดกลางแนวตั้ง */
-  display: table-cell !important; /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
-  height: 100% !important; /* ใช้พื้นที่เต็ม */
+  background-color: rgb(196, 196, 196);
+  /* สีสำหรับสถานะ "รอ" */
+  color: #493628;
+  /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
+  text-align: center !important;
+  /* จัดกลางแนวนอน */
+  vertical-align: middle !important;
+  /* จัดกลางแนวตั้ง */
+  display: table-cell !important;
+  /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
+  height: 100% !important;
+  /* ใช้พื้นที่เต็ม */
 }
 
 .confirmed {
-  background-color: #b5cfb7; /* สีเขียวสำหรับการจอง */
-  color: #493628; /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
+  background-color: #b5cfb7;
+  /* สีเขียวสำหรับการจอง */
+  color: #493628;
+  /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
   text-align: center;
-  vertical-align: middle !important; /* จัดกลางแนวตั้ง */
-  display: table-cell !important; /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
-  height: 100% !important; /* ใช้พื้นที่เต็ม */
+  vertical-align: middle !important;
+  /* จัดกลางแนวตั้ง */
+  display: table-cell !important;
+  /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
+  height: 100% !important;
+  /* ใช้พื้นที่เต็ม */
+}
+
+.color-currently {
+  width: 15px;
+  height: 15px;
+  background-color: #b5cfb7;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.color-waiting {
+  width: 15px;
+  height: 15px;
+  background-color: rgb(196, 196, 196);
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.status-text {
+  font-size: 16px;
+  color: #493628;
+  font-weight: bold;
+}
+
+.mg-leftfloor {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mg-rightfloor {
+  display: flex;
+  align-items: center;
+  margin-right: 170px;
+}
+
+.color-currently {
+  width: 15px;
+  height: 15px;
+  background-color: #b5cfb7;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.color-waiting {
+  width: 15px;
+  height: 15px;
+  background-color: rgb(196, 196, 196);
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.status-text {
+  font-size: 16px;
+  color: #493628;
+  font-weight: bold;
 }
 </style>
