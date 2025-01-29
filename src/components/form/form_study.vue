@@ -136,49 +136,7 @@
           class="width-formroom text-field-rounded"
         />
       </span>
-      <span class="d-flex">
-        <h1 class="mg-repeat head1-title">ทำซ้ำ</h1>
-        <v-select
-          v-model="repeatOption"
-          :items="['ไม่', 'ทำซ้ำ']"
-          outlined
-          label=""
-          class="width-formrepeat text-field-rounded"
-        />
-        <h1 class="mg-date3 head1-title">สิ้นสุด</h1>
-        <v-menu
-          v-model="endRepeatMenu"
-          v-model:return-value="endRepeatDate"
-          :close-on-content-click="false"
-          transition="scale-transition"
-          offset-y
-        >
-          <template #activator="{ props }">
-            <v-text-field
-              class="width-formtime3 text-field-rounded"
-              v-bind="props"
-              :value="
-                endRepeatDate
-                  ? formatDate(endRepeatDate)
-                  : formatDate(new Date())
-              "
-              readonly
-              :disabled="repeatOption === 'ไม่'"
-            />
-          </template>
-          <v-date-picker
-            v-model="endRepeatDate"
-            :allowed-dates="allowedDates"
-            :min="new Date().toISOString().split('T')[0]"
-            @update:model-value="
-              (val) => {
-                endRepeatDate = val;
-                endRepeatMenu = false;
-              }
-            "
-          />
-        </v-menu>
-      </span>
+     
 
       <!-- span4 -->
       <span class="d-flex">
@@ -253,12 +211,9 @@ const startMenu = ref(false); // เมนูเริ่มต้น
 const endMenu = ref(false); // เมนูสิ้นสุด
 const startDate = ref<Date | null>(null); // วันที่เริ่มต้น
 const endDate = ref<Date | null>(null); // วันที่สิ้นสุด
-const endRepeatMenu = ref(false); // เมนูทำซ้ำ
-const endRepeatDate = ref<Date | null>(null); // วันที่สิ้นสุดการทำซ้ำ
-const startTime = ref(""); // เวลาเริ่มต้น
+ const startTime = ref(""); // เวลาเริ่มต้น
 const endTime = ref(""); // เวลาสิ้นสุด
 const floor = ref<number>(); // ชั้นของห้อง
-const repeatOption = ref("ไม่"); // ตัวเลือกการทำซ้ำ
 const listparticipants = ref<string[]>([]); // รายชื่อผู้เข้าร่วม
 const currentDate = ref(""); // วันที่ปัจจุบัน
 const saveSelectRoom = ref<GetRoomType>(); // ห้องที่ถูกเลือก
@@ -375,7 +330,6 @@ const allowedDates = (date: Date) => {
 const handleDateUpdate = (val: any) => {
   startDate.value = val;
   endDate.value = val;
-  endRepeatDate.value = val;
   startMenu.value = false;
 };
 
