@@ -136,7 +136,6 @@
           class="width-formroom text-field-rounded"
         />
       </span>
-     
 
       <!-- span4 -->
       <span class="d-flex">
@@ -211,7 +210,7 @@ const startMenu = ref(false); // เมนูเริ่มต้น
 const endMenu = ref(false); // เมนูสิ้นสุด
 const startDate = ref<Date | null>(null); // วันที่เริ่มต้น
 const endDate = ref<Date | null>(null); // วันที่สิ้นสุด
- const startTime = ref(""); // เวลาเริ่มต้น
+const startTime = ref(""); // เวลาเริ่มต้น
 const endTime = ref(""); // เวลาสิ้นสุด
 const floor = ref<number>(); // ชั้นของห้อง
 const listparticipants = ref<string[]>([]); // รายชื่อผู้เข้าร่วม
@@ -466,6 +465,7 @@ async function submitBookingRoom() {
       repeat_End_Flag: currentDate.value,
       details: formDetail.value!,
       reason: "",
+
       roomId: saveSelectRoom.value?.roomId!,
     };
     console.log(normalRoomBooking.value);
@@ -483,6 +483,7 @@ async function submitBookingRoom() {
       repeat_End_Flag: formatDate,
       details: formDetail.value!,
       reason: "",
+      cancelTime: "",
       roomId: saveSelectRoom.value?.roomId!,
     };
     console.log(normalRoomBooking.value);
