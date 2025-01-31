@@ -465,6 +465,7 @@ async function submitBookingRoom() {
       repeat_End_Flag: currentDate.value,
       details: formDetail.value!,
       reason: "",
+      cancelTime: "",
       roomId: saveSelectRoom.value?.roomId!,
     };
     console.log(normalRoomBooking.value);
@@ -482,6 +483,7 @@ async function submitBookingRoom() {
       repeat_End_Flag: formatDate,
       details: formDetail.value!,
       reason: "",
+      cancelTime: "",
       roomId: saveSelectRoom.value?.roomId!,
     };
     console.log(normalRoomBooking.value);

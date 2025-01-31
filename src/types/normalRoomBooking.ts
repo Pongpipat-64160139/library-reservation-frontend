@@ -24,7 +24,7 @@ export interface NormalRoomBooking {
 
   reason?: string;
 
-  // cancelTime?: string;
+  cancelTime?: string;
 }
 export interface getStatusReserved {
   userId: number;
