@@ -54,7 +54,7 @@
             {{ item.room_name }}
           </td>
           <td>
-            {{ item.start_date }}
+            {{ formatThaiDate(item.start_date) }}
           </td>
           <td>{{ item.start_time }} - {{ item.end_time }}</td>
           <td class="align-center justify-center">
@@ -265,7 +265,7 @@
         />
       </v-card-text>
       <v-card-actions class="d-flex justify-center mg-topdiastatus">
-        <v-btn class="btn-cancelreason" text @click="clearCancelReason">
+        <v-btn class="btn-cancelreason" @click="clearCancelReason">
           ยกเลิก
         </v-btn>
         <v-btn
@@ -354,69 +354,70 @@ onMounted(async () => {
   try {
     const allReserved = await nrbStore.getAllReservedRooms();
     bookingDetails.value = allReserved;
+    formatThaiDate("03-02-2025");
   } catch (error) {
     console.error("Error fetching data:", error);
   }
 });
 
-onMounted(() => {
-  // ตรวจสอบเวลาทุกวินาที
-  // setInterval(() => {
-  //   const now = new Date();
-  //   bookingDetails.value.forEach(async (item) => {
-  //     if (item.reseve_status === "รอ") {
-  //       try {
-  //         // ตรวจสอบรูปแบบ startDate และแปลงเป็น Date Object
-  //         const startDateParts = item.start_date.split(" "); // แยกวันที่
-  //         const [day, month, year] = [
-  //           startDateParts[1], // วันที่
-  //           startDateParts[2], // เดือน
-  //           startDateParts[3], // ปี
-  //         ];
-  //         const thaiMonths = [
-  //           "มกราคม",
-  //           "กุมภาพันธ์",
-  //           "มีนาคม",
-  //           "เมษายน",
-  //           "พฤษภาคม",
-  //           "มิถุนายน",
-  //           "กรกฎาคม",
-  //           "สิงหาคม",
-  //           "กันยายน",
-  //           "ตุลาคม",
-  //           "พฤศจิกายน",
-  //           "ธันวาคม",
-  //         ];
-  //         const monthIndex = thaiMonths.indexOf(month); // แปลงเดือนภาษาไทยเป็น index
-  //         if (monthIndex === -1) throw new Error("Invalid month in startDate");
-  //         // สร้าง Date Object
-  //         const startDate = new Date(
-  //           parseInt(year) - 543, // แปลง พ.ศ. เป็น ค.ศ.
-  //           monthIndex,
-  //           parseInt(day)
-  //         );
-  //         // แปลง startTime เป็นชั่วโมงและนาที
-  //         const [hours, minutes] = item.start_time.split(":").map(Number);
-  //         startDate.setHours(hours, minutes); // เพิ่มเวลาเริ่มในวันที่
-  //         // คำนวณเวลาที่เหลือ
-  //         const diff = now.getTime() - startDate.getTime(); // คำนวณ ms
-  //         const diffMinutes = diff / (1000 * 60); // แปลงเป็นนาที
-  //         // หากเวลาผ่านไปเกิน 2 นาที
-  //         // if (diffMinutes > 15) {
-  //         //   // อัปเดตสถานะใน backend
-  //         //   await nrbStore.updateStatus(item.reserved_Id, "ยกเลิก");
-  //         //   // อัปเดตสถานะใน local state
-  //         //   item.status = "ยกเลิก";
-  //         //   item.cancelReason = "หมดเวลาที่กำหนด"; // เพิ่มเหตุผล
-  //         //   item.cancelTime = now.toTimeString().slice(0, 5); // เวลา cancel
-  //         // }
-  //       } catch (error) {
-  //         // console.error(`Error processing item ${item.numb}:`, error);
-  //       }
-  //     }
-  //   });
-  // }, 1000);
-});
+// onMounted(() => {
+//   // ตรวจสอบเวลาทุกวินาที
+//   setInterval(() => {
+//     const now = new Date();
+//     bookingDetails.value.forEach(async (item) => {
+//       if (item.reseve_status === "รอ") {
+//         try {
+//           // ตรวจสอบรูปแบบ startDate และแปลงเป็น Date Object
+//           const startDateParts = item.start_date.split(" "); // แยกวันที่
+//           const [day, month, year] = [
+//             startDateParts[1], // วันที่
+//             startDateParts[2], // เดือน
+//             startDateParts[3], // ปี
+//           ];
+//           const thaiMonths = [
+//             "มกราคม",
+//             "กุมภาพันธ์",
+//             "มีนาคม",
+//             "เมษายน",
+//             "พฤษภาคม",
+//             "มิถุนายน",
+//             "กรกฎาคม",
+//             "สิงหาคม",
+//             "กันยายน",
+//             "ตุลาคม",
+//             "พฤศจิกายน",
+//             "ธันวาคม",
+//           ];
+//           const monthIndex = thaiMonths.indexOf(month); // แปลงเดือนภาษาไทยเป็น index
+//           if (monthIndex === -1) throw new Error("Invalid month in startDate");
+//           // สร้าง Date Object
+//           const startDate = new Date(
+//             parseInt(year) - 543, // แปลง พ.ศ. เป็น ค.ศ.
+//             monthIndex,
+//             parseInt(day)
+//           );
+//           // แปลง startTime เป็นชั่วโมงและนาที
+//           const [hours, minutes] = item.start_time.split(":").map(Number);
+//           startDate.setHours(hours, minutes); // เพิ่มเวลาเริ่มในวันที่
+//           // คำนวณเวลาที่เหลือ
+//           const diff = now.getTime() - startDate.getTime(); // คำนวณ ms
+//           const diffMinutes = diff / (1000 * 60); // แปลงเป็นนาที
+//           // หากเวลาผ่านไปเกิน 2 นาที
+//           // if (diffMinutes > 15) {
+//           //   // อัปเดตสถานะใน backend
+//           //   await nrbStore.updateStatus(item.reserved_Id, "ยกเลิก");
+//           //   // อัปเดตสถานะใน local state
+//           //   item.status = "ยกเลิก";
+//           //   item.cancelReason = "หมดเวลาที่กำหนด"; // เพิ่มเหตุผล
+//           //   item.cancelTime = now.toTimeString().slice(0, 5); // เวลา cancel
+//           // }
+//         } catch (error) {
+//           // console.error(`Error processing item ${item.numb}:`, error);
+//         }
+//       }
+//     });
+//   }, 1000);
+// });
 
 watch(
   () => editedFloor.value,
@@ -437,9 +438,9 @@ async function LoadingData() {
   }
 }
 
-const formatThaiDate = (dateString: string | number | Date) => {
-  const dateObj = new Date(dateString);
-  const days = [
+function formatThaiDate(dateString: string) {
+  // Array ของวันในสัปดาห์ภาษาไทย
+  const thaiDays = [
     "อาทิตย์",
     "จันทร์",
     "อังคาร",
@@ -448,8 +449,8 @@ const formatThaiDate = (dateString: string | number | Date) => {
     "ศุกร์",
     "เสาร์",
   ];
-
-  const months = [
+  // Array ของชื่อเดือนภาษาไทย
+  const thaiMonths = [
     "มกราคม",
     "กุมภาพันธ์",
     "มีนาคม",
@@ -463,14 +464,17 @@ const formatThaiDate = (dateString: string | number | Date) => {
     "พฤศจิกายน",
     "ธันวาคม",
   ];
+  // แยกค่าจากรูปแบบ "dd-mm-yyyy"
+  const [day, month, year] = dateString.split("-").map(Number);
 
-  const day = days[dateObj.getDay()];
-  const date = dateObj.getDate();
-  const month = months[dateObj.getMonth()];
-  const year = dateObj.getFullYear() + 543; // แปลงเป็น พ.ศ.
+  const dateObj = new Date(year, month - 1, day);
+  const dayIndex = dateObj.getDay();
 
-  return `${day} ${date} ${month} ${year}`;
-};
+  // จัดรูปแบบข้อความให้สวยงาม
+  return `วัน${thaiDays[dayIndex]} ที่ ${day} ${thaiMonths[month - 1]} พ.ศ. ${
+    year + 543
+  }`;
+}
 
 const formatTime = (time: string): string => {
   return time.slice(0, 5);
