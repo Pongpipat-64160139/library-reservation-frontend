@@ -20,7 +20,7 @@ export interface NormalRoomBooking {
 
   details: string;
 
-  roomId: number;
+  roomBooking: Room;
 
   reason?: string;
 
@@ -36,4 +36,18 @@ export interface getStatusReserved {
   end_date: string;
   end_time: string;
   re_status: string;
+  cancelTime: string;
+}
+export interface UpdateNormalRoomBooking {
+  startDate: string; // วันที่เริ่มต้น (รูปแบบ DD-MM-YYYY)
+  startTime: string; // เวลาที่เริ่มต้น (รูปแบบ HH:MM:SS)
+  endDate: string; // วันที่สิ้นสุด (รูปแบบ DD-MM-YYYY)
+  endTime: string; // เวลาสิ้นสุด (รูปแบบ HH:MM:SS)
+  repeat_Flag: string; // ตัวบ่งบอกว่าการจองทำซ้ำหรือไม่ (Yes/No)
+  repeat_End_Flag: string; // วันที่สิ้นสุดของการทำซ้ำ (ถ้ามี)
+  reseve_status: string; // สถานะการจอง (รอ, อนุมัติ, ยกเลิก ฯลฯ)
+  details: string; // รายละเอียดของการจอง
+  reason: string; // เหตุผลสำหรับการเปลี่ยนแปลง/ยกเลิก (ถ้ามี)
+  roomId: number; // รหัสของห้องที่ถูกจอง
+  cancelTime: string;
 }

@@ -37,7 +37,7 @@
       v-model:sort-by="sortBy"
       :headers="headers"
       :items="filteredData"
-       :sort-desc="[true]"
+      :sort-desc="[true]"
       style="background-color: #cdbba7"
       class="rd-datatable table-text"
     >
@@ -46,26 +46,32 @@
           <td>
             {{ index + 1 }}
           </td>
-          <td>-</td>
+          <td>{{ item.user_name }}</td>
           <td>
-            {{ item.floorNumber }}
+            {{ item.floor_number }}
           </td>
           <td>
-            {{ item.roomName }}
+            {{ item.room_name }}
           </td>
           <td>
-            {{ item.startDate }}
+            {{ item.start_date }}
           </td>
-          <td>{{ item.startTime }} - {{ item.endTime }}</td>
+          <td>{{ item.start_time }} - {{ item.end_time }}</td>
           <td class="align-center justify-center">
             <v-select
-              :model-value="item.status"
+              :model-value="item.reseve_status"
               :items="['รอ', 'อนุมัติ', 'ยกเลิก']"
               variant="outlined"
               density="compact"
               class="size-selectstatus"
-              :disabled="item.status === 'อนุมัติ' || item.status === 'ยกเลิก'"
-              @update:model-value="(val) => handleStatusChange(item, val)"
+              :disabled="
+                item.reseve_status === 'อนุมัติ' ||
+                item.reseve_status === 'ยกเลิก'
+              "
+              @update:model-value="
+                (val) =>
+                  handleStatusChange(item.reserved_Id, val, item.formReserved)
+              "
             />
           </td>
           <td>
@@ -278,26 +284,21 @@
 import { computed, ref, watch, onMounted } from "vue";
 import { useRoomStore } from "@/stores/roomStore";
 import { useNormalRoomBookStore } from "@/stores/nrbStore";
-
-interface BookingDetail {
-  numb: number;
-  floorNumber: string;
-  roomName: string;
-  startDate: string;
-  startTime: string;
-  endDate: string;
-  endTime: string;
-  status: string;
-  details: string;
-  cancelReason: string;
-  cancelTime?: string; // ฟิลด์สำหรับเก็บเวลายกเลิก
-}
+import type { AllReserve } from "@/types/allReserved";
+import { useSpecialRoomStore } from "@/stores/srbStore";
+import type {
+  NormalRoomBooking,
+  UpdateNormalRoomBooking,
+} from "@/types/normalRoomBooking";
+import type { GetSpecialRoomBooking } from "@/types/specialRoomBooking";
+import { useRouter } from "vue-router";
 
 const roomStore = useRoomStore(); // เชื่อม store ห้อง
 const nrbStore = useNormalRoomBookStore(); // เชื่อม store การจอง
+const srbStore = useSpecialRoomStore(); //
+const bookingDetails = ref<AllReserve[]>([]);
 
-const bookingDetails = ref<BookingDetail[]>([]);
-
+const router = useRouter();
 const sortBy = ref([
   { key: "numb", order: "desc" },
   { key: "numb", order: "asc" },
@@ -324,8 +325,13 @@ const dialog = ref(false);
 const selectedItem = ref<any>(null);
 const editMode = ref(false);
 const statusChangeDialog = ref(false);
+
 const newStatus = ref("");
-const itemToUpdate = ref<any>(null);
+
+const itemToUpdateNRB = ref<NormalRoomBooking>();
+const itemToUpdateSRB = ref<GetSpecialRoomBooking>();
+const keepTypeForm = ref<string>();
+
 const cancelReason = ref("");
 const selectedFloor = ref(2); // ค่าเริ่มต้นให้ตรงกับชั้นแรกที่มีในแท็บ
 const editedFloor = ref<number>(0);
@@ -335,7 +341,7 @@ const editedEndTime = ref("");
 
 const filteredData = computed(() => {
   return bookingDetails.value.filter(
-    (item) => parseInt(item.floorNumber) === selectedFloor.value
+    (item) => item.floor_number === selectedFloor.value
   );
 });
 
@@ -346,28 +352,8 @@ const availableRooms = computed(() => {
 // เพิ่มข้อมูลที่มีโครงสร้างตรงกับ `BookingDetail`
 onMounted(async () => {
   try {
-    const reserveResponse = await nrbStore.getAllReserve();
-    if (reserveResponse.data && reserveResponse.data.length > 0) {
-      for (const booking of reserveResponse.data) {
-        const roomId = booking.roomBooking?.roomId;
-        if (roomId) {
-          const roomResponse = await roomStore.getRoomByID(roomId);
-          bookingDetails.value.push({
-            numb: booking.nrbId,
-            floorNumber: roomResponse.floor?.floor_Number || "ไม่มีข้อมูลชั้น",
-            roomName: roomResponse.room_Name || "ไม่มีชื่อห้อง",
-            startDate: formatThaiDate(booking.startDate),
-            startTime: formatTime(booking.startTime),
-            endDate: formatThaiDate(booking.endDate),
-            endTime: formatTime(booking.endTime),
-            status: booking.reseve_status || "ไม่มีสถานะ",
-            details: booking.details || "ไม่มีรายละเอียด",
-            cancelReason: booking.reason || "",
-          });
-        }
-      }
-    }
- 
+    const allReserved = await nrbStore.getAllReservedRooms();
+    bookingDetails.value = allReserved;
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -375,74 +361,62 @@ onMounted(async () => {
 
 onMounted(() => {
   // ตรวจสอบเวลาทุกวินาที
-  setInterval(() => {
-  const now = new Date();
-
-  bookingDetails.value.forEach(async (item) => {
-    if (item.status === "รอ") {
-      try {
-        // ตรวจสอบรูปแบบ startDate และแปลงเป็น Date Object
-        const startDateParts = item.startDate.split(" "); // แยกวันที่
-        const [day, month, year] = [
-          startDateParts[1], // วันที่
-          startDateParts[2], // เดือน
-          startDateParts[3], // ปี
-        ];
-
-        const thaiMonths = [
-          "มกราคม",
-          "กุมภาพันธ์",
-          "มีนาคม",
-          "เมษายน",
-          "พฤษภาคม",
-          "มิถุนายน",
-          "กรกฎาคม",
-          "สิงหาคม",
-          "กันยายน",
-          "ตุลาคม",
-          "พฤศจิกายน",
-          "ธันวาคม",
-        ];
-
-        const monthIndex = thaiMonths.indexOf(month); // แปลงเดือนภาษาไทยเป็น index
-        if (monthIndex === -1) throw new Error("Invalid month in startDate");
-
-        // สร้าง Date Object
-        const startDate = new Date(
-          parseInt(year) - 543, // แปลง พ.ศ. เป็น ค.ศ.
-          monthIndex,
-          parseInt(day)
-        );
-
-        // แปลง startTime เป็นชั่วโมงและนาที
-        const [hours, minutes] = item.startTime.split(":").map(Number);
-
-        startDate.setHours(hours, minutes); // เพิ่มเวลาเริ่มในวันที่
-
-        // คำนวณเวลาที่เหลือ
-        const diff = now.getTime() - startDate.getTime(); // คำนวณ ms
-        const diffMinutes = diff / (1000 * 60); // แปลงเป็นนาที
-
-   
-        // หากเวลาผ่านไปเกิน 2 นาที
-        if (diffMinutes > 15) {
-          // อัปเดตสถานะใน backend
-          await nrbStore.updateStatus(item.numb, "ยกเลิก");
-
-          // อัปเดตสถานะใน local state
-          item.status = "ยกเลิก";
-          item.cancelReason = "หมดเวลาที่กำหนด"; // เพิ่มเหตุผล
-          item.cancelTime = now.toTimeString().slice(0, 5); // เวลา cancel
-        }
-      } catch (error) {
-        console.error(`Error processing item ${item.numb}:`, error);
-      }
-    }
-  });
-}, 1000);
-
+  // setInterval(() => {
+  //   const now = new Date();
+  //   bookingDetails.value.forEach(async (item) => {
+  //     if (item.reseve_status === "รอ") {
+  //       try {
+  //         // ตรวจสอบรูปแบบ startDate และแปลงเป็น Date Object
+  //         const startDateParts = item.start_date.split(" "); // แยกวันที่
+  //         const [day, month, year] = [
+  //           startDateParts[1], // วันที่
+  //           startDateParts[2], // เดือน
+  //           startDateParts[3], // ปี
+  //         ];
+  //         const thaiMonths = [
+  //           "มกราคม",
+  //           "กุมภาพันธ์",
+  //           "มีนาคม",
+  //           "เมษายน",
+  //           "พฤษภาคม",
+  //           "มิถุนายน",
+  //           "กรกฎาคม",
+  //           "สิงหาคม",
+  //           "กันยายน",
+  //           "ตุลาคม",
+  //           "พฤศจิกายน",
+  //           "ธันวาคม",
+  //         ];
+  //         const monthIndex = thaiMonths.indexOf(month); // แปลงเดือนภาษาไทยเป็น index
+  //         if (monthIndex === -1) throw new Error("Invalid month in startDate");
+  //         // สร้าง Date Object
+  //         const startDate = new Date(
+  //           parseInt(year) - 543, // แปลง พ.ศ. เป็น ค.ศ.
+  //           monthIndex,
+  //           parseInt(day)
+  //         );
+  //         // แปลง startTime เป็นชั่วโมงและนาที
+  //         const [hours, minutes] = item.start_time.split(":").map(Number);
+  //         startDate.setHours(hours, minutes); // เพิ่มเวลาเริ่มในวันที่
+  //         // คำนวณเวลาที่เหลือ
+  //         const diff = now.getTime() - startDate.getTime(); // คำนวณ ms
+  //         const diffMinutes = diff / (1000 * 60); // แปลงเป็นนาที
+  //         // หากเวลาผ่านไปเกิน 2 นาที
+  //         // if (diffMinutes > 15) {
+  //         //   // อัปเดตสถานะใน backend
+  //         //   await nrbStore.updateStatus(item.reserved_Id, "ยกเลิก");
+  //         //   // อัปเดตสถานะใน local state
+  //         //   item.status = "ยกเลิก";
+  //         //   item.cancelReason = "หมดเวลาที่กำหนด"; // เพิ่มเหตุผล
+  //         //   item.cancelTime = now.toTimeString().slice(0, 5); // เวลา cancel
+  //         // }
+  //       } catch (error) {
+  //         // console.error(`Error processing item ${item.numb}:`, error);
+  //       }
+  //     }
+  //   });
+  // }, 1000);
 });
-
 
 watch(
   () => editedFloor.value,
@@ -451,8 +425,17 @@ watch(
     editedRoom.value = rooms ? rooms[0] : "";
   }
 );
-
-
+watch(selectedFloor, (newSelect) => {
+  LoadingData(); // โหลดข้อมูลตามชั้นใหม่ทุกครั้งที่เลือก ชั้น
+});
+async function LoadingData() {
+  try {
+    const allReserved = await nrbStore.getAllReservedRooms();
+    bookingDetails.value = allReserved;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
 
 const formatThaiDate = (dateString: string | number | Date) => {
   const dateObj = new Date(dateString);
@@ -492,6 +475,14 @@ const formatThaiDate = (dateString: string | number | Date) => {
 const formatTime = (time: string): string => {
   return time.slice(0, 5);
 };
+function getCurrentTime(): string {
+  const now = new Date();
+  const hours = now.getHours().toString().padStart(2, "0"); // ทำให้เป็น 2 หลัก
+  const minutes = now.getMinutes().toString().padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
+console.log(getCurrentTime()); // ตัวอย่าง output: "14:30"
 
 const getDetailMessage = (status: string, currentItem: any) => {
   if (status === "ยกเลิก") {
@@ -505,48 +496,66 @@ const getDetailMessage = (status: string, currentItem: any) => {
   return "-";
 };
 
-const handleStatusChange = (item: BookingDetail, newStatusValue: string) => {
-  itemToUpdate.value = item;
+const handleStatusChange = async (
+  id: number,
+  newStatusValue: string,
+  typeForm: string
+) => {
+  keepTypeForm.value = typeForm;
   newStatus.value = newStatusValue;
+  if (typeForm == "normal") {
+    itemToUpdateNRB.value = await nrbStore.findOneReserve(id);
+  } else if (typeForm == "special") {
+    itemToUpdateSRB.value = await srbStore.getOneById(id);
+  }
   statusChangeDialog.value = true; // เปิด Dialog ยืนยัน
 };
+function formatDateToDDMMYYYY(dateString: string): string {
+  const [year, month, day] = dateString.split("-");
+  return `${day}-${month}-${year}`;
+}
 
 const confirmStatusChange = async () => {
-  if (itemToUpdate.value) {
-    try {
-      // เรียกใช้งาน updateStatus เพื่ออัปเดตสถานะไปยัง backend
-      const updatedBooking = await nrbStore.updateStatus(
-        itemToUpdate.value.numb,
-        newStatus.value
-      );
-
-      // อัปเดตสถานะใน local state
-      const bookingIndex = bookingDetails.value.findIndex(
-        (booking) => booking.numb === itemToUpdate.value.numb
-      );
-      if (bookingIndex !== -1) {
-        // อัปเดตสถานะใน local state
-        bookingDetails.value[bookingIndex].status = newStatus.value;
+  try {
+    if (newStatus.value == "อนุมัติ") {
+      if (keepTypeForm.value == "normal") {
+        const updateStatus = await nrbStore.updateStatus(
+          itemToUpdateNRB.value?.nrbId!,
+          newStatus.value
+        );
+        LoadingData();
+      } else if (keepTypeForm.value == "special") {
+        const updateStatus = await srbStore.updateReseveStatus(
+          itemToUpdateSRB.value?.srb_Id!,
+          newStatus.value
+        );
+        LoadingData();
       }
-
-      // หากสถานะเป็น "ยกเลิก" ให้บันทึกเหตุผลและเวลา
-      if (newStatus.value === "ยกเลิก") {
-        const now = new Date();
-        const formattedTime = `${now
-          .getHours()
-          .toString()
-          .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
-        bookingDetails.value[bookingIndex].cancelReason = cancelReason.value;
-        bookingDetails.value[bookingIndex].cancelTime = formattedTime;
+    } else if (newStatus.value == "ยกเลิก") {
+      if (keepTypeForm.value == "normal") {
+        const updateReseve = await nrbStore.cancelReseved(
+          itemToUpdateNRB.value?.nrbId!,
+          cancelReason.value,
+          newStatus.value,
+          getCurrentTime()
+        );
+        LoadingData();
+      } else if (keepTypeForm.value == "special") {
+        const updateReseve = await srbStore.cancelResevedSpecial(
+          itemToUpdateSRB.value?.srb_Id!,
+          newStatus.value,
+          cancelReason.value,
+          getCurrentTime()
+        );
+        LoadingData();
       }
-
-      // ปิด Dialog หลังอัปเดตสำเร็จ
-      statusChangeDialog.value = false;
-      cancelReason.value = ""; // Reset เหตุผล
-    } catch (error) {
-      console.error("Failed to update status:", error);
-      alert("ไม่สามารถเปลี่ยนสถานะได้ กรุณาลองอีกครั้ง");
     }
+    // ปิด Dialog หลังอัปเดตสำเร็จ
+    statusChangeDialog.value = false;
+    cancelReason.value = ""; // Reset เหตุผล
+  } catch (error) {
+    console.error("Failed to update status:", error);
+    alert("ไม่สามารถเปลี่ยนสถานะได้ กรุณาลองอีกครั้ง");
   }
 };
 
@@ -700,7 +709,7 @@ const toggleEditMode = () => {
   }
 };
 
-const showDialog = (item: BookingDetail) => {
+const showDialog = (item: any) => {
   selectedItem.value = { ...item };
   editedFloor.value = parseInt(item.floorNumber); // แปลง `floorNumber` เป็นตัวเลข
   editedRoom.value = item.roomName;
@@ -912,7 +921,6 @@ th {
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
   margin-bottom: 20px;
-
 }
 
 .btn-cancelreason {

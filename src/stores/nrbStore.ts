@@ -3,6 +3,7 @@ import normalBookService from "../services/normalBookService";
 import {
   getStatusReserved,
   NormalRoomBooking,
+  UpdateNormalRoomBooking,
 } from "../types/normalRoomBooking";
 import { ref } from "vue";
 
@@ -18,9 +19,10 @@ export const useNormalRoomBookStore = defineStore("normal-room-booking", () => {
     return await nrbService.getAllRNB();
   }
   async function findOneReserve(id: number) {
-    return await nrbService.getNRBById(id);
+    const res = await nrbService.getNRBById(id);
+    return res.data;
   }
-  async function updateReserve(id: number, nrb: NormalRoomBooking) {
+  async function updateReserve(id: number, nrb: UpdateNormalRoomBooking) {
     try {
       // ตรวจสอบว่ามีการจองอยู่หรือไม่
       const existingBooking = await nrbService.getNRBById(id);
@@ -58,17 +60,33 @@ export const useNormalRoomBookStore = defineStore("normal-room-booking", () => {
     const res = await nrbService.getReservedRoom(currentDate);
     return res.data;
   }
-  async function updateStatus(id: number, status: string) {
-    try {
-      const updatedBooking = await nrbService.updateNRB(id, { reseve_status: status });
-      return updatedBooking.data;
-    } catch (error) {
-      console.error(`Error updating status for booking ID ${id}:`, error);
-      throw error;
-    }
+  async function updateStatus(id: number, updateStatus: string) {
+    const res = await nrbService.updateNRB(id, {
+      reseve_status: updateStatus,
+    });
+    return res.data;
   }
-  
+
+  async function cancelReseved(
+    id: number,
+    updateReason: string,
+    updateStatus: string,
+    newCancelTime: string
+  ) {
+    const res = await nrbService.updateNRB(id, {
+      reseve_status: updateStatus,
+      reason: updateReason,
+      cancelTime: newCancelTime,
+    });
+    return res.data;
+  }
+  async function getAllReservedRooms() {
+    const res = await nrbService.getAllReserved();
+    return res.data;
+  }
   return {
+    updateStatus,
+    getAllReservedRooms,
     createNewBooking,
     getAllReserve,
     findOneReserve,
@@ -76,6 +94,6 @@ export const useNormalRoomBookStore = defineStore("normal-room-booking", () => {
     deleteReserve,
     getStatusReserve,
     bookings,
-    updateStatus
+    cancelReseved,
   };
 });
