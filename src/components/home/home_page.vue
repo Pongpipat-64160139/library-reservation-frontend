@@ -17,15 +17,18 @@
       </span>
 
       <v-slide-group show-arrows class="mg-arrow mg-arrowipad">
-        <v-slide-group-item v-for="(room, index) in studys" :key="index">
+        <v-slide-group-item
+          v-for="(group, index) in groupedStudyRooms"
+          :key="index"
+        >
           <div
             class="ma-4 d-flex flex-column align-center mg-leftimage"
-            @click="openDialog(room)"
+            @click="openDialog(group)"
           >
-            <img :src="room.src" :alt="room.alt" class="slide-image" />
-            <span class="mt-2 text-center room-caption">{{
-              room.caption
-            }}</span>
+            <img :src="group.src" :alt="group.alt" class="slide-image" />
+            <span class="mt-2 text-center room-caption">
+              ห้องศึกษากลุ่ม ชั้น {{ group.floorNumber }}
+            </span>
           </div>
         </v-slide-group-item>
       </v-slide-group>
@@ -44,14 +47,17 @@
       </span>
 
       <v-slide-group show-arrows class="mg-arrow mg-arrowipad">
-        <v-slide-group-item v-for="(room, index) in entertainment" :key="index">
+        <v-slide-group-item
+          v-for="(group, index) in EntertainRooms"
+          :key="index"
+        >
           <div
             class="ma-4 d-flex flex-column align-center"
-            @click="openDialog(room)"
+            @click="openDialog(group)"
           >
-            <img :src="room.src" :alt="room.alt" class="slide-image" />
+            <img :src="group.src" :alt="group.alt" class="slide-image" />
             <span class="mt-2 text-center room-caption">
-              {{ room.caption }}
+              {{ group.roomName }}
             </span>
           </div>
         </v-slide-group-item>
@@ -71,14 +77,14 @@
       </span>
 
       <v-slide-group show-arrows class="ms-1 mg-arrow">
-        <v-slide-group-item v-for="(room, index) in meeting" :key="index">
+        <v-slide-group-item v-for="(group, index) in MeetingRooms" :key="index">
           <div
             class="ma-4 d-flex flex-column align-center"
-            @click="openDialog(room)"
+            @click="openDialog(group)"
           >
-            <img :src="room.src" :alt="room.alt" class="slide-image" />
+            <img :src="group.src" :alt="group.alt" class="slide-image" />
             <span class="mt-2 text-center room-caption">
-              {{ room.caption }}
+              {{ group.roomName }}
             </span>
           </div>
         </v-slide-group-item>
@@ -87,57 +93,43 @@
 
     <v-dialog v-model="dialog" overlay max-width="900px">
       <v-card class="style_dialog">
-        <v-card-title class="headline text-center text-bold mt-8">
-          {{ selectedRoom.caption }}
-        </v-card-title>
-        <v-card-text>
-          <div class="d-flex">
-            <!-- ซ้าย -->
-            <div class="text-left mg-textdialogs">
-              <!-- ไอคอนและข้อความจำนวนห้อง -->
-              <div class="align-center mg-topdialog">
-                <p>จำนวน {{ selectedRoom.count }} ห้อง</p>
-                <img
-                  :src="selectedRoom.gifRoom"
-                  alt="Room GIF"
-                  class="icon-gif me-2"
-                />
-              </div>
-              <div class="align-center mt-16">
-                <p>จำนวน {{ selectedRoom.seats }} ที่นั่ง</p>
-                <img
-                  :src="selectedRoom.gifSeat"
-                  alt="Room GIF"
-                  class="icon-gif me-2"
-                />
-              </div>
-            </div>
+        <!-- แสดงชื่อชั้น -->
 
-            <!-- กลาง -->
+        <v-card-text>
+          <!-- ปุ่มเลือกห้อง (แสดงเฉพาะเมื่อมีห้องจริงๆ) -->
+          <div v-if="selectedGroup?.rooms" class="d-flex justify-center mb-4">
+            <v-btn
+              v-for="(room, index) in selectedGroup.rooms"
+              :key="index"
+              class="ma-2"
+              @click="selectRoom(room)"
+              :class="{
+                'selected-room':
+                  selectedRoom && selectedRoom.roomName === room.roomName,
+              }"
+            >
+              {{ index + 1 }}
+            </v-btn>
+          </div>
+
+          <!-- ข้อมูลห้องที่เลือก -->
+          <div v-if="selectedRoom" class="text-center">
+            <h2>{{ selectedRoom.roomName }}</h2>
+            <p>
+              ที่นั่ง {{ selectedRoom.maxcapacity }} -
+              {{ selectedRoom.capacity }} คน
+            </p>
+            <p>รับกุญแจชั้น {{ selectedRoom.key || "-" }}</p>
             <img
-              :src="selectedRoom.src"
-              :alt="selectedRoom.alt"
+              :src="selectedRoom.src || ''"
+              :alt="selectedRoom.caption || 'ไม่มีภาพ'"
               class="dialog-image mx-auto"
             />
-
-            <!-- ขวา -->
-            <div class="text-left mg-textdialoge">
-              <div class="align-center mg-topdialog">
-                <p>รับกุญแจชั้น {{ selectedRoom.key }}</p>
-                <img :src="key_gif" alt="Dressing Room Icon" class="icon-gif" />
-              </div>
-              <div class="align-center mt-16">
-                <p>ผู้มีสิทธิ์จอง</p>
-                <img
-                  :src="selectedRoom.gifRole"
-                  alt="Room GIF"
-                  class="icon-gif me-2"
-                />
-              </div>
-            </div>
+          </div>
+          <div v-else class="text-center">
+            <p>กรุณาเลือกห้อง</p>
           </div>
         </v-card-text>
-        <v-card-actions />
       </v-card>
     </v-dialog>
   </v-container>
@@ -145,214 +137,30 @@
 </template>
 
 <script lang="ts">
-import room201 from "@/assets/201.png";
-import cyber1 from "@/assets/cyber1.png";
-import cyber2 from "@/assets/cyber2.png";
-import karaoke from "@/assets/karaoke.png";
-import lectureroom from "@/assets/lectureroom.png";
-import liveforlife from "@/assets/liveforlife.png";
-import ministudio from "@/assets/ministudio.png";
-import minitheater from "@/assets/minitheater.png";
-import smartboard from "@/assets/smartboard.png";
-import study3 from "@/assets/study3.png";
-import study4 from "@/assets/study4.png";
-import study5 from "@/assets/study5.png";
-import stv from "@/assets/stv.png";
-import talk_gif from "@/assets/talk.gif";
-import key_gif from "@/assets/key.gif";
-import movie_gif from "@/assets/watching-movie.gif";
-import karaoke_gif from "@/assets/karaoke.gif";
-import cinema_gif from "@/assets/cinema.gif";
-import chair_gif from "@/assets/chair.gif";
-import couch_gif from "@/assets/couch.gif";
-import seat_gif from "@/assets/seats.gif";
-import cyber_gif from "@/assets/cyber.gif";
-import studio_gif from "@/assets/studio.gif";
-import live_gif from "@/assets/live.gif";
-import board_gif from "@/assets/board.gif";
-import lecroom_gif from "@/assets/lecroom.gif";
-import meet201_gif from "@/assets/meet201.gif";
-import university_gif from "@/assets/university.gif";
-import teacher_gif from "@/assets/teacher.gif";
-import officer_gif from "@/assets/officer.gif";
-
-const studys = [
-  {
-    src: study3,
-    alt: "ห้องศึกษากลุ่ม ชั้น 3",
-    caption: "ห้องศึกษากลุ่ม ชั้น 3",
-    key: "2",
-    count: "6",
-    seats: "3-5",
-    eligible: "นักศึกษา",
-    gifRoom: talk_gif,
-    gifSeat: chair_gif,
-    gifRole: university_gif,
-  },
-  {
-    src: study4,
-    alt: "ห้องศึกษากลุ่ม ชั้น 4",
-    caption: "ห้องศึกษากลุ่ม ชั้น 4",
-    key: "4",
-    count: "5",
-    seats: "3-5",
-    eligible: "นักศึกษา",
-    gifRoom: talk_gif,
-    gifSeat: chair_gif,
-    gifRole: university_gif,
-  },
-  {
-    src: study5,
-    alt: "ห้องศึกษากลุ่ม ชั้น 5",
-    caption: "ห้องศึกษากลุ่ม ชั้น 5",
-    key: "4",
-    count: "5",
-    seats: "3-5",
-    eligible: "นักศึกษา",
-    gifRoom: talk_gif,
-    gifSeat: chair_gif,
-    gifRole: university_gif,
-  },
-];
-
-const entertainment = [
-  {
-    src: stv,
-    alt: "ห้องศึกษากลุ่มมัลติมีเดีย (STV) ชั้น 6",
-    caption: "ห้องศึกษากลุ่มมัลติมีเดีย ชั้น 6",
-    key: "6",
-    count: "9",
-    seats: "3-5",
-    eligible: "นักศึกษา",
-    gifRoom: movie_gif,
-    gifSeat: couch_gif,
-    gifRole: university_gif,
-  },
-  {
-    src: karaoke,
-    alt: "LIBRA OKE ชั้น 6",
-    caption: "LIBRA OKE ชั้น 6",
-    key: "6",
-    count: "2",
-    seats: "3-5",
-    eligible: "นักศึกษา",
-    gifRoom: karaoke_gif,
-    gifSeat: couch_gif,
-    gifRole: university_gif,
-  },
-  {
-    src: minitheater,
-    alt: "MINI THEATER ชั้น 6",
-    caption: "MINI THEATER ชั้น 6",
-    key: "6",
-    count: "1",
-    seats: "10-30",
-    eligible: "นักศึกษา",
-    gifRoom: cinema_gif,
-    gifSeat: seat_gif,
-    gifRole: university_gif,
-  },
-];
-
-const meeting = [
-  {
-    src: room201,
-    alt: "ห้อง 201 ชั้น 2",
-    caption: "ห้อง 201 ชั้น 2",
-    key: "2",
-    count: "1",
-    seats: "20-50",
-    eligible: "นักศึกษา",
-    gifRoom: meet201_gif,
-    gifSeat: chair_gif,
-    gifRole: officer_gif,
-  },
-  {
-    src: lectureroom,
-    alt: "ห้อง Lecturer's Room ชั้น 5",
-    caption: "ห้อง Lecturer's Room ชั้น 5",
-    key: "4",
-    count: "3",
-    seats: "3-5",
-    eligible: "นักศึกษา",
-    gifRoom: lecroom_gif,
-    gifSeat: chair_gif,
-    gifRole: teacher_gif,
-  },
-  {
-    src: smartboard,
-    alt: "ห้อง 604 Smart Board ชั้น 6",
-    caption: "ห้อง 604 Smart Board ชั้น 6",
-    key: "6",
-    count: "1",
-    seats: "8-10",
-    eligible: "นักศึกษา",
-    gifRoom: board_gif,
-    gifSeat: chair_gif,
-    gifRole: university_gif,
-  },
-  {
-    src: ministudio,
-    alt: "ห้อง Mini Studio ชั้น 6",
-    caption: "ห้อง Mini Studio ชั้น 6",
-    key: "6",
-    count: "1",
-    seats: "มากกว่า 1",
-    eligible: "นักศึกษา",
-    gifRoom: studio_gif,
-    gifSeat: chair_gif,
-    gifRole: teacher_gif,
-  },
-  {
-    src: cyber1,
-    alt: "ห้อง Cyber Zone I ชั้น 6",
-    caption: "ห้อง Cyber Zone I ชั้น 6",
-    key: "6",
-    count: "1",
-    seats: "ไม่เกิน 70",
-    eligible: "นักศึกษา",
-    gifRoom: cyber_gif,
-    gifSeat: chair_gif,
-    gifRole: officer_gif,
-  },
-  {
-    src: cyber2,
-    alt: "ห้อง Cyber Zone II ชั้น 6",
-    caption: "ห้อง Cyber Zone II ชั้น 6",
-    key: "3",
-    count: "5",
-    seats: "ไม่เกิน 30",
-    eligible: "นักศึกษา",
-    gifRoom: cyber_gif,
-    gifSeat: chair_gif,
-    gifRole: officer_gif,
-  },
-  {
-    src: liveforlife,
-    alt: "ห้อง Live for Life ชั้น 6",
-    caption: "ห้อง Live for Life ชั้น 6",
-    key: "3",
-    count: "5",
-    seats: "มากกว่า 3",
-    eligible: "นักศึกษา",
-    gifRoom: live_gif,
-    gifSeat: chair_gif,
-    gifRole: university_gif,
-  },
-];
+import { ref } from "vue";
+import { useRoomStore } from "@/stores/roomStore";
+import { onMounted } from "vue";
+import lib from "@/assets/lib.png";
 
 interface Room {
-  src: string;
+  roomName: string;
+  floorNumber: number;
+  capacity: number;
+  maxcapacity: number;
+  maxHours: number;
+  status: string;
+  src: 'lib';
   alt: string;
-  caption: string;
+  caption?: string;
   key?: string;
-  count?: string;
-  seats?: string;
-  eligible?: string;
-  gifRoom?: string;
-  gifSeat?: string;
-  gifRole?: string;
 }
+
+interface GroupedRoom {
+  floorNumber: number;
+  rooms: Room[];
+}
+
+const selectedRoom = ref<any>(null);
 
 export default {
   name: "SlideGroupWithStaticImages",
@@ -360,56 +168,196 @@ export default {
   data() {
     return {
       dialog: false,
-      selectedRoom: {
-        caption: "",
-        key: "",
-        count: "",
-        seats: "",
-        eligible: "",
-        src: "",
-        alt: "",
-        gifRoom: "",
-        gifSeat: "",
-        gifRole: "",
-      },
-      studys,
-      entertainment,
-      meeting,
-      talk_gif,
-      key_gif,
-      movie_gif,
-      karaoke_gif,
-      cinema_gif,
-      chair_gif,
-      couch_gif,
-      seat_gif,
-      cyber_gif,
-      studio_gif,
-      live_gif,
-      board_gif,
-      lecroom_gif,
-      meet201_gif,
-      university_gif,
-      teacher_gif,
-      officer_gif,
+      selectedGroup: { rooms: [] as Room[] },
+      selectedRoom: null as Room | null,
+      lib
+    };
+  },
+  setup() {
+    const roomStore = useRoomStore();
+    const groupedByType = ref<any>({});
+
+    onMounted(async () => {
+      try {
+        const rooms = await roomStore.getAllRooms();
+
+        const roomTypeMap: { [key: string]: any[] } = {};
+
+        rooms.data.forEach((room: any) => {
+          const type = room.room_Type;
+          const floorId = room.floor.floorId;
+
+          if (!roomTypeMap[type]) {
+            roomTypeMap[type] = [];
+          }
+
+          if (
+            type === "Group study" &&
+            (floorId === 2 || floorId === 3 || floorId === 4)
+          ) {
+            roomTypeMap[type].push({
+              roomName: room.room_Name,
+              floorNumber: room.floor.floor_Number,
+              capacity: room.capacity,
+              maxcapacity: room.room_Minimum,
+              maxHours: room.max_hours,
+              status: room.room_Status,
+            });
+          }
+
+          if (type === "Entertain" && floorId === 5) {
+            roomTypeMap[type].push({
+              roomName: room.room_Name,
+              floorNumber: room.floor.floor_Number,
+              capacity: room.capacity,
+              maxcapacity: room.room_Minimum,
+              maxHours: room.max_hours,
+              status: room.room_Status,
+            });
+          }
+
+          if (
+            type === "Meeting" &&
+            (floorId === 1 || floorId === 4 || floorId === 5 || floorId === 6)
+          ) {
+            roomTypeMap[type].push({
+              roomName: room.room_Name,
+              floorNumber: room.floor.floor_Number,
+              capacity: room.capacity,
+              maxcapacity: room.room_Minimum,
+              maxHours: room.max_hours,
+              status: room.room_Status,
+            });
+          }
+        });
+
+        if (roomTypeMap["Group study"]) {
+          roomTypeMap["Group study"].sort(
+            (a, b) => a.floorNumber - b.floorNumber
+          );
+        }
+
+        groupedByType.value = roomTypeMap;
+        console.log("📌 ห้องแยกตามประเภท:", groupedByType.value);
+      } catch (error) {
+        console.error("❌ เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
+      }
+    });
+
+    return {
+      groupedByType,
     };
   },
 
+  computed: {
+    groupedStudyRooms() {
+      const roomMap = new Map();
+
+      this.groupedByType["Group study"]?.forEach((room: any) => {
+        if (!roomMap.has(room.floorNumber)) {
+          roomMap.set(room.floorNumber, []);
+        }
+        roomMap.get(room.floorNumber).push(room);
+      });
+
+      const floors = Array.from(roomMap.keys());
+
+      floors.sort((a, b) => a - b);
+
+      return floors.map((floorNumber) => {
+        return {
+          floorNumber,
+          rooms: roomMap.get(floorNumber) || [],
+        };
+      });
+    },
+    EntertainRooms() {
+      const roomMap = new Map();
+
+      this.groupedByType["Entertain"]?.forEach((room: any) => {
+        let mainRoomName = "";
+
+        if (room.roomName.includes("LIBRA OKE")) {
+          mainRoomName = "LIBRA OKE";
+        } else if (room.roomName === "Mini theater") {
+          mainRoomName = "Mini theater";
+        } else if (room.roomName.includes("STV")) {
+          mainRoomName = "ห้องศึกษากลุ่มมัลติมีเดีย STV";
+        }
+
+        if (room.floorNumber) {
+          if (!roomMap.has(mainRoomName)) {
+            roomMap.set(mainRoomName, []);
+          }
+
+          roomMap.get(mainRoomName).push(room);
+        }
+      });
+
+      const mainRoomNames = Array.from(roomMap.keys());
+      mainRoomNames.sort();
+
+      return mainRoomNames.map((roomName) => {
+        return {
+          roomName,
+          rooms: roomMap.get(roomName) || [],
+        };
+      });
+    },
+    MeetingRooms() {
+      const roomMap = new Map();
+
+      this.groupedByType["Meeting"]?.forEach((room: any) => {
+        let mainRoomName = "";
+
+        if (room.roomName.includes("ห้อง 201")) {
+          mainRoomName = "ห้อง 201";
+        } else if (room.roomName.includes("Lecture's room")) {
+          mainRoomName = "Lecture's room";
+        } else if (room.roomName.includes("640 Smart Board")) {
+          mainRoomName = "640 Smart Board";
+        } else if (room.roomName.includes("Mini Studio")) {
+          mainRoomName = "Mini Studio";
+        } else if (room.roomName.includes("CYBER ZONE")) {
+          mainRoomName = "CYBER ZONE";
+        } else if (room.roomName.includes("Live for Life")) {
+          mainRoomName = "Live for Life";
+        } else if (room.roomName.includes("ห้อง")) {
+          mainRoomName = "ห้อง";
+        }
+
+        if (room.floorNumber) {
+          if (!roomMap.has(mainRoomName)) {
+            roomMap.set(mainRoomName, []);
+          }
+
+          roomMap.get(mainRoomName).push(room);
+        }
+      });
+
+      const mainRoomNames = Array.from(roomMap.keys());
+      mainRoomNames.sort();
+
+      return mainRoomNames.map((roomName) => {
+        return {
+          roomName,
+          rooms: roomMap.get(roomName) || [],
+        };
+      });
+    },
+  },
+
   methods: {
-    openDialog(room: Room) {
-      this.selectedRoom = {
-        caption: room.caption || "",
-        key: room.key || "",
-        count: room.count || "",
-        seats: room.seats || "",
-        gifRoom: room.gifRoom || "",
-        gifSeat: room.gifSeat || "",
-        eligible: room.eligible || "",
-        gifRole: room.gifRole || "",
-        src: room.src || "",
-        alt: room.alt || "",
-      };
+    openDialog(group: any) {
+      this.selectedGroup = group || { roomName: "ไม่พบข้อมูลห้อง", rooms: [] };
       this.dialog = true;
+
+      if (this.selectedGroup.rooms && this.selectedGroup.rooms.length > 0) {
+        this.selectedRoom = this.selectedGroup.rooms[0];
+      }
+    },
+    selectRoom(room: any) {
+      this.selectedRoom = room || null;
     },
   },
 };
@@ -443,12 +391,14 @@ export default {
   margin-left: 355px;
   margin-top: 8px;
 }
+
 .regular-entertain-title {
   font-weight: 400;
   font-size: 16px;
   margin-left: 447px;
   margin-top: 8px;
 }
+
 .regular-meeting-title {
   font-weight: 400;
   font-size: 16px;
@@ -491,7 +441,8 @@ export default {
 }
 
 .back-ground {
-  background-color: #f9f3ea; /* พื้นหลังสีหลัก */
+  background-color: #f9f3ea;
+  /* พื้นหลังสีหลัก */
   background-image: url("@/assets/subtle-dark-vertical.png");
   background-repeat: repeat;
   background-size: auto;
@@ -563,6 +514,12 @@ export default {
 .mg-bottomdialog {
   margin-bottom: 10px;
 }
+
+.selected-room {
+  background-color: #493628;
+  color: white;
+}
+
 /* ipad */
 
 @media (max-width: 1024px) {
@@ -587,12 +544,14 @@ export default {
     margin-left: 255px;
     margin-top: 8px;
   }
+
   .regular-entertain-title {
     font-weight: 400;
     font-size: 16px;
     margin-left: 347px;
     margin-top: 8px;
   }
+
   .regular-meeting-title {
     font-weight: 400;
     font-size: 16px;
@@ -630,14 +589,17 @@ export default {
     height: 300px;
     margin: auto;
   }
+
   .icon-gif {
     width: 50px;
     height: 50px;
     margin-top: 10px;
   }
+
   .text-left {
     font-size: 16px;
   }
+
   .mg-textdialogs {
     margin-left: 0px;
   }
@@ -645,6 +607,7 @@ export default {
   .mg-textdialoge {
     margin-right: 0px;
   }
+
   .mg-topdialog {
     margin-top: 20px;
   }
@@ -673,12 +636,14 @@ export default {
     margin-left: 40px;
     margin-top: 5px;
   }
+
   .regular-entertain-title {
     font-weight: 400;
     font-size: 14px;
     margin-left: 123px;
     margin-top: 5px;
   }
+
   .regular-meeting-title {
     font-weight: 400;
     font-size: 14px;
@@ -713,14 +678,17 @@ export default {
     margin: auto;
     padding: 10px;
   }
+
   .icon-gif {
     width: 50px;
     height: 50px;
     margin-top: 10px;
   }
+
   .text-left {
     font-size: 11px;
   }
+
   .mg-textdialogs {
     margin-left: 0px;
   }
@@ -728,6 +696,7 @@ export default {
   .mg-textdialoge {
     margin-right: 0px;
   }
+
   .mg-topdialog {
     margin-top: 20px;
   }
