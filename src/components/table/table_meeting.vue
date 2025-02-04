@@ -1,21 +1,12 @@
 <template>
   <Header_page />
-  <v-container fluid class="back-ground ms-kob">
+  <v-container fluid class="back-ground mg-toppage">
     <v-container>
       <v-row justify="center" align="center">
         <!-- Dropdown เลือกประเภทห้อง -->
-        <v-col
-          class="d-flex justify-center"
-          cols="auto"
-          style="margin-right: 100px"
-        >
-          <v-select
-            v-model="selectedPage"
-            class="width-dd v-selectcolor"
-            label="ประเภทห้อง"
-            :items="typeroom"
-            @update:model-value="onSelectChange"
-          />
+        <v-col class="d-flex justify-center" cols="auto" style="margin-right: 100px">
+          <v-select v-model="selectedPage" class="size-dropdown v-selectcolor" label="ประเภทห้อง" :items="typeroom"
+            @update:model-value="onSelectChange" />
         </v-col>
 
         <!-- ช่องสำหรับปุ่มแสดงวันที่ -->
@@ -24,72 +15,57 @@
             {{
               selectedDate
                 ? new Date(selectedDate).toLocaleDateString("th-TH", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
                 : new Date().toLocaleDateString("th-TH", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
             }}
             <v-icon class="calendar-icon"> mdi-calendar </v-icon>
           </v-btn>
 
-          <v-date-picker
-            v-if="showDatePicker"
-            v-model="selectedDate"
-            class="date-picker-position"
-            :allowed-dates="allowedDates"
-            :day-class="getDayClass"
-            @update:model-value="handleDateSelect"
-            @click:clear="selectedDate = null"
-          />
+          <v-date-picker v-if="showDatePicker" v-model="selectedDate" class="date-picker-position"
+            :allowed-dates="allowedDates" :day-class="getDayClass" @update:model-value="handleDateSelect"
+            @click:clear="selectedDate = null" />
         </v-col>
       </v-row>
     </v-container>
     <!-- ตารางสำหรับชั้น 2 ห้อง 201 -->
-    <h1 class="pt-5 head-title pb-10 ml-left">
-      ชั้น 2 ห้อง 201
-      <v-icon class="mb-1 ms-2"> mdi-lectern </v-icon>
+    <h1 class="text-head mg-left mg-leftfloor">
+      <div class="flex-header">
+        ชั้น 2 ห้อง 201
+        <v-icon class="mg-icon"> mdi-lectern </v-icon>
+        <div class="color-currently"></div>
+        <span class="status-text">กำลังใช้งาน</span>
+        <div class="color-waiting ms-5"></div>
+        <span class="status-text">รอใช้งาน</span>
+      </div>
     </h1>
-    <v-container class="ms-minustop">
+    <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
             <th class="font-table">เวลา</th>
-            <th
-              v-for="(room, index) in twozo"
-              :key="room.roomId"
-              class="room-column font-table"
-            >
+            <th v-for="(room, index) in twozo" :key="room.roomId" class="font-table">
               {{ room.roomName }}
             </th>
           </tr>
         </thead>
 
         <tbody>
-          <tr
-            v-for="(time, timeIndex) in timeSlots"
-            :key="time"
-            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
-          >
+          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
             <td class="time-column font-table">
               {{ time }}
             </td>
-            <td
-              v-for="(room, roomIndex) in twozo"
-              :key="roomIndex"
-              class="room1-column"
-              @click="selectRoom(room.roomId)"
-            >
-              <a
-                :href="generateBookingLink(roomIndex, time, 2)"
-                class="table-link"
-              />
+            <td v-for="(room, roomIndex) in twozo" :key="roomIndex" class="room1-column"
+              @click="selectRoom(room.roomId)">
+              <a :href="generateBookingLink(roomIndex, time, 2)" class="table-link" />
             </td>
           </tr>
         </tbody>
@@ -97,11 +73,17 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 5 ห้อง Lecturer's Room -->
-    <h1 class="pt-5 head-title pb-10 ml-left">
-      ชั้น 5 ห้อง Lecturer's Room
-      <v-icon class="mb-1 ms-2"> mdi-chair-school </v-icon>
+    <h1 class="text-head mg-left mg-leftfloor">
+      <div class="flex-header">
+        ชั้น 5 ห้อง Lecturer's Room
+        <v-icon class="mg-icon"> mdi-chair-school </v-icon>
+        <div class="color-currently"></div>
+        <span class="status-text">กำลังใช้งาน</span>
+        <div class="color-waiting ms-5"></div>
+        <span class="status-text">รอใช้งาน</span>
+      </div>
     </h1>
-    <v-container class="ms-minustop">
+    <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
@@ -113,28 +95,15 @@
         </thead>
 
         <tbody>
-          <tr
-            v-for="(time, timeIndex) in timeSlots"
-            :key="time"
-            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
-          >
+          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
             <td class="time-column font-table">
               {{ time }}
             </td>
-            <td
-              v-for="(room, roomIndex) in lecture"
-              :key="roomIndex"
-              class="room3-column"
-              :class="getCellClass(room.roomId, time)?.class"
-              :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden"
-              @click="selectRoom(room.roomId)"
-            >
+            <td v-for="(room, roomIndex) in lecture" :key="roomIndex" class="room3-column"
+              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(room.roomId)">
               {{ getCellClass(room.roomId, time)?.text }}
-              <a
-                :href="generateBookingLink(roomIndex, time, 5)"
-                class="table-link"
-              />
+              <a :href="generateBookingLink(roomIndex, time, 5)" class="table-link" />
             </td>
           </tr>
         </tbody>
@@ -142,47 +111,36 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง 604 Smart Board -->
-    <h1 class="pt-5 head-title pb-10 ml-left">
-      ชั้น 6 ห้อง 604 Smart Board
-      <v-icon class="mb-1 ms-2"> mdi-human-male-board-poll </v-icon>
+    <h1 class="text-head mg-left mg-leftfloor">
+      <div class="flex-header">
+        ชั้น 6 ห้อง 604 Smart Board
+        <v-icon class="mg-icon">mdi-human-male-board-poll </v-icon>
+        <div class="color-currently"></div>
+        <span class="status-text">กำลังใช้งาน</span>
+        <div class="color-waiting ms-5"></div>
+        <span class="status-text">รอใช้งาน</span>
+      </div>
     </h1>
-    <v-container class="ms-minustop">
+    <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th
-              v-for="room in smartboard"
-              :key="room.roomId"
-              class="font-table"
-            >
+            <th v-for="room in smartboard" :key="room.roomId" class="font-table">
               {{ room.roomName }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(time, timeIndex) in timeSlots"
-            :key="time"
-            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
-          >
+          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
             <td class="time-column font-table">
               {{ time }}
             </td>
-            <td
-              v-for="(room, roomIndex) in smartboard"
-              :key="roomIndex"
-              class="room1-column"
-              :class="getCellClass(room.roomId, time)?.class"
-              :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden"
-              @click="selectRoom(room.roomId)"
-            >
+            <td v-for="(room, roomIndex) in smartboard" :key="roomIndex" class="room1-column"
+              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(room.roomId)">
               {{ getCellClass(room.roomId, time)?.text }}
-              <a
-                :href="generateBookingLink(roomIndex, time, 5)"
-                class="table-link"
-              />
+              <a :href="generateBookingLink(roomIndex, time, 5)" class="table-link" />
             </td>
           </tr>
         </tbody>
@@ -190,47 +148,36 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง Mini Studio -->
-    <h1 class="pt-5 head-title pb-10 ml-left">
-      ชั้น 6 ห้อง Mini Studio
-      <v-icon class="mb-1 ms-2"> mdi-monitor-account </v-icon>
+    <h1 class="text-head mg-left mg-leftfloor">
+      <div class="flex-header">
+        ชั้น 6 ห้อง Mini Studio
+        <v-icon class="mg-icon">mdi-monitor-account </v-icon>
+        <div class="color-currently"></div>
+        <span class="status-text">กำลังใช้งาน</span>
+        <div class="color-waiting ms-5"></div>
+        <span class="status-text">รอใช้งาน</span>
+      </div>
     </h1>
-    <v-container class="ms-minustop">
+    <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th
-              v-for="room in ministudio"
-              :key="room.roomId"
-              class="font-table"
-            >
+            <th v-for="room in ministudio" :key="room.roomId" class="font-table">
               {{ room.roomName }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(time, timeIndex) in timeSlots"
-            :key="time"
-            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
-          >
+          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
             <td class="time-column font-table">
               {{ time }}
             </td>
-            <td
-              v-for="(room, roomIndex) in ministudio"
-              :key="roomIndex"
-              class="room1-column"
-              :class="getCellClass(room.roomId, time)?.class"
-              :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden"
-              @click="selectRoom(room.roomId)"
-            >
+            <td v-for="(room, roomIndex) in ministudio" :key="roomIndex" class="room1-column"
+              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(room.roomId)">
               {{ getCellClass(room.roomId, time)?.text }}
-              <a
-                :href="generateBookingLink(roomIndex, time, 6)"
-                class="table-link"
-              />
+              <a :href="generateBookingLink(roomIndex, time, 6)" class="table-link" />
             </td>
           </tr>
         </tbody>
@@ -238,11 +185,17 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง Cyber Zone -->
-    <h1 class="pt-5 head-title pb-10 ml-left">
-      ชั้น 6 ห้อง Cyber Zone
-      <v-icon class="mb-1 ms-2"> mdi-desktop-tower-monitor </v-icon>
+    <h1 class="text-head mg-left mg-leftfloor">
+      <div class="flex-header">
+        ชั้น 6 ห้อง Cyber Zone
+        <v-icon class="mg-icon">mdi-monitor</v-icon>
+        <div class="color-currently"></div>
+        <span class="status-text">กำลังใช้งาน</span>
+        <div class="color-waiting ms-5"></div>
+        <span class="status-text">รอใช้งาน</span>
+      </div>
     </h1>
-    <v-container class="ms-minustop">
+    <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
@@ -253,28 +206,15 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(time, timeIndex) in timeSlots"
-            :key="time"
-            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
-          >
+          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
             <td class="time-column font-table">
               {{ time }}
             </td>
-            <td
-              v-for="(room, roomIndex) in cyberzone"
-              :key="roomIndex"
-              class="room2-column"
-              :class="getCellClass(room.roomId, time)?.class"
-              :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden"
-              @click="selectRoom(room.roomId)"
-            >
+            <td v-for="(room, roomIndex) in cyberzone" :key="roomIndex" class="room2-column"
+              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(room.roomId)">
               {{ getCellClass(room.roomId, time)?.text }}
-              <a
-                :href="generateBookingLink(roomIndex, time, 6)"
-                class="table-link"
-              />
+              <a :href="generateBookingLink(roomIndex, time, 6)" class="table-link" />
             </td>
           </tr>
         </tbody>
@@ -282,47 +222,36 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 6 ห้อง Live for Life -->
-    <h1 class="pt-5 head-title pb-10 ml-left">
-      ชั้น 6 ห้อง Live for Life
-      <v-icon class="mb-1 ms-2"> mdi-monitor-account </v-icon>
+    <h1 class="text-head mg-left mg-leftfloor">
+      <div class="flex-header">
+        ชั้น 6 ห้อง Live for Life
+        <v-icon class="mg-icon">mdi-monitor-account</v-icon>
+        <div class="color-currently"></div>
+        <span class="status-text">กำลังใช้งาน</span>
+        <div class="color-waiting ms-5"></div>
+        <span class="status-text">รอใช้งาน</span>
+      </div>
     </h1>
-    <v-container class="ms-minustop">
+    <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th
-              v-for="room in liveforlife"
-              :key="room.roomId"
-              class="font-table"
-            >
+            <th v-for="room in liveforlife" :key="room.roomId" class="font-table">
               {{ room.roomName }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(time, timeIndex) in timeSlots"
-            :key="time"
-            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
-          >
+          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
             <td class="time-column font-table">
               {{ time }}
             </td>
-            <td
-              v-for="(room, roomIndex) in liveforlife"
-              :key="roomIndex"
-              class="room1-column"
-              :class="getCellClass(room.roomId, time)?.class"
-              :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden"
-              @click="selectRoom(room.roomId)"
-            >
+            <td v-for="(room, roomIndex) in liveforlife" :key="roomIndex" class="room1-column"
+              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(room.roomId)">
               {{ getCellClass(room.roomId, time)?.text }}
-              <a
-                :href="generateBookingLink(roomIndex, time, 6)"
-                class="table-link"
-              />
+              <a :href="generateBookingLink(roomIndex, time, 6)" class="table-link" />
             </td>
           </tr>
         </tbody>
@@ -330,43 +259,34 @@
     </v-container>
 
     <!-- ตารางสำหรับชั้น 7 ห้อง ประชุมบุคลากรภายใน -->
-    <h1 class="pt-5 head-title pb-10 ml-left">
-      ชั้น 7 ห้อง ประชุมบุคลากรภายใน
-      <v-icon class="mb-1 ms-2"> mdi-lectern </v-icon>
+    <h1 class="text-head mg-left mg-leftfloor">
+      <div class="flex-header">
+        ชั้น 7 ห้อง ประชุมบุคลากรภายใน
+        <v-icon class="mg-icon">mdi-lectern</v-icon>
+        <div class="color-currently"></div>
+        <span class="status-text">กำลังใช้งาน</span>
+        <div class="color-waiting ms-5"></div>
+        <span class="status-text">รอใช้งาน</span>
+      </div>
     </h1>
-    <v-container class="ms-minustop">
+    <v-container class="mg-btmtbl">
       <v-simple-table class="table-bordered">
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th
-              v-for="room in sevenfloor"
-              :key="room.roomId"
-              class="font-table"
-            >
+            <th v-for="room in sevenfloor" :key="room.roomId" class="font-table">
               {{ room.roomName }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(time, timeIndex) in timeSlots"
-            :key="time"
-            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
-          >
+          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
             <td class="time-column font-table">
               {{ time }}
             </td>
-            <td
-              v-for="(room, roomIndex) in sevenfloor"
-              :key="roomIndex"
-              class="room2-column"
-              @click="selectRoom(room.roomId)"
-            >
-              <a
-                :href="generateBookingLink(roomIndex, time, 7)"
-                class="table-link"
-              />
+            <td v-for="(room, roomIndex) in sevenfloor" :key="roomIndex" class="room2-column"
+              @click="selectRoom(room.roomId)">
+              <a :href="generateBookingLink(roomIndex, time, 7)" class="table-link" />
             </td>
           </tr>
         </tbody>
@@ -432,8 +352,6 @@ const ministudio = computed(() => roomStore.miniStudioRoom);
 const cyberzone = computed(() => roomStore.cyberZoneRooms);
 const liveforlife = computed(() => roomStore.liveForLifeRoom);
 const sevenfloor = computed(() => roomStore.meetingRoomFloor7);
-
-
 
 const fetchHolidays = async (year: string) => {
   const response = await fetch(
@@ -562,7 +480,6 @@ const typeroom = [
   },
 ];
 
-
 const onSelectChange = (value: string) => {
   console.log("Selected value:", value);
   if (value === "Group Study Room") {
@@ -616,14 +533,12 @@ const generateBookingLink = (
   const currentRoom = roomStore.currentTypeRoom;
   // ถ้าห้องอยู่ในชั้น 2 หรือชั้น 7 ให้ไป booking_meeting
   if (currentRoom.floorId + 1 === 2 || currentRoom.floorId + 1 === 7) {
-    return `/booking_meeting?floor=${floor}&room=${
-      roomIndex + 1
-    }&time=${time}&date=${formattedDate}`;
+    return `/booking_meeting?floor=${floor}&room=${roomIndex + 1
+      }&time=${time}&date=${formattedDate}`;
   } else {
     // // ค่าเริ่มต้นสำหรับหน้า booking_study
-    return `/booking_study?floor=${floor}&room=${
-      roomIndex + 1
-    }&time=${time}&date=${formattedDate}`;
+    return `/booking_study?floor=${floor}&room=${roomIndex + 1
+      }&time=${time}&date=${formattedDate}`;
   }
 };
 
@@ -654,7 +569,11 @@ async function loadedReserveRoom(selectedDate: string) {
 function getCellClass(roomId: number, time: string) {
   const bookings = nrbStore.bookings; // ดึงรายการจองทั้งหมด
   const isBook = bookings.find(
-    (b) => b.room_id === roomId && time >= b.start_time && time <= b.end_time && b.re_status !== "ยกเลิก"
+    (b) =>
+      b.room_id === roomId &&
+      time >= b.start_time &&
+      time <= b.end_time &&
+      b.re_status !== "ยกเลิก"
   );
 
   // หา index ของเวลาเริ่มต้นและสิ้นสุด
@@ -757,26 +676,49 @@ watch(selectedDate, (newDate) => {
 }
 
 .booked {
-  background-color: rgb(196, 196, 196); /* สีสำหรับสถานะ "รอ" */
-  color: #493628; /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
-  text-align: center !important; /* จัดกลางแนวนอน */
-  vertical-align: middle !important; /* จัดกลางแนวตั้ง */
-  display: table-cell !important; /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
-  height: 100% !important; /* ใช้พื้นที่เต็ม */
+  background-color: rgb(196, 196, 196);
+  /* สีสำหรับสถานะ "รอ" */
+  color: #493628;
+  /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
+  text-align: center !important;
+  /* จัดกลางแนวนอน */
+  vertical-align: middle !important;
+  /* จัดกลางแนวตั้ง */
+  display: table-cell !important;
+  /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
+  height: 100% !important;
+  /* ใช้พื้นที่เต็ม */
 }
 
 .confirmed {
-  background-color: #b5cfb7; /* สีเขียวสำหรับการจอง */
-  color: #493628; /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
+  background-color: #b5cfb7;
+  /* สีเขียวสำหรับการจอง */
+  color: #493628;
+  /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
   text-align: center;
-  vertical-align: middle !important; /* จัดกลางแนวตั้ง */
-  display: table-cell !important; /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
-  height: 100% !important; /* ใช้พื้นที่เต็ม */
+  vertical-align: middle !important;
+  /* จัดกลางแนวตั้ง */
+  display: table-cell !important;
+  /* ทำให้แน่ใจว่าเป็นเซลล์ของตาราง */
+  height: 100% !important;
+  /* ใช้พื้นที่เต็ม */
 }
 
-.head-title {
+.text-head {
   font-weight: 600;
   font-size: 20px;
+  padding-top: 20px;
+  padding-bottom: 35px;
+}
+
+.mg-left {
+  margin-left: 170px;
+}
+
+.mg-leftfloor {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .font-table {
@@ -831,25 +773,35 @@ watch(selectedDate, (newDate) => {
 }
 
 .table-bordered td {
-  height: 20px; /* ความสูงของเซลล์ */
-  padding: 0; /* กำจัด Padding */
+  height: 20px;
+  /* ความสูงของเซลล์ */
+  padding: 0;
+  /* กำจัด Padding */
   text-align: center;
-  vertical-align: middle; /* จัดข้อความให้อยู่กลาง */
+  vertical-align: middle;
+  /* จัดข้อความให้อยู่กลาง */
   overflow: hidden;
-  position: relative; /* เพื่อให้ลูกของ td อยู่ในตำแหน่งที่สัมพันธ์กัน */
+  position: relative;
+  /* เพื่อให้ลูกของ td อยู่ในตำแหน่งที่สัมพันธ์กัน */
 }
 
 .table-link {
-  display: block; /* ให้คลุมพื้นที่ทั้งหมดของเซลล์ */
-  height: 100%; /* ความสูงเต็มเซลล์ */
-  width: 100%; /* ความกว้างเต็มเซลล์ */
-  text-decoration: none; /* ลบเส้นใต้ */
-  background-color: transparent; /* ไม่มีพื้นหลังเริ่มต้น */
+  display: block;
+  /* ให้คลุมพื้นที่ทั้งหมดของเซลล์ */
+  height: 100%;
+  /* ความสูงเต็มเซลล์ */
+  width: 100%;
+  /* ความกว้างเต็มเซลล์ */
+  text-decoration: none;
+  /* ลบเส้นใต้ */
+  background-color: transparent;
+  /* ไม่มีพื้นหลังเริ่มต้น */
   font-size: 12px;
 }
 
 .table-link:hover {
-  background-color: #edb3bc; /* สีพื้นหลังเมื่อชี้เมาส์ */
+  background-color: #edb3bc;
+  /* สีพื้นหลังเมื่อชี้เมาส์ */
 }
 
 .table-bordered thead th {
@@ -870,11 +822,11 @@ watch(selectedDate, (newDate) => {
   cursor: pointer;
 }
 
-.ms-kob {
+.mg-toppage {
   margin-top: -600px;
 }
 
-.ms-minustop {
+.mg-btmtbl {
   margin-top: -40px;
 }
 
@@ -882,7 +834,7 @@ watch(selectedDate, (newDate) => {
   margin-left: 240px;
 }
 
-.width-dd {
+.size-dropdown {
   width: 300px;
 }
 
@@ -945,5 +897,40 @@ watch(selectedDate, (newDate) => {
 .v-date-picker :deep(.v-picker-title) {
   font-size: 15px !important;
   margin-top: 10px;
+}
+
+.color-currently {
+  width: 15px;
+  height: 15px;
+  background-color: #a2cda5;
+  border-radius: 50%;
+  margin-right: 10px;
+  margin-left: 20px;
+}
+
+.color-waiting {
+  width: 15px;
+  height: 15px;
+  background-color: rgb(196, 196, 196);
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.status-text {
+  font-size: 16px;
+  color: #493628;
+  font-weight: bold;
+}
+
+.flex-header {
+  display: flex;
+  /* ทำให้เนื้อหาทั้งหมดแสดงในแถวเดียว */
+  align-items: center;
+  /* จัดให้เนื้อหาตรงกลางในแนวตั้ง */
+}
+
+.mg-icon {
+  margin-bottom: 10px;
+  margin-left: 5px;
 }
 </style>
