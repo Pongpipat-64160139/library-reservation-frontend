@@ -3,6 +3,7 @@ import normalBookService from "../services/normalBookService";
 import {
   getStatusReserved,
   NormalRoomBooking,
+  PostNormalReseved,
   UpdateNormalRoomBooking,
 } from "../types/normalRoomBooking";
 import { ref } from "vue";
@@ -10,7 +11,7 @@ import { ref } from "vue";
 export const useNormalRoomBookStore = defineStore("normal-room-booking", () => {
   const nrbService = normalBookService;
   const bookings = ref<getStatusReserved[]>([]);
-  async function createNewBooking(nrb: NormalRoomBooking) {
+  async function createNewBooking(nrb: PostNormalReseved) {
     const res = await nrbService.createNRB(nrb);
     const newNRB = res.data;
     return newNRB;

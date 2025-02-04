@@ -1,6 +1,7 @@
 import http from "../axios";
 import {
   NormalRoomBooking,
+  PostNormalReseved,
   UpdateNormalRoomBooking,
 } from "../types/normalRoomBooking";
 
@@ -11,7 +12,7 @@ export function getNRBById(id: number) {
   return http.get(`/normal-room-booking/${id}`);
 }
 
-export function createNRB(nrb: NormalRoomBooking) {
+export function createNRB(nrb: PostNormalReseved) {
   return http.post("/normal-room-booking", nrb);
 }
 

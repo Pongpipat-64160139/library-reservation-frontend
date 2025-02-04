@@ -287,6 +287,7 @@ import { useNormalRoomBookStore } from "@/stores/nrbStore";
 import type { AllReserve } from "@/types/allReserved";
 import { useSpecialRoomStore } from "@/stores/srbStore";
 import type {
+  getStatusReserved,
   NormalRoomBooking,
   UpdateNormalRoomBooking,
 } from "@/types/normalRoomBooking";
@@ -339,6 +340,8 @@ const editedRoom = ref("");
 const editedStartTime = ref("");
 const editedEndTime = ref("");
 
+let intervalId: number | undefined; // เก็บค่า setInterval ID
+
 const filteredData = computed(() => {
   return bookingDetails.value.filter(
     (item) => item.floor_number === selectedFloor.value
@@ -354,7 +357,6 @@ onMounted(async () => {
   try {
     const allReserved = await nrbStore.getAllReservedRooms();
     bookingDetails.value = allReserved;
-    formatThaiDate("03-02-2025");
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -486,8 +488,6 @@ function getCurrentTime(): string {
   return `${hours}:${minutes}`;
 }
 
-console.log(getCurrentTime()); // ตัวอย่าง output: "14:30"
-
 const getDetailMessage = (status: string, currentItem: any) => {
   if (status === "ยกเลิก") {
     return "รอดำเนินการ";
@@ -518,7 +518,46 @@ function formatDateToDDMMYYYY(dateString: string): string {
   const [year, month, day] = dateString.split("-");
   return `${day}-${month}-${year}`;
 }
+function countTime(startTime: string) {
+  const [hour, minutes] = startTime.split(":").map(Number);
+  const sumMinites = hour * 60 + minutes;
+  return sumMinites;
+}
+async function checkResevedCountTime() {
+  const allReseved = ref<AllReserve[]>([]);
+  allReseved.value = await nrbStore.getAllReservedRooms();
+  const ResevedStatusWait = ref<AllReserve[]>([]);
+  ResevedStatusWait.value = allReseved.value.filter(
+    (s) => s.reseve_status === "รอ"
+  );
 
+  for (let i = 0; i < ResevedStatusWait.value.length; i++) {
+    let startTime = countTime(ResevedStatusWait.value[i].start_time);
+    let checkTime = countTime(getCurrentTime());
+
+    if (checkTime >= startTime + 15) {
+      if (ResevedStatusWait.value[i].formReserved == "normal") {
+        const updateCancelReseved = nrbStore.cancelReseved(
+          ResevedStatusWait.value[i].reserved_Id,
+          "หมดเวลาการขอเข้าใช้บริการ",
+          "ยกเลิก",
+          getCurrentTime()
+        );
+        LoadingData();
+        console.log("Canceled Reseve :", updateCancelReseved);
+      }
+    }
+  }
+}
+
+const startAutoUpdate = () => {
+  intervalId = setInterval(() => {
+    console.log("📢 เรียกใช้ฟังก์ชันทุก 30 วินาที");
+    checkResevedCountTime();
+  }, 30000); // 30 วินาที
+};
+// เรียกใช้ function startAutoUpdate
+startAutoUpdate();
 const confirmStatusChange = async () => {
   try {
     if (newStatus.value == "อนุมัติ") {

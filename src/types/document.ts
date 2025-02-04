@@ -1,7 +1,7 @@
-import type { SpecialRoomBooking } from "./specialRoomBooking";
 import { Buffer } from "buffer";
-export interface Document {
-  id: number; // ID หลัก เป็น Primary Key
+
+export interface DocumentFile {
+  id: string | number; // ID หลัก เป็น Primary Key
 
   fileName: string; // ชื่อไฟล์ เช่น "example.pdf"
 
@@ -9,8 +9,7 @@ export interface Document {
 
   fileSize: number; // ขนาดไฟล์ในหน่วย Byte เช่น 1024
 
-  // ใช้ longblob สำหรับเก็บไฟล์ใหญ่ ๆ
-  data: Buffer; // ตัวไฟล์จริงในรูปแบบ Binary
+  uploadedAt: Date; // วันที่อัปโหลดไฟล์
 
-  srb: SpecialRoomBooking;
+  data?: Buffer; // ตัวไฟล์จริงในรูปแบบ Binary (ใช้ `LONGBLOB` ใน MySQL)
 }

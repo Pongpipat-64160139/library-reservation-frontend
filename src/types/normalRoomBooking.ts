@@ -26,6 +26,20 @@ export interface NormalRoomBooking {
 
   cancelTime?: string;
 }
+
+export interface PostNormalReseved {
+  startDate: string;
+  startTime: string;
+  endDate: string;
+  endTime: string;
+  repeat_Flag: string;
+  repeat_End_Flag: string;
+  reseve_status: string;
+  details: string;
+  reason: string;
+  cancelTime: string;
+  roomId: number;
+}
 export interface getStatusReserved {
   userId: number;
   user_name: string;

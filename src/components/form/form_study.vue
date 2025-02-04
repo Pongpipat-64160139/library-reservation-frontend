@@ -181,7 +181,7 @@ import { useParticipantStore } from "@/stores/participant";
 
 // Types
 import type { GetRoomType } from "@/types/getRoomType";
-import type { NormalRoomBooking } from "@/types/normalRoomBooking";
+import type { NormalRoomBooking, PostNormalReseved } from "@/types/normalRoomBooking";
 import type { Room } from "@/types/room";
 import type { UBPostpayload, UserBooking } from "@/types/userBooking";
 import type { User } from "@/types/user";
@@ -216,7 +216,7 @@ const floor = ref<number>(); // ชั้นของห้อง
 const listparticipants = ref<string[]>([]); // รายชื่อผู้เข้าร่วม
 const currentDate = ref(""); // วันที่ปัจจุบัน
 const saveSelectRoom = ref<GetRoomType>(); // ห้องที่ถูกเลือก
-const normalRoomBooking = ref<NormalRoomBooking>(); // การจองห้องปกติ
+const normalRoomBooking = ref<PostNormalReseved>(); // การจองห้องปกติ
 const user = ref<User>(); // ข้อมูลผู้ใช้
 
 // ---------------------
