@@ -4,14 +4,27 @@
     <v-container>
       <v-row justify="center" align="center">
         <!-- Dropdown สำหรับเลือกประเภทของห้อง -->
-        <v-col class="d-flex justify-center" cols="auto" style="margin-right: 100px">
-          <v-select v-model="selectedPage" class="size-dropdown v-selectcolor" label="ประเภทห้อง" :items="typeroom"
-            @update:model-value="onSelectChange" />
+        <v-col
+          class="d-flex justify-center"
+          cols="auto"
+          style="margin-right: 100px"
+        >
+          <v-select
+            v-model="selectedPage"
+            class="size-dropdown v-selectcolor"
+            label="ประเภทห้อง"
+            :items="typeroom"
+            @update:model-value="onSelectChange"
+          />
         </v-col>
 
         <!-- ปฏิทินสำหรับเลือกวันที่การจองห้อง -->
         <v-col class="d-flex justify-center" cols="auto">
-          <vue-flatpickr v-model="selectedDate" class="text-center btn-date" :config="flatpickrConfig" />
+          <vue-flatpickr
+            v-model="selectedDate"
+            class="text-center btn-date"
+            :config="flatpickrConfig"
+          />
         </v-col>
       </v-row>
     </v-container>
@@ -32,22 +45,39 @@
         <thead>
           <tr>
             <th class="text-table">เวลา</th>
-            <th v-for="(room, index) in rooms3" :key="room.roomId" class="room-column text-table">
+            <th
+              v-for="(room, index) in rooms3"
+              :key="room.roomId"
+              class="room-column text-table"
+            >
               {{ room.roomName }}
               <v-icon class="mg-icontbl"> mdi-television </v-icon>
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
+          <tr
+            v-for="(time, timeIndex) in timeSlots"
+            :key="time"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
+          >
             <td class="time-column text-table">
               {{ time }}
             </td>
-            <td v-for="(room, roomIndex) in rooms3" :key="roomIndex" class="room6-column"
-              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(roomIndex, 3, time)">
+            <td
+              v-for="(room, roomIndex) in rooms3"
+              :key="roomIndex"
+              class="room6-column"
+              :class="getCellClass(room.roomId, time)?.class"
+              :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden"
+              @click="selectRoom(roomIndex, 3, time)"
+            >
               {{ getCellClass(room.roomId, time)?.text }}
-              <a :href="generateBookingLink(roomIndex, time, 3)" class="table-link" />
+              <a
+                :href="generateBookingLink(roomIndex, time, 3)"
+                class="table-link"
+              />
             </td>
           </tr>
         </tbody>
@@ -70,7 +100,11 @@
         <thead>
           <tr>
             <th class="time-column text-table">เวลา</th>
-            <th v-for="(room, index) in rooms4" :key="room.roomId" class="text-table">
+            <th
+              v-for="(room, index) in rooms4"
+              :key="room.roomId"
+              class="text-table"
+            >
               {{ room.roomName }}
               <v-icon v-if="index === 3 || index === 4" class="ms-2">
                 mdi-television
@@ -79,15 +113,28 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
+          <tr
+            v-for="(time, timeIndex) in timeSlots"
+            :key="time"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
+          >
             <td class="time-column text-table">
               {{ time }}
             </td>
-            <td v-for="(room, roomIndex) in rooms4" :key="roomIndex" class="room5-column"
-              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(roomIndex, 4, time)">
+            <td
+              v-for="(room, roomIndex) in rooms4"
+              :key="roomIndex"
+              class="room5-column"
+              :class="getCellClass(room.roomId, time)?.class"
+              :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden"
+              @click="selectRoom(roomIndex, 4, time)"
+            >
               {{ getCellClass(room.roomId, time)?.text }}
-              <a :href="generateBookingLink(roomIndex, time, 4)" class="table-link" />
+              <a
+                :href="generateBookingLink(roomIndex, time, 4)"
+                class="table-link"
+              />
             </td>
           </tr>
         </tbody>
@@ -110,7 +157,11 @@
         <thead>
           <tr>
             <th class="time-column text-table">เวลา</th>
-            <th v-for="(room, index) in rooms5" :key="room.roomId" class="text-table">
+            <th
+              v-for="(room, index) in rooms5"
+              :key="room.roomId"
+              class="text-table"
+            >
               {{ room.roomName }}
               <v-icon v-if="index === 3 || index === 4" class="ms-2">
                 mdi-television
@@ -119,15 +170,28 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
+          <tr
+            v-for="(time, timeIndex) in timeSlots"
+            :key="time"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
+          >
             <td class="time-column text-table">
               {{ time }}
             </td>
-            <td v-for="(room, roomIndex) in rooms5" :key="roomIndex" class="room5-column"
-              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(roomIndex, 5, time)">
+            <td
+              v-for="(room, roomIndex) in rooms5"
+              :key="roomIndex"
+              class="room5-column"
+              :class="getCellClass(room.roomId, time)?.class"
+              :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden"
+              @click="selectRoom(roomIndex, 5, time)"
+            >
               {{ getCellClass(room.roomId, time)?.text }}
-              <a :href="generateBookingLink(roomIndex, time, 5)" class="table-link" />
+              <a
+                :href="generateBookingLink(roomIndex, time, 5)"
+                class="table-link"
+              />
             </td>
           </tr>
         </tbody>
@@ -417,10 +481,10 @@ function selectRoom(roomIndex: number, floor: number, time: string) {
     floor === 3
       ? roomStore.studyFloor3
       : floor === 4
-        ? roomStore.studyFloor4
-        : floor === 5
-          ? roomStore.studyFloor5
-          : [];
+      ? roomStore.studyFloor4
+      : floor === 5
+      ? roomStore.studyFloor5
+      : [];
 
   const room = rooms[roomIndex];
   if (room) {
@@ -482,10 +546,10 @@ const generateBookingLink = (
     floor === 3
       ? rooms3.value
       : floor === 4
-        ? rooms4.value
-        : floor === 5
-          ? rooms5.value
-          : [];
+      ? rooms4.value
+      : floor === 5
+      ? rooms5.value
+      : [];
 
   if (Array.isArray(rooms) && rooms[roomIndex]?.roomName) {
     roomName = rooms[roomIndex].roomName;
@@ -497,8 +561,9 @@ const generateBookingLink = (
   }
 
   // สร้างลิงก์
-  return `/booking_study?floor=${floor}&room=${roomIndex + 1
-    }&time=${time}&roomName=${encodeURIComponent(roomName)}`;
+  return `/booking_study?floor=${floor}&room=${
+    roomIndex + 1
+  }&time=${time}&roomName=${encodeURIComponent(roomName)}`;
 };
 
 const timeSlots = [
@@ -552,7 +617,7 @@ function getCellClass(roomId: number, time: string) {
   if (currentIndex === startIndex) {
     if (
       bookings.find(
-        (book) => book.room_id === roomId && book.re_status == "อนุมัติ"
+        (book) => book.room_id === roomId && book.re_status === "อนุมัติ"
       )
     ) {
       return {
@@ -563,7 +628,7 @@ function getCellClass(roomId: number, time: string) {
         text: `${isBook.userId}`, // ข้อความที่แสดงในเซลล์
       };
     } else if (
-      bookings.find((book) => book.room_id === roomId && book.re_status == "รอ")
+      bookings.find((book) => book.room_id === roomId && book.re_status === "รอ")
     ) {
       return {
         class: "booked text-username",

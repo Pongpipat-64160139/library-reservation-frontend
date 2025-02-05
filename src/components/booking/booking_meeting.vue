@@ -11,12 +11,14 @@
   </v-container>
 </template>
 <script setup lang="ts">
+import { useDocumentStore } from "@/stores/documentStore";
 import { useEquipmentStore } from "@/stores/equipmentStore";
 import { useOrderDetialStore } from "@/stores/orderStore";
 import { onMounted } from "vue";
 
 const eqStore = useEquipmentStore();
 const orderStore = useOrderDetialStore();
+const documentFileStore = useDocumentStore();
 onMounted(() => {
   try {
   } catch (error) {
@@ -26,9 +28,12 @@ onMounted(() => {
 async function saveReserved() {
   const eq = await eqStore.selectedEQForm;
   const orders = await orderStore.orders;
+  const file = await documentFileStore.currentDocument;
+  const res = await documentFileStore.newDocumentFile(file!);
   // orderStore.createdOrder(1);
-  await console.log("Selected :", eq);
-  await console.log("Orders :", orders);
+  // await console.log("Selected :", eq);
+  // await console.log("Orders :", orders);
+  await console.log("DocumentStore :", res);
 }
 </script>
 <style scoped>

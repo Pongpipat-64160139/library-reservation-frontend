@@ -1,6 +1,6 @@
 import { Buffer } from "buffer";
 
-export interface DocumentFile {
+export interface PostDocumentFile {
   id: string | number; // ID หลัก เป็น Primary Key
 
   fileName: string; // ชื่อไฟล์ เช่น "example.pdf"
@@ -11,5 +11,5 @@ export interface DocumentFile {
 
   uploadedAt: Date; // วันที่อัปโหลดไฟล์
 
-  data?: Buffer; // ตัวไฟล์จริงในรูปแบบ Binary (ใช้ `LONGBLOB` ใน MySQL)
+  data?: Buffer | null; // ตัวไฟล์จริงในรูปแบบ Binary (ใช้ `LONGBLOB` ใน MySQL)
 }

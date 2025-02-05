@@ -51,6 +51,7 @@
       <span>
         <h1 class="head-more ms-10 mt-5">ไฟล์เอกสารเพิ่มเติม</h1>
         <v-file-input
+          v-model="selectedFile"
           class="text-field-rounded width-file mt-2"
           label="เพิ่มไฟล์"
           single-line
@@ -62,14 +63,21 @@
 </template>
 
 <script setup lang="ts">
+import { useDocumentStore } from "@/stores/documentStore";
 import { useEquipmentStore } from "@/stores/equipmentStore";
 import type { Equipment } from "@/types/equipment";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 
 const equipmentStore = useEquipmentStore();
 // อาร์เรย์ของรายการอุปกรณ์
 const equipmentList = ref<Equipment[]>([]);
 const eqother = ref<string>();
+const selectedFile = ref<File | null>(null);
+const documentFileStore = useDocumentStore();
+watch(selectedFile, (newFile, oldFile) => {
+  documentFileStore.currentDocument = newFile;
+  console.log("File :", documentFileStore.currentDocument);
+});
 async function selectedEquipment(itemIndex: number) {
   const findEQ = equipmentList.value.find((eq) => eq.eq_Id === itemIndex + 1);
   let selected = equipmentStore.selectedEQForm;

@@ -567,6 +567,7 @@ const confirmStatusChange = async () => {
           newStatus.value
         );
         LoadingData();
+        console.log("Status updated :", updateStatus);
       } else if (keepTypeForm.value == "special") {
         const updateStatus = await srbStore.updateReseveStatus(
           itemToUpdateSRB.value?.srb_Id!,
