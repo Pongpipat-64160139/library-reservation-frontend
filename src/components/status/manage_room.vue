@@ -1,3 +1,4 @@
+
 <template>
   <Header_page />
   <v-container fluid class="back-ground mg-toppage">
@@ -262,6 +263,28 @@
               />
             </v-col>
           </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-select
+                v-model="selectedFloor"
+                label="ชั้น"
+                  :items="['All', ...Object.keys(floorRooms)]"
+                density="compact"
+                variant="outlined"
+                @update:model-value="updateRoomOptions"
+              />
+
+              <v-select
+                v-model="selectedRoom"
+                label="ห้อง"
+                multiple
+                 :items="['All', ...roomOptions]"
+                density="compact"
+                variant="outlined"
+                @update:model-value="handleRoomChange"
+              />
+            </v-col>
+          </v-row>
         </v-card-text>
         <v-card-actions class="d-flex justify-center mb-5">
           <v-btn
@@ -440,50 +463,50 @@ const headers = [
 ];
 
 const floorRooms: FloorRooms = {
-  2: ["201 (20-50)"],
+  2: ["201 "],
   3: [
-    "ศึกษากลุ่ม 1 (3-5)",
-    "ศึกษากลุ่ม 2 (3-5)",
-    "ศึกษากลุ่ม 3 (3-5)",
-    "ศึกษากลุ่ม 4 (3-5)",
-    "ศึกษากลุ่ม 5 (3-5)",
-    "ศึกษากลุ่ม 6 (3-5)",
+    "ศึกษากลุ่ม 1 ",
+    "ศึกษากลุ่ม 2 ",
+    "ศึกษากลุ่ม 3 ",
+    "ศึกษากลุ่ม 4 ",
+    "ศึกษากลุ่ม 5 ",
+    "ศึกษากลุ่ม 6 ",
   ],
   4: [
-    "ศึกษากลุ่ม 1 (3-5)",
-    "ศึกษากลุ่ม 2 (3-5)",
-    "ศึกษากลุ่ม 3 (3-5)",
-    "ศึกษากลุ่ม 4 (3-5)",
-    "ศึกษากลุ่ม 5 (3-5)",
+    "ศึกษากลุ่ม 1 ",
+    "ศึกษากลุ่ม 2 ",
+    "ศึกษากลุ่ม 3 ",
+    "ศึกษากลุ่ม 4 ",
+    "ศึกษากลุ่ม 5 ",
   ],
   5: [
-    "ศึกษากลุ่ม 1 (3-5)",
-    "ศึกษากลุ่ม 2 (3-5)",
-    "ศึกษากลุ่ม 3 (3-5)",
-    "ศึกษากลุ่ม 4 (3-5)",
-    "ศึกษากลุ่ม 5 (3-5)",
-    "Lecturer's Room 1 (3-5)",
-    "Lecturer's Room 2 (3-5)",
-    "Lecturer's Room 3 (3-5)",
+    "ศึกษากลุ่ม 1 ",
+    "ศึกษากลุ่ม 2 ",
+    "ศึกษากลุ่ม 3 ",
+    "ศึกษากลุ่ม 4 ",
+    "ศึกษากลุ่ม 5 ",
+    "Lecturer's Room 1 ",
+    "Lecturer's Room 2 ",
+    "Lecturer's Room 3 ",
   ],
   6: [
-    "STV 1 (3-5)",
-    "STV 2 (3-5)",
-    "STV 3 (3-5)",
-    "STV 4 (3-5)",
-    "STV 5 (3-5)",
-    "STV 6 (3-5)",
-    "STV 7 (3-5)",
-    "STV 8 (3-5)",
-    "STV 9 (3-5)",
-    "LIBRA OKE 1 (3-5)",
-    "LIBRA OKE 2 (3-5)",
-    "MINI THEATER (10-30)",
-    "604 Smart Board (8-10)",
+    "STV 1 ",
+    "STV 2 ",
+    "STV 3 ",
+    "STV 4 ",
+    "STV 5 ",
+    "STV 6 ",
+    "STV 7 ",
+    "STV 8 ",
+    "STV 9 ",
+    "LIBRA OKE 1 ",
+    "LIBRA OKE 2 ",
+    "MINI THEATER ",
+    "604 Smart Board ",
     "Mini Studio",
-    "Cyber Zone 1 (ไม่เกิน 70)",
-    "Cyber Zone 2 (ไม่เกิน 30)",
-    "Live for Life (มากกว่า 3)",
+    "Cyber Zone 1 ",
+    "Cyber Zone 2 ",
+    "Live for Life ",
   ],
   7: ["706", "707"],
 };
@@ -558,12 +581,48 @@ const saveChanges = () => {
 
 const selectedFloor = ref("2");
 const roomOptions = ref<string[]>(floorRooms[selectedFloor.value]);
-const selectedRoom = ref(roomOptions.value[0]);
+const selectedRoom = ref<string[]>([]);
 
 const updateRoomOptions = () => {
-  roomOptions.value = floorRooms[selectedFloor.value] || [];
-  selectedRoom.value = roomOptions.value[0] || "";
+  if (selectedFloor.value === 'All') {
+    // หากเลือก 'All' ให้ห้องทั้งหมดถูกเลือก
+    roomOptions.value = Object.values(floorRooms).flat();
+  } else {
+    // ถ้าเลือกชั้นอื่น ให้แสดงห้องที่เกี่ยวข้อง
+    roomOptions.value = floorRooms[selectedFloor.value];
+  }
 };
+
+
+
+const selectAllRooms = () => {
+  if (selectedRoom.value.length === roomOptions.value.length) {
+    // หากห้องทั้งหมดถูกเลือกแล้ว ให้ยกเลิกการเลือกทั้งหมด
+    selectedRoom.value = [];
+  } else {
+    // หากยังไม่ครบ ให้เลือกทั้งหมด
+    selectedRoom.value = [...roomOptions.value];
+  }
+};
+
+const handleRoomChange = () => {
+  if (selectedRoom.value.includes("All")) {
+    // หากเลือก 'All' ให้เลือกห้องทั้งหมด
+    selectedRoom.value = roomOptions.value;
+  } else if (selectedRoom.value.length === roomOptions.value.length) {
+    // หากเลือกห้องทั้งหมด ให้เลือก 'All'
+    selectedRoom.value.push("All");
+  } else {
+    // หากไม่ได้เลือก 'All' แต่เลือกห้องบางห้อง
+    const allSelected = selectedRoom.value.length === roomOptions.value.length;
+    if (allSelected) {
+      selectedRoom.value.push("All");
+    } else {
+      selectedRoom.value = selectedRoom.value.filter((room) => room !== "All");
+    }
+  }
+};
+
 </script>
 
 <style scoped>
