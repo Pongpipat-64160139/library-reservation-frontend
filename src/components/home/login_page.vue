@@ -332,25 +332,51 @@ const submitForm = () => {
 
 /* phone */
 @media (max-width: 768px) {
+  .background-form {
+    margin: auto; /* จัดตรงกลางแนวนอน */
+    margin-top: 50px;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
+    width: 350px;
+  }
+
+  .mg-imagebuulib {
+    margin-top: 30px;
+    margin-left: 10px;
+    width: 350px;
+  }
+
   .title-font {
     font-weight: 300;
-    font-size: 30px;
+    font-size: 20px;
     font-style: italic;
+  }
+
+  .mg-titlefont {
+    margin-left: 20px;
+    margin-top: 15px;
   }
 
   .formusername-font {
     font-weight: 600;
-    font-size: 15px;
+    font-size: 12px;
   }
 
   .formpassword-font {
     font-weight: 600;
-    font-size: 15px;
+    font-size: 12px;
     margin-top: 30px;
   }
 
+  .mg-formfont {
+    margin-left: 5px;
+    margin-top: 10px;
+  }
+
   .form-border .v-input__control {
-    width: 350px;
+    width: 300px;
     margin-top: 10px;
     border-radius: 5px;
     border: 2px solid #493628;
@@ -365,9 +391,9 @@ const submitForm = () => {
   }
 
   .btn-form {
-    margin-top: 55px;
+    margin-top: 20px;
     font-weight: bold !important;
-    font-size: 15px !important;
+    font-size: 12px !important;
     width: 350px;
   }
 
@@ -375,16 +401,9 @@ const submitForm = () => {
     margin-left: -1px;
   }
 
-  .mg-titlefont {
-    margin-left: 20px;
-    margin-top: 15px;
-  }
 
-  .mg-imagebuulib {
-    margin-top: 30px;
-    margin-left: 10px;
-    width: 350px;
-  }
+
+
 
   .mg-imagelib {
     margin-top: 30px;
@@ -392,9 +411,6 @@ const submitForm = () => {
     width: 700px;
   }
 
-  .mg-formfont {
-    margin-left: 5px;
-    margin-top: 30px;
-  }
+
 }
 </style>
