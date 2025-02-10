@@ -1,28 +1,27 @@
-<template>
-  <v-row>
-    <!-- Col ซ้าย -->
-    <v-col cols="12" md="5" class="ms-15">
-      <div>
-        <v-img :src="buulib" width="350" height="100" class="mt-10" />
-        <p class="font-text mt-3 ms-9">Welcome to our online</p>
-        <p class="font-text ms-9">library reservation system!</p>
+<template class="back-ground">
+  <v-row class="back-ground mg-toppage">
+    <v-col cols="12" md="5" class="mg-leftcol">
+      <div class="background-form">
+        <v-img :src="buulib" class="mg-imagebuulib" />
+        <p class="title-font mg-titlefont">Welcome to our online</p>
+        <p class="title-font mg-titlefont">library reservation system!</p>
 
-        <v-card-text class="mt-15 ms-6">
-          <p class="font-head2">Username</p>
-          <v-form class="width-form" @submit.prevent="submitForm">
+        <v-card-text class="mg-formfont">
+          <p class="formusername-font">Username</p>
+          <v-form @submit.prevent="submitForm">
             <v-text-field
               v-model="username"
-              class="mt-2 text-field-rounded"
+              class="form-border"
               label="Username"
               type="text"
               prepend-inner-icon="mdi-account-circle-outline"
               hide-details
             />
 
-            <p class="font-head2 mt-9">Password</p>
+            <p class="formpassword-font">Password</p>
             <v-text-field
               v-model="password"
-              class="mt-2 text-field-rounded"
+              class="form-border"
               hide-details
               label="Password"
               type="password"
@@ -30,12 +29,10 @@
             />
           </v-form>
           <v-btn
-            to="/home_page"
-            width="500"
-            height="50"
-            class="mt-10 font-bold"
+            class="btn-form"
             color="#C2AC9E"
             size="x-large"
+            @click="submitForm"
           >
             Login
           </v-btn>
@@ -43,40 +40,54 @@
       </div>
     </v-col>
 
-    <!-- Col ขวา -->
     <v-col cols="12" md="6">
-      <v-img :src="lib" width="700" height="700" />
+      <v-img
+        v-if="isDesktop || (!isMobile && !isTablet)"
+        :src="lib"
+        class="mg-imagelib"
+      />
     </v-col>
   </v-row>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { onMounted, onUnmounted, ref } from "vue";
 import lib from "@/assets/lib.png";
 import buulib from "@/assets/buulib.png";
 
-const data = {
-  lib,
-  buulib,
-  username: "",
-  password: "",
+const isMobile = ref(false);
+const isTablet = ref(false);
+const isDesktop = ref(false);
+
+const checkScreenSize = () => {
+  const width = window.innerWidth;
+
+  isMobile.value = width < 768; // 📌 ซ่อนรูปถ้าหน้าจอเล็กกว่า 768px
+  isTablet.value = width >= 800 && width <= 1280; // 📌 ซ่อนรูปถ้าหน้าจออยู่ระหว่าง 800px - 1280px
+  isDesktop.value = width >= 1025 && width <= 1440; // ✅ แสดงรูปที่ 1025px - 1440px
 };
 
-const methods = {
-  submitForm() {
-    if (data.username && data.password) {
-      console.log("Form submitted:", {
-        username: data.username,
-        password: data.password,
-      });
-    }
-  },
-};
+onMounted(() => {
+  checkScreenSize();
+  window.addEventListener("resize", checkScreenSize);
+});
 
-export default {
-  data() {
-    return data;
-  },
-  methods,
+onUnmounted(() => {
+  window.removeEventListener("resize", checkScreenSize);
+});
+
+const username = ref("");
+const password = ref("");
+
+const submitForm = () => {
+  if (username.value && password.value) {
+    console.log("Form submitted:", {
+      username: username.value,
+      password: password.value,
+    });
+  } else {
+    console.log("Please enter username and password.");
+  }
 };
 </script>
 
@@ -88,32 +99,56 @@ export default {
   color: #493628;
 }
 
-.font-head {
-  font-weight: 400;
-  font-size: 20px;
+.back-ground {
+  background-color: #f9f3ea;
+  /* พื้นหลังสีหลัก */
+  background-image: url("@/assets/subtle-dark-vertical.png");
+  background-repeat: repeat;
+  background-size: auto;
+  background-position: top left;
 }
 
-.font-head2 {
-  font-weight: 600;
-  font-size: 20px;
+.background-form {
+  margin-top: 25px;
+  margin-bottom: 5px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
 }
 
-.font-text {
+.mg-imagebuulib {
+  padding: 15px;
+  margin-top: 20px;
+  margin-left: 30px;
+  width: 400px;
+}
+
+.title-font {
   font-weight: 300;
   font-size: 35px;
   font-style: italic;
 }
 
-.width-form {
+.formusername-font {
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.formpassword-font {
+  font-weight: 600;
+  font-size: 20px;
+  margin-top: 20px;
+}
+
+.form-border .v-input__control {
+  width: 500px;
+  margin-top: 10px;
+  border-radius: 5px;
+  border: 2px solid #493628;
   width: 500px;
 }
 
-.text-field-rounded .v-input__control {
-  border-radius: 5px;
-  border: 2px solid #493628;
-}
-
-.text-field-rounded .v-input__slot {
+.form-border .v-input__slot {
   border-radius: 10px;
 }
 
@@ -121,8 +156,245 @@ export default {
   border-bottom: none;
 }
 
-.font-bold {
+.btn-form {
+  margin-top: 35px;
+  margin-bottom: 12px;
   font-weight: bold !important;
   font-size: 18px !important;
+  width: 500px;
+}
+
+.mg-leftcol {
+  margin-left: 60px;
+}
+
+.mg-titlefont {
+  margin-left: 40px;
+  margin-top: 15px;
+}
+
+.mg-imagelib {
+  margin-top: 25px;
+  margin-left: 30px;
+  width: 800px;
+}
+
+.mg-formfont {
+  margin-left: 30px;
+  margin-top: 30px;
+}
+
+/* ipad แนวตั้ง*/
+@media only screen and (min-width: 800px) and (max-width: 1280px) {
+  .background-form {
+    margin: auto; /* จัดตรงกลางแนวนอน */
+    margin-top: 200px;
+    margin-bottom: 150px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
+    width: 500px;
+  }
+
+  .mg-imagebuulib {
+    margin-top: 100px;
+    width: 400px;
+  }
+
+  .title-font {
+    font-weight: 300;
+    font-size: 35px;
+    font-style: italic;
+  }
+
+  .mg-titlefont {
+    margin-top: 1px;
+  }
+
+  .formusername-font {
+    font-weight: 600;
+    font-size: 25px;
+  }
+
+  .formpassword-font {
+    font-weight: 600;
+    font-size: 25px;
+    margin-top: 10px;
+  }
+
+  .mg-formfont {
+    margin-top: 1px;
+  }
+
+  .form-border .v-input__control {
+    width: 400px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 2px solid #493628;
+  }
+
+  .form-border .v-input__slot {
+    border-radius: 10px;
+  }
+
+  .v-input__control .v-input__slot {
+    border-bottom: none;
+  }
+
+  .btn-form {
+    margin-top: 20px;
+    font-weight: bold !important;
+    font-size: 18px !important;
+    width: 400px;
+  }
+
+  .mg-leftcol {
+    margin-left: 1px;
+  }
+}
+
+/* ipad แนวนอน*/
+@media only screen and (min-width: 1025px) and (max-width: 1440px) {
+  .background-form {
+    margin-top: 115px;
+    margin-bottom: 120px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
+    width: 470px;
+  }
+
+  .mg-imagebuulib {
+    margin-top: 100px;
+    margin-left: 30px;
+    width: 240px;
+  }
+
+  .title-font {
+    font-weight: 300;
+    font-size: 22px;
+    font-style: italic;
+  }
+
+  .mg-titlefont {
+    margin-left: 30px;
+    margin-top: -5px;
+  }
+
+  .formusername-font {
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  .formpassword-font {
+    font-weight: 600;
+    font-size: 18px;
+    margin-top: 10px;
+  }
+
+  .mg-formfont {
+    margin-left: 20px;
+    margin-top: -5px;
+  }
+
+  .form-border .v-input__control {
+    width: 400px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 2px solid #493628;
+  }
+
+  .form-border .v-input__slot {
+    border-radius: 10px;
+  }
+
+  .v-input__control .v-input__slot {
+    border-bottom: none;
+  }
+
+  .btn-form {
+    margin-top: 20px;
+    font-weight: bold !important;
+    font-size: 18px !important;
+    width: 400px;
+  }
+
+  .mg-leftcol {
+    margin-left: 20px;
+  }
+
+  .mg-imagelib {
+    margin-top: 115px;
+    margin-left: 50px;
+    width: 810px;
+  }
+}
+
+/* phone */
+@media (max-width: 768px) {
+  .title-font {
+    font-weight: 300;
+    font-size: 30px;
+    font-style: italic;
+  }
+
+  .formusername-font {
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .formpassword-font {
+    font-weight: 600;
+    font-size: 15px;
+    margin-top: 30px;
+  }
+
+  .form-border .v-input__control {
+    width: 350px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 2px solid #493628;
+  }
+
+  .form-border .v-input__slot {
+    border-radius: 10px;
+  }
+
+  .v-input__control .v-input__slot {
+    border-bottom: none;
+  }
+
+  .btn-form {
+    margin-top: 55px;
+    font-weight: bold !important;
+    font-size: 15px !important;
+    width: 350px;
+  }
+
+  .mg-leftcol {
+    margin-left: -1px;
+  }
+
+  .mg-titlefont {
+    margin-left: 20px;
+    margin-top: 15px;
+  }
+
+  .mg-imagebuulib {
+    margin-top: 30px;
+    margin-left: 10px;
+    width: 350px;
+  }
+
+  .mg-imagelib {
+    margin-top: 30px;
+    margin-left: 30px;
+    width: 700px;
+  }
+
+  .mg-formfont {
+    margin-left: 5px;
+    margin-top: 30px;
+  }
 }
 </style>
