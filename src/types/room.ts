@@ -2,7 +2,6 @@ import { Confirmation } from "./confirmation";
 import { Floor } from "./floor";
 import { NormalRoomBooking } from "./normalRoomBooking";
 import { RoleRoomAccess } from "./roleRoomAccess";
-import { SpecialRoomBooking } from "./specialRoomBooking";
 
 export interface Room {
   roomId: number;
@@ -21,13 +20,19 @@ export interface Room {
 
   orderFood: string;
 
+  RoomKey:string
+
+  imagePath:string;
+
+  DetailRoom:string;
+
   floor: Floor;
 
-  confirmations: Confirmation[];
+  // confirmations: Confirmation[];
 
-  normalRoomBookings: NormalRoomBooking[];
+  // normalRoomBookings: NormalRoomBooking[];
 
-  roleRoomAccesses: RoleRoomAccess[];
+  // roleRoomAccesses: RoleRoomAccess[];
 
-  specialRoomBookings: SpecialRoomBooking[];
+  // specialRoomBookings: SpecialRoomBooking[];
 }
