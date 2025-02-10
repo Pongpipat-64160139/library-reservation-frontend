@@ -1,4 +1,3 @@
-
 <template>
   <Header_page />
   <v-container fluid class="back-ground mg-toppage">
@@ -268,7 +267,7 @@
               <v-select
                 v-model="selectedFloor"
                 label="ชั้น"
-                  :items="['All', ...Object.keys(floorRooms)]"
+                :items="['All', ...Object.keys(floorRooms)]"
                 density="compact"
                 variant="outlined"
                 @update:model-value="updateRoomOptions"
@@ -278,7 +277,7 @@
                 v-model="selectedRoom"
                 label="ห้อง"
                 multiple
-                 :items="['All', ...roomOptions]"
+                :items="['All', ...roomOptions]"
                 density="compact"
                 variant="outlined"
                 @update:model-value="handleRoomChange"
@@ -584,16 +583,16 @@ const roomOptions = ref<string[]>(floorRooms[selectedFloor.value]);
 const selectedRoom = ref<string[]>([]);
 
 const updateRoomOptions = () => {
-  if (selectedFloor.value === 'All') {
-    // หากเลือก 'All' ให้ห้องทั้งหมดถูกเลือก
+  if (selectedFloor.value === "All") {
+    // ถ้าเลือก "All" ที่ชั้น ให้เลือกทุกห้องทั้งหมดของทุกชั้น
     roomOptions.value = Object.values(floorRooms).flat();
+    selectedRoom.value = [...roomOptions.value]; // เลือกทุกห้อง
   } else {
-    // ถ้าเลือกชั้นอื่น ให้แสดงห้องที่เกี่ยวข้อง
-    roomOptions.value = floorRooms[selectedFloor.value];
+    // ถ้าเลือกชั้นอื่น ให้แสดงเฉพาะห้องของชั้นนั้น และเลือกทุกห้องในชั้นนั้น
+    roomOptions.value = floorRooms[selectedFloor.value] || [];
+    selectedRoom.value = [...roomOptions.value]; // เลือกทุกห้องของชั้นนั้น
   }
 };
-
-
 
 const selectAllRooms = () => {
   if (selectedRoom.value.length === roomOptions.value.length) {
@@ -607,22 +606,20 @@ const selectAllRooms = () => {
 
 const handleRoomChange = () => {
   if (selectedRoom.value.includes("All")) {
-    // หากเลือก 'All' ให้เลือกห้องทั้งหมด
-    selectedRoom.value = roomOptions.value;
-  } else if (selectedRoom.value.length === roomOptions.value.length) {
-    // หากเลือกห้องทั้งหมด ให้เลือก 'All'
-    selectedRoom.value.push("All");
-  } else {
-    // หากไม่ได้เลือก 'All' แต่เลือกห้องบางห้อง
-    const allSelected = selectedRoom.value.length === roomOptions.value.length;
-    if (allSelected) {
-      selectedRoom.value.push("All");
+    if (selectedRoom.value.length > 1) {
+      // ถ้าเลือก "All" พร้อมห้องอื่น → ยกเลิกการเลือกทั้งหมด
+      selectedRoom.value = [];
     } else {
-      selectedRoom.value = selectedRoom.value.filter((room) => room !== "All");
+      // ถ้าเลือก "All" อย่างเดียว → เลือกทุกห้อง
+      selectedRoom.value = [...roomOptions.value];
+    }
+  } else {
+    // ถ้าห้องที่เลือกครบทุกห้อง → เพิ่ม "All"
+    if (selectedRoom.value.length === roomOptions.value.length) {
+      selectedRoom.value = [...roomOptions.value];
     }
   }
 };
-
 </script>
 
 <style scoped>
@@ -771,6 +768,4 @@ th {
   border: 2px solid #493628;
   height: 55px;
 }
-
-
 </style>
