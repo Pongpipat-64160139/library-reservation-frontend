@@ -45,6 +45,8 @@
         <span class="status-text">กำลังใช้งาน</span>
         <div class="color-waiting ms-5"></div>
         <span class="status-text">รอใช้งาน</span>
+        <div class="color-success ms-5"></div>
+        <span class="status-text">ใช้งานเสร็จสิ้น</span>
       </div>
     </h1>
     <v-container class="mg-btmtbl">
@@ -81,6 +83,8 @@
         <span class="status-text">กำลังใช้งาน</span>
         <div class="color-waiting ms-5"></div>
         <span class="status-text">รอใช้งาน</span>
+        <div class="color-success ms-5"></div>
+        <span class="status-text">ใช้งานเสร็จสิ้น</span>
       </div>
     </h1>
     <v-container class="mg-btmtbl">
@@ -119,6 +123,8 @@
         <span class="status-text">กำลังใช้งาน</span>
         <div class="color-waiting ms-5"></div>
         <span class="status-text">รอใช้งาน</span>
+        <div class="color-success ms-5"></div>
+        <span class="status-text">ใช้งานเสร็จสิ้น</span>
       </div>
     </h1>
     <v-container class="mg-btmtbl">
@@ -156,6 +162,8 @@
         <span class="status-text">กำลังใช้งาน</span>
         <div class="color-waiting ms-5"></div>
         <span class="status-text">รอใช้งาน</span>
+        <div class="color-success ms-5"></div>
+        <span class="status-text">ใช้งานเสร็จสิ้น</span>
       </div>
     </h1>
     <v-container class="mg-btmtbl">
@@ -193,6 +201,8 @@
         <span class="status-text">กำลังใช้งาน</span>
         <div class="color-waiting ms-5"></div>
         <span class="status-text">รอใช้งาน</span>
+        <div class="color-success ms-5"></div>
+        <span class="status-text">ใช้งานเสร็จสิ้น</span>
       </div>
     </h1>
     <v-container class="mg-btmtbl">
@@ -230,6 +240,8 @@
         <span class="status-text">กำลังใช้งาน</span>
         <div class="color-waiting ms-5"></div>
         <span class="status-text">รอใช้งาน</span>
+        <div class="color-success ms-5"></div>
+        <span class="status-text">ใช้งานเสร็จสิ้น</span>
       </div>
     </h1>
     <v-container class="mg-btmtbl">
@@ -267,6 +279,8 @@
         <span class="status-text">กำลังใช้งาน</span>
         <div class="color-waiting ms-5"></div>
         <span class="status-text">รอใช้งาน</span>
+        <div class="color-success ms-5"></div>
+        <span class="status-text">ใช้งานเสร็จสิ้น</span>
       </div>
     </h1>
     <v-container class="mg-btmtbl">
@@ -939,6 +953,14 @@ watch(selectedDate, (newDate) => {
   font-size: 16px;
   color: #493628;
   font-weight: bold;
+}
+
+.color-success {
+  width: 15px;
+  height: 15px;
+  background-color: rgb(148, 187, 216);
+  border-radius: 50%;
+  margin-right: 10px;
 }
 
 .flex-header {

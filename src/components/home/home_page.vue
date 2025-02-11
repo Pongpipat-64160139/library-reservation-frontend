@@ -2,35 +2,32 @@
   <!-- ส่วน Header ของหน้า -->
   <Header_page />
 
-  <v-container fluid class="back-ground ms-kob">
+  <v-container fluid class="back-ground mg-toppage">
     <!-- ชื่อหน้าหลัก -->
-    <h1 class="pt-5 head-title text-center pb-10">ประเภทห้อง</h1>
+    <h1 class="toppic-font mg-btmtoppic">ประเภทห้อง</h1>
 
     <!-- 🔹 Section: Group Study Room -->
-    <v-sheet class="mx-auto study_box">
+    <v-sheet class="mx-auto study_sheet">
       <span class="d-flex">
-        <h1 class="ps-16 pt-5 head1-title">Group Study Room</h1>
+        <h1 class="type_font">Group Study Room</h1>
         <!-- ปุ่มไปหน้าจองห้อง -->
-        <router-link
-          to="/table_study"
-          class="ps-16 pt-4 regular-study-title regularstu-line"
-        >
+        <router-link to="/table_study" class="bookingstudy-font">
           จองห้อง <v-icon right>mdi-arrow-right</v-icon>
         </router-link>
       </span>
 
       <!-- แสดงรายการห้อง Group Study -->
-      <v-slide-group show-arrows class="mg-arrow mg-arrowipad">
+      <v-slide-group show-arrows class="mg-slidegroup">
         <v-slide-group-item
           v-for="(group, index) in groupedStudyRooms"
           :key="index"
         >
           <div
-            class="ma-4 d-flex flex-column align-center mg-leftimage"
+            class="pd-slidegroup flex-column align-center"
             @click="openDialog(group)"
           >
-            <img :src="lib" alt="Study Room" class="slide-image" />
-            <span class="mt-2 text-center room-caption"
+            <img :src="lib" alt="Study Room" class="size-image" />
+            <span class="room-caption"
               >ห้องศึกษากลุ่ม ชั้น {{ group.floorNumber }}</span
             >
           </div>
@@ -39,61 +36,51 @@
     </v-sheet>
 
     <!-- 🔹 Section: Entertainment Room -->
-    <v-sheet class="mx-auto mt-10 entertain_box">
+    <v-sheet class="mx-auto entertain_sheet">
       <span class="d-flex">
-        <h1 class="ps-16 pt-5 head1-title">Entertain Room</h1>
+        <h1 class="type_font">Entertain Room</h1>
         <!-- ปุ่มไปหน้าจองห้อง -->
-        <router-link
-          to="/table_entertain"
-          class="pt-4 regular-entertain-title regularstu-line"
-        >
+        <router-link to="/table_entertain" class="bookingentertain-font">
           จองห้อง <v-icon right>mdi-arrow-right</v-icon>
         </router-link>
       </span>
 
       <!-- แสดงรายการห้อง Entertainment -->
-      <v-slide-group show-arrows class="mg-arrow mg-arrowipad">
+      <v-slide-group show-arrows class="mg-slidegroup">
         <v-slide-group-item
           v-for="(group, index) in EntertainRooms"
           :key="index"
         >
           <div
-            class="ma-4 d-flex flex-column align-center"
+            class="pd-slidegroup flex-column align-center"
             @click="openDialog(group)"
           >
-            <img :src="lib" alt="Entertain Room" class="slide-image" />
-            <span class="mt-2 text-center room-caption">{{
-              group.roomName
-            }}</span>
+            <img :src="lib" alt="Entertain Room" class="size-image" />
+            <span class="room-caption">{{ group.roomName }}</span>
           </div>
         </v-slide-group-item>
       </v-slide-group>
     </v-sheet>
 
     <!-- 🔹 Section: Meeting Room -->
-    <v-sheet class="mx-auto mt-10 mb-10 meeting_box">
+    <v-sheet class="mx-auto meeting_sheet">
       <span class="d-flex">
-        <h1 class="ps-16 pt-5 head1-title">Meeting Room</h1>
+        <h1 class="type_font">Meeting Room</h1>
         <!-- ปุ่มไปหน้าจองห้อง -->
-        <router-link
-          to="/table_meeting"
-          class="ps-16 pt-4 regular-meeting-title regularstu-line"
-        >
+        <router-link to="/table_meeting" class="bookingmeeting-font">
           จองห้อง <v-icon right>mdi-arrow-right</v-icon>
         </router-link>
       </span>
 
       <!-- แสดงรายการห้อง Meeting -->
-      <v-slide-group show-arrows class="ms-1 mg-arrow">
+      <v-slide-group show-arrows class="mg-slidegroupmeeting">
         <v-slide-group-item v-for="(group, index) in MeetingRooms" :key="index">
           <div
-            class="ma-4 d-flex flex-column align-center"
+            class="pd-slidegroup flex-column align-center"
             @click="openDialog(group)"
           >
-            <img :src="lib" alt="Meeting Room" class="slide-image" />
-            <span class="mt-2 text-center room-caption">{{
-              group.roomName
-            }}</span>
+            <img :src="lib" alt="Meeting Room" class="size-image" />
+            <span class="room-caption">{{ group.roomName }}</span>
           </div>
         </v-slide-group-item>
       </v-slide-group>
@@ -264,75 +251,6 @@ function selectRoom(room: Room) {
   color: #493628;
 }
 
-.head-title {
-  font-weight: 600;
-  font-size: 24px;
-}
-
-.head1-title {
-  font-weight: 600;
-  font-size: 20px;
-}
-
-.mg-arrow {
-  margin-left: 50px;
-}
-
-.regular-study-title {
-  font-weight: 400;
-  font-size: 16px;
-  margin-left: 355px;
-  margin-top: 8px;
-}
-
-.regular-entertain-title {
-  font-weight: 400;
-  font-size: 16px;
-  margin-left: 447px;
-  margin-top: 8px;
-}
-
-.regular-meeting-title {
-  font-weight: 400;
-  font-size: 16px;
-  margin-left: 395px;
-  margin-top: 8px;
-}
-
-.room-caption {
-  font-weight: 500;
-  font-size: 16px;
-}
-
-.slide-image {
-  width: 200px;
-  height: 200px;
-  border-radius: 10px;
-  object-fit: cover;
-  transition: transform 0.3s ease-in-out;
-}
-
-.slide-image:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.text-center {
-  text-align: center;
-}
-
-.text-bold {
-  font-weight: 600;
-}
-
-.mt-2 {
-  margin-top: 10px;
-}
-
-.v-slide-group__controls {
-  z-index: 10;
-}
-
 .back-ground {
   background-color: #f9f3ea;
   /* พื้นหลังสีหลัก */
@@ -342,15 +260,36 @@ function selectRoom(room: Room) {
   background-position: top left;
 }
 
-.ms-kob {
-  margin-top: -615px;
-}
-
-.align-center {
+.toppic-font {
+  font-weight: 600;
+  font-size: 24px;
   text-align: center;
 }
 
-.regularstu-line {
+.mg-btmtoppic {
+  margin-top: 35px;
+  margin-bottom: 50px;
+}
+
+.study_sheet {
+  background-color: #ead8c0;
+  border-radius: 16px;
+  max-width: 800px;
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
+}
+
+.type_font {
+  font-weight: 600;
+  font-size: 20px;
+  margin-left: 65px;
+  margin-top: 20px;
+}
+
+.bookingstudy-font {
+  font-weight: 400;
+  font-size: 16px;
+  margin-left: 415px;
+  margin-top: 25px;
   cursor: pointer;
   text-decoration: none;
   color: #493628;
@@ -359,53 +298,98 @@ function selectRoom(room: Room) {
   z-index: 10;
 }
 
-.icon-gif {
-  width: 70px;
-  height: 70px;
+.mg-slidegroup {
+  margin-left: 50px;
+}
+
+.pd-slidegroup {
+  padding: 16px;
+  display: flex;
+}
+
+.size-image {
+  width: 200px;
+  height: 200px;
+  border-radius: 10px;
+  object-fit: cover;
+  transition: transform 0.3s ease-in-out;
+}
+
+.room-caption {
+  font-weight: 500;
+  font-size: 16px;
   margin-top: 10px;
+  text-align: center;
 }
 
-.study_box {
+.entertain_sheet {
   background-color: #ead8c0;
   border-radius: 16px;
   max-width: 800px;
   box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
+  margin-top: 40px;
 }
 
-.entertain_box {
+.bookingentertain-font {
+  font-weight: 400;
+  font-size: 16px;
+  margin-left: 447px;
+  margin-top: 25px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #493628;
+  transition: text-decoration 0.2s ease-in-out;
+  position: relative;
+  z-index: 10;
+}
+
+.meeting_sheet {
   background-color: #ead8c0;
   border-radius: 16px;
   max-width: 800px;
   box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
+  margin-top: 40px;
 }
 
-.meeting_box {
-  background-color: #ead8c0;
-  border-radius: 16px;
-  max-width: 800px;
-  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
+.bookingmeeting-font {
+  font-weight: 400;
+  font-size: 16px;
+  margin-left: 455px;
+  margin-top: 25px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #493628;
+  transition: text-decoration 0.2s ease-in-out;
+  position: relative;
+  z-index: 10;
+}
+
+.mg-slidegroupmeeting {
+  margin-left: 50px;
+  margin-left: -2px;
+}
+
+.size-image:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.v-slide-group__controls {
+  z-index: 10;
+}
+
+.mg-toppage {
+  margin-top: -615px;
+}
+
+.align-center {
+  text-align: center;
 }
 
 .style_dialog {
   background-color: #fff;
-  max-width: 900px;
+  max-width: 800px;
   box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
-}
-
-.mg-textdialogs {
-  margin-left: 50px;
-}
-
-.mg-textdialoge {
-  margin-right: 50px;
-}
-
-.mg-topdialog {
-  margin-top: 50px;
-}
-
-.mg-bottomdialog {
-  margin-bottom: 10px;
 }
 
 .selected-room {
@@ -413,189 +397,143 @@ function selectRoom(room: Room) {
   color: white;
 }
 
-/* ipad */
+/* ipad แนวนอน*/
+@media only screen and (min-width: 1025px) and (max-width: 1440px) {
+  .toppic-font {
+    font-weight: 600;
+    font-size: 24px;
+    text-align: center;
+  }
 
-@media (max-width: 1024px) {
-  .head-title {
+  .mg-btmtoppic {
+    margin-top: 35px;
+    margin-bottom: 50px;
+  }
+
+  .study_sheet {
+    background-color: #ead8c0;
+    border-radius: 16px;
+    max-width: 800px;
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .type_font {
     font-weight: 600;
     font-size: 20px;
+    margin-left: 65px;
+    margin-top: 20px;
   }
 
-  .head1-title {
-    font-weight: 600;
-    font-size: 20px;
-    margin-left: 40px;
-  }
-
-  .mg-leftimage {
-    margin-left: 100px;
-  }
-
-  .regular-study-title {
+  .bookingstudy-font {
     font-weight: 400;
     font-size: 16px;
-    margin-left: 255px;
-    margin-top: 8px;
+    margin-left: 415px;
+    margin-top: 25px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #493628;
+    transition: text-decoration 0.2s ease-in-out;
+    position: relative;
+    z-index: 10;
   }
 
-  .regular-entertain-title {
-    font-weight: 400;
-    font-size: 16px;
-    margin-left: 347px;
-    margin-top: 8px;
+  .mg-slidegroup {
+    margin-left: 50px;
   }
 
-  .regular-meeting-title {
-    font-weight: 400;
-    font-size: 16px;
-    margin-left: 295px;
-    margin-top: 8px;
+  .pd-slidegroup {
+    padding: 16px;
+    display: flex;
   }
 
-  .room-caption {
-    font-weight: 500;
-    font-size: 13px;
-  }
-
-  .slide-image {
-    width: 170px;
-    height: 170px;
+  .size-image {
+    width: 200px;
+    height: 200px;
     border-radius: 10px;
     object-fit: cover;
     transition: transform 0.3s ease-in-out;
   }
 
-  .ms-kob {
-    margin-top: -900px;
-  }
-
-  .mg-arrow {
-    margin-left: 1px;
-  }
-
-  .mg-arrowipad {
-    margin-left: 85px;
-  }
-
-  .dialog-image {
-    width: 300px;
-    height: 300px;
-    margin: auto;
-  }
-
-  .icon-gif {
-    width: 50px;
-    height: 50px;
-    margin-top: 10px;
-  }
-
-  .text-left {
-    font-size: 16px;
-  }
-
-  .mg-textdialogs {
-    margin-left: 0px;
-  }
-
-  .mg-textdialoge {
-    margin-right: 0px;
-  }
-
-  .mg-topdialog {
-    margin-top: 20px;
-  }
-
-  .mg-bottomdialog {
-    margin-bottom: 10px;
-  }
-}
-
-/* phone */
-@media (max-width: 768px) {
-  .head-title {
-    font-weight: 600;
-    font-size: 20px;
-  }
-
-  .head1-title {
-    font-weight: 600;
-    font-size: 14px;
-    margin-left: -40px;
-  }
-
-  .regular-study-title {
-    font-weight: 400;
-    font-size: 14px;
-    margin-left: 40px;
-    margin-top: 5px;
-  }
-
-  .regular-entertain-title {
-    font-weight: 400;
-    font-size: 14px;
-    margin-left: 123px;
-    margin-top: 5px;
-  }
-
-  .regular-meeting-title {
-    font-weight: 400;
-    font-size: 14px;
-    margin-left: 68px;
-    margin-top: 5px;
-  }
-
   .room-caption {
     font-weight: 500;
-    font-size: 13px;
-  }
-
-  .slide-image {
-    width: 170px;
-    height: 170px;
-    border-radius: 10px;
-    object-fit: cover;
-    transition: transform 0.3s ease-in-out;
-  }
-
-  .ms-kob {
-    margin-top: -550px;
-  }
-
-  .mg-arrow {
-    margin-left: 1px;
-  }
-
-  .dialog-image {
-    width: 170px;
-    height: 170px;
-    margin: auto;
-    padding: 10px;
-  }
-
-  .icon-gif {
-    width: 50px;
-    height: 50px;
+    font-size: 16px;
     margin-top: 10px;
+    text-align: center;
   }
 
-  .text-left {
-    font-size: 11px;
+  .entertain_sheet {
+    background-color: #ead8c0;
+    border-radius: 16px;
+    max-width: 800px;
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
+    margin-top: 40px;
   }
 
-  .mg-textdialogs {
-    margin-left: 0px;
+  .bookingentertain-font {
+    font-weight: 400;
+    font-size: 16px;
+    margin-left: 447px;
+    margin-top: 25px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #493628;
+    transition: text-decoration 0.2s ease-in-out;
+    position: relative;
+    z-index: 10;
   }
 
-  .mg-textdialoge {
-    margin-right: 0px;
+  .meeting_sheet {
+    background-color: #ead8c0;
+    border-radius: 16px;
+    max-width: 800px;
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
+    margin-top: 40px;
   }
 
-  .mg-topdialog {
-    margin-top: 20px;
+  .bookingmeeting-font {
+    font-weight: 400;
+    font-size: 16px;
+    margin-left: 455px;
+    margin-top: 25px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #493628;
+    transition: text-decoration 0.2s ease-in-out;
+    position: relative;
+    z-index: 10;
   }
 
-  .mg-bottomdialog {
-    margin-bottom: 10px;
+  .mg-slidegroupmeeting {
+    margin-left: 50px;
+    margin-left: -2px;
+  }
+
+  .size-image:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .v-slide-group__controls {
+    z-index: 10;
+  }
+
+  .mg-toppage {
+    margin-top: -615px;
+  }
+
+  .align-center {
+    text-align: center;
+  }
+
+  .style_dialog {
+    background-color: #fff;
+    max-width: 800px;
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .selected-room {
+    background-color: #493628;
+    color: white;
   }
 }
 </style>
