@@ -107,19 +107,31 @@
 
           <!-- ✅ แสดงข้อมูลห้องที่เลือก -->
           <div v-if="selectedRoom" class="text-center">
-            <h2>{{ selectedRoom.room_Name }}</h2>
-            <p>ที่นั่ง {{ selectedRoom.capacity }} คน</p>
-            <p>รับกุญแจชั้น {{ selectedRoom.RoomKey || "-" }}</p>
-            <img
-              :src="`${linkBaseURL}${selectedRoom.imagePath}`"
-              :alt="selectedRoom.imagePath || 'ไม่มีภาพ'"
-              class="dialog-image mx-auto"
-            />
+            <h2 class="room_fontdialog">{{ selectedRoom.room_Name }}</h2>
+            <v-row>
+              <v-col>
+                <v-img :src="couch" class="size-imageicon mx-auto" />
+                <p>ที่นั่ง {{ selectedRoom.capacity }} คน</p>
+              </v-col>
+              <v-col>
+                <router-link to="/table_study">
+                  <img
+                    :src="`${linkBaseURL}${selectedRoom.imagePath}`"
+                    :alt="selectedRoom.imagePath || 'ไม่มีภาพ'"
+                    class="dialog-image mx-auto"
+                    title="คลิกเพื่อจองห้อง"
+                  />
+                </router-link>
+              </v-col>
+              <v-col>
+                <v-img :src="holdinghandkey" class="size-imageicon mx-auto" />
+                <p>รับกุญแจชั้น {{ selectedRoom.RoomKey || "-" }}</p>
+              </v-col>
+            </v-row>
+            <p class="detail-roomfont">รายละเอียดห้อง {{ selectedRoom.RoomKey || "-" }}</p>
+            <p class="detail-roomfont">สิทธิ์ในการจองห้อง {{ selectedRoom.RoomKey || "-" }}</p>
           </div>
-          <!-- ✅ ถ้ายังไม่ได้เลือกห้อง -->
-          <div v-else class="text-center">
-            <p>กรุณาเลือกห้อง</p>
-          </div>
+
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -135,7 +147,8 @@ import { useRoomStore } from "@/stores/roomStore";
 import lib from "@/assets/lib.png";
 import type { Room } from "@/types/room";
 import http from "@/axios/index";
-
+import couch from "@/assets/couch.png";
+import holdinghandkey from "@/assets/holding-hand-key.png";
 const roomStore = useRoomStore();
 const groupedByType = ref<Record<string, Room[]>>({});
 const dialog = ref(false);
@@ -390,6 +403,25 @@ function selectRoom(room: Room) {
   background-color: #fff;
   max-width: 800px;
   box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
+}
+
+.room_fontdialog {
+  font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.size-imageicon {
+  margin-top: 100px;
+  margin-bottom: 10px;
+  width: 50px;
+  height: 50px;
+}
+
+.detail-roomfont {
+  font-size: 15px;
+  margin-top: 15px;
+  margin-bottom: 5px;
 }
 
 .selected-room {

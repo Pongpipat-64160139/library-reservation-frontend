@@ -37,7 +37,7 @@
         <div class="color-currently"></div>
         <span class="status-text">กำลังใช้งาน</span>
         <div class="color-waiting ms-5"></div>
-        <span class="status-text">รอใช้งาน</span>
+        <span class="status-text">รออนุมัติ</span>
         <div class="color-success ms-5"></div>
         <span class="status-text">ใช้งานเสร็จสิ้น</span>
       </div>
@@ -94,7 +94,7 @@
         <div class="color-currently"></div>
         <span class="status-text">กำลังใช้งาน</span>
         <div class="color-waiting ms-5"></div>
-        <span class="status-text">รอใช้งาน</span>
+        <span class="status-text">รออนุมัติ</span>
         <div class="color-success ms-5"></div>
         <span class="status-text">ใช้งานเสร็จสิ้น</span>
       </div>
@@ -153,7 +153,7 @@
         <div class="color-currently"></div>
         <span class="status-text">กำลังใช้งาน</span>
         <div class="color-waiting ms-5"></div>
-        <span class="status-text">รอใช้งาน</span>
+        <span class="status-text">รออนุมัติ</span>
         <div class="color-success ms-5"></div>
         <span class="status-text">ใช้งานเสร็จสิ้น</span>
       </div>
