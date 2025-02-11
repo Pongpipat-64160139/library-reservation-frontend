@@ -30,9 +30,6 @@ async function saveReserved() {
   const orders = await orderStore.orders;
   const file = await documentFileStore.currentDocument;
   const res = await documentFileStore.newDocumentFile(file!);
-  // orderStore.createdOrder(1);
-  // await console.log("Selected :", eq);
-  // await console.log("Orders :", orders);
   await console.log("DocumentStore :", res);
 }
 </script>

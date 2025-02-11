@@ -8,6 +8,14 @@ export function createNewDocumentFile(file: File) {
     },
   });
 }
+export function updateFile(id: number, file: File) {
+  return http.patch(`/documents/${id}`, file, {
+    headers: {
+      "Content-Type": "multipart/form-data; charset=UTF-8",
+    },
+  });
+}
 export default {
   createNewDocumentFile,
+  updateFile,
 };

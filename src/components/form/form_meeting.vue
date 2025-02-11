@@ -28,7 +28,7 @@
           :rules="[(v) => /^\d+$/.test(v) || '', (v) => v > 0 || '']"
           @input="validateNumber"
         />
-
+        {{ numPeople }}
         <h1 class="ps-15 pt-5 head1-title">เบอร์โทรติดต่อ</h1>
         <v-text-field
           v-model="phoneNumber"
@@ -37,8 +37,8 @@
           label=""
           :rules="[(v) => /^\d{10}$/.test(v) || '']"
         />
+        {{ phoneNumber }}
       </span>
-
       <!-- span3 -->
       <span class="d-flex">
         <h1 class="ps-2 pt-5 head1-title">ชื่อป้ายเวที</h1>
@@ -181,63 +181,7 @@
         />
       </span>
 
-      <!-- span4 -->
-      <span class="d-flex">
-        <h1 class="mg-repeat pt-5 head1-title">ทำซ้ำ</h1>
-        <v-select
-          v-model="repeatOption"
-          :items="['ไม่', 'ทำซ้ำ']"
-          outlined
-          label=""
-          class="width-formrepeat text-field-rounded"
-          @change="onRepeatOptionChange"
-        />
-        <h1 class="ps-12 pt-5 head1-title">สิ้นสุด</h1>
-        <v-menu
-          v-model="endRepeatMenu"
-          v-model:return-value="endRepeatDate"
-          class="width-formdate text-field-rounded"
-          :close-on-content-click="false"
-          transition="scale-transition"
-          offset-y
-        >
-          <template #activator="{ props }">
-            <v-text-field
-              class="width-formdate text-field-rounded"
-              v-bind="props"
-              :value="
-                endRepeatDate
-                  ? new Date(endRepeatDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-              "
-              readonly
-              :disabled="repeatOption === 'ไม่'"
-            />
-          </template>
-          <v-date-picker
-            v-model="endRepeatDate"
-            :allowed-dates="allowedDates"
-            :min="new Date().toISOString().split('T')[0]"
-            @update:model-value="
-              (val) => {
-                endRepeatDate = val;
-                endRepeatMenu = false;
-              }
-            "
-          />
-        </v-menu>
-        <h1 class="ps-15 width-formblank1" />
-      </span>
+    
     </v-sheet>
   </v-container>
 </template>

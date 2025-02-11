@@ -5,11 +5,5 @@ export interface PostDocumentFile {
 
   fileName: string; // ชื่อไฟล์ เช่น "example.pdf"
 
-  fileType: string; // ประเภทไฟล์ เช่น "application/pdf"
-
-  fileSize: number; // ขนาดไฟล์ในหน่วย Byte เช่น 1024
-
-  uploadedAt: Date; // วันที่อัปโหลดไฟล์
-
-  data?: Buffer | null; // ตัวไฟล์จริงในรูปแบบ Binary (ใช้ `LONGBLOB` ใน MySQL)
+  documentPath: string; // เก็บ Path ไฟล์ เช่น /uploads/documents/file-xxxxx13486.pdf"
 }
