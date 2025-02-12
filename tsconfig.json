@@ -1,11 +1,17 @@
 {
   "compilerOptions": {
-    "typeRoots": ["node_modules/@types"], // เพิ่ม Type Definitions ของ Node.js
-    "types": ["node"], // บอกให้รองรับ Buffer และโมดูล Node.js
-    "moduleResolution": "node", // ใช้ Node.js Module Resolution
-    "module": "commonjs", // หรือ ESNext หากต้องการ
-    "target": "ES2017", // ตั้งเป้าหมายของ JavaScript
-    "strict": true // เปิดการตรวจสอบ TypeScript แบบเข้มงวด
+    "baseUrl": "./",   // ✅ บอกว่า path เริ่มจาก root ของโปรเจค
+    "paths": {
+      "@/*": ["src/*"],    // ✅ กำหนดว่า `@/` ให้ชี้ไปที่ `src/`
+      "@stores/*": ["src/stores/*"], // ✅ ทำให้ `@stores/roomStore` ชี้ไปที่ `src/stores/roomStore.ts`
+      "@types/*": ["src/types/*"]    // ✅ ทำให้ `@types/user` ชี้ไปที่ `src/types/user.ts`
+    },
+    "typeRoots": ["node_modules/@types"], // ✅ ให้ TypeScript รู้จัก Type Definitions ที่อยู่ใน node_modules
+    "types": ["node"], // ✅ รองรับ TypeScript ที่ใช้กับ Node.js
+    "moduleResolution": "node", // ✅ บอกให้ TypeScript ใช้วิธี resolve module แบบ Node.js
+    "module": "commonjs", // ✅ กำหนดให้ใช้ CommonJS (เหมาะกับ Node.js)
+    "target": "ES2017", // ✅ ตั้งค่า JavaScript Target เป็น ES2017
+    "strict": true // ✅ เปิด strict mode ใน TypeScript
   },
   "files": [],
   "references": [

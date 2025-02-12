@@ -1,6 +1,4 @@
-import { Buffer } from "buffer";
-
-export interface PostDocumentFile {
+export interface Document {
   id: string | number; // ID หลัก เป็น Primary Key
 
   fileName: string; // ชื่อไฟล์ เช่น "example.pdf"

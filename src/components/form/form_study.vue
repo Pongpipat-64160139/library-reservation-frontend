@@ -182,16 +182,13 @@ import { useParticipantStore } from "@/stores/participant";
 // Types
 import type { GetRoomType } from "@/types/getRoomType";
 import type { NormalRoomBooking, PostNormalReseved } from "@/types/normalRoomBooking";
-import type { Room } from "@/types/room";
 import type { UBPostpayload, UserBooking } from "@/types/userBooking";
 import type { User } from "@/types/user";
-import type { ParticipantPostPayload } from "@/types/participant";
 
 // ---------------------
 // Store Initialization
 // ---------------------
 // ใช้ store ในการจัดการข้อมูล
-const route = useRoute();
 const roomStore = useRoomStore();
 const timeStore = useTimeStore();
 const nrbStore = useNormalRoomBookStore();
@@ -205,7 +202,6 @@ const participantStore = useParticipantStore();
 // ตัวแปรแบบ reactive สำหรับจัดการข้อมูลใน component
 const numPeople = ref(""); // จำนวนคนที่เข้าร่วม
 const formDetail = ref<string>(""); // รายละเอียดในฟอร์ม
-const menu = ref(false); // เมนูแสดง/ซ่อน
 const startMenu = ref(false); // เมนูเริ่มต้น
 const endMenu = ref(false); // เมนูสิ้นสุด
 const startDate = ref<Date | null>(null); // วันที่เริ่มต้น
@@ -242,6 +238,7 @@ function generateStartTime() {
   const endTime = "19:30";
   timeStore.generateTimeSlots(startTime.value, endTime);
 }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const callFunction_GenerateTime = generateStartTime();
 // เวลาที่เริ่มต้นสำหรับการใช้งาน
 const timeOptions = timeStore.timeSlots;
@@ -511,14 +508,14 @@ watch(startTime, (newStartTime) => {
   console.log("Start Time:", newStartTime);
   updateEndTimeSlots();
 });
-watch(endTime, (newEndTime, oldEndTime) => {
+watch(endTime, (newEndTime) => {
   console.log("new End Time:", newEndTime);
 });
 
 watch(floor, (newFloor) => {
   console.log("Floor update:", newFloor);
 });
-watch(roomName, (newRoom, oldRoom) => {
+watch(roomName, (newRoom) => {
   console.log(roomName.value);
   selectRoom(floor.value!, newRoom);
 });

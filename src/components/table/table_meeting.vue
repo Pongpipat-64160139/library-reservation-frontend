@@ -4,9 +4,18 @@
     <v-container>
       <v-row justify="center" align="center">
         <!-- Dropdown เลือกประเภทห้อง -->
-        <v-col class="d-flex justify-center" cols="auto" style="margin-right: 100px">
-          <v-select v-model="selectedPage" class="size-dropdown v-selectcolor" label="ประเภทห้อง" :items="typeroom"
-            @update:model-value="onSelectChange" />
+        <v-col
+          class="d-flex justify-center"
+          cols="auto"
+          style="margin-right: 100px"
+        >
+          <v-select
+            v-model="selectedPage"
+            class="size-dropdown v-selectcolor"
+            label="ประเภทห้อง"
+            :items="typeroom"
+            @update:model-value="onSelectChange"
+          />
         </v-col>
 
         <!-- ช่องสำหรับปุ่มแสดงวันที่ -->
@@ -15,24 +24,30 @@
             {{
               selectedDate
                 ? new Date(selectedDate).toLocaleDateString("th-TH", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
                 : new Date().toLocaleDateString("th-TH", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
             }}
             <v-icon class="calendar-icon"> mdi-calendar </v-icon>
           </v-btn>
 
-          <v-date-picker v-if="showDatePicker" v-model="selectedDate" class="date-picker-position"
-            :allowed-dates="allowedDates" :day-class="getDayClass" @update:model-value="handleDateSelect"
-            @click:clear="selectedDate = null" />
+          <v-date-picker
+            v-if="showDatePicker"
+            v-model="selectedDate"
+            class="date-picker-position"
+            :allowed-dates="allowedDates"
+            :day-class="getDayClass"
+            @update:model-value="handleDateSelect"
+            @click:clear="selectedDate = null"
+          />
         </v-col>
       </v-row>
     </v-container>
@@ -54,20 +69,35 @@
         <thead>
           <tr>
             <th class="font-table">เวลา</th>
-            <th v-for="(room, index) in twozo" :key="room.roomId" class="font-table">
+            <th
+              v-for="(room, index) in twozo"
+              :key="room.roomId"
+              class="font-table"
+            >
               {{ room.roomName }}
             </th>
           </tr>
         </thead>
 
         <tbody>
-          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
+          <tr
+            v-for="(time, timeIndex) in timeSlots"
+            :key="time"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
+          >
             <td class="time-column font-table">
               {{ time }}
             </td>
-            <td v-for="(room, roomIndex) in twozo" :key="roomIndex" class="room1-column"
-              @click="selectRoom(room.roomId)">
-              <a :href="generateBookingLink(roomIndex, time, 2)" class="table-link" />
+            <td
+              v-for="(room, roomIndex) in twozo"
+              :key="roomIndex"
+              class="room1-column"
+              @click="selectRoom(room.roomId)"
+            >
+              <a
+                :href="generateBookingLink(roomIndex, time, 2)"
+                class="table-link"
+              />
             </td>
           </tr>
         </tbody>
@@ -99,15 +129,28 @@
         </thead>
 
         <tbody>
-          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
+          <tr
+            v-for="(time, timeIndex) in timeSlots"
+            :key="time"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
+          >
             <td class="time-column font-table">
               {{ time }}
             </td>
-            <td v-for="(room, roomIndex) in lecture" :key="roomIndex" class="room3-column"
-              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(room.roomId)">
+            <td
+              v-for="(room, roomIndex) in lecture"
+              :key="roomIndex"
+              class="room3-column"
+              :class="getCellClass(room.roomId, time)?.class"
+              :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden"
+              @click="selectRoom(room.roomId)"
+            >
               {{ getCellClass(room.roomId, time)?.text }}
-              <a :href="generateBookingLink(roomIndex, time, 5)" class="table-link" />
+              <a
+                :href="generateBookingLink(roomIndex, time, 5)"
+                class="table-link"
+              />
             </td>
           </tr>
         </tbody>
@@ -132,21 +175,38 @@
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th v-for="room in smartboard" :key="room.roomId" class="font-table">
+            <th
+              v-for="room in smartboard"
+              :key="room.roomId"
+              class="font-table"
+            >
               {{ room.roomName }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
+          <tr
+            v-for="(time, timeIndex) in timeSlots"
+            :key="time"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
+          >
             <td class="time-column font-table">
               {{ time }}
             </td>
-            <td v-for="(room, roomIndex) in smartboard" :key="roomIndex" class="room1-column"
-              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(room.roomId)">
+            <td
+              v-for="(room, roomIndex) in smartboard"
+              :key="roomIndex"
+              class="room1-column"
+              :class="getCellClass(room.roomId, time)?.class"
+              :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden"
+              @click="selectRoom(room.roomId)"
+            >
               {{ getCellClass(room.roomId, time)?.text }}
-              <a :href="generateBookingLink(roomIndex, time, 5)" class="table-link" />
+              <a
+                :href="generateBookingLink(roomIndex, time, 5)"
+                class="table-link"
+              />
             </td>
           </tr>
         </tbody>
@@ -171,21 +231,38 @@
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th v-for="room in ministudio" :key="room.roomId" class="font-table">
+            <th
+              v-for="room in ministudio"
+              :key="room.roomId"
+              class="font-table"
+            >
               {{ room.roomName }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
+          <tr
+            v-for="(time, timeIndex) in timeSlots"
+            :key="time"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
+          >
             <td class="time-column font-table">
               {{ time }}
             </td>
-            <td v-for="(room, roomIndex) in ministudio" :key="roomIndex" class="room1-column"
-              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(room.roomId)">
+            <td
+              v-for="(room, roomIndex) in ministudio"
+              :key="roomIndex"
+              class="room1-column"
+              :class="getCellClass(room.roomId, time)?.class"
+              :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden"
+              @click="selectRoom(room.roomId)"
+            >
               {{ getCellClass(room.roomId, time)?.text }}
-              <a :href="generateBookingLink(roomIndex, time, 6)" class="table-link" />
+              <a
+                :href="generateBookingLink(roomIndex, time, 6)"
+                class="table-link"
+              />
             </td>
           </tr>
         </tbody>
@@ -216,15 +293,28 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
+          <tr
+            v-for="(time, timeIndex) in timeSlots"
+            :key="time"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
+          >
             <td class="time-column font-table">
               {{ time }}
             </td>
-            <td v-for="(room, roomIndex) in cyberzone" :key="roomIndex" class="room2-column"
-              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(room.roomId)">
+            <td
+              v-for="(room, roomIndex) in cyberzone"
+              :key="roomIndex"
+              class="room2-column"
+              :class="getCellClass(room.roomId, time)?.class"
+              :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden"
+              @click="selectRoom(room.roomId)"
+            >
               {{ getCellClass(room.roomId, time)?.text }}
-              <a :href="generateBookingLink(roomIndex, time, 6)" class="table-link" />
+              <a
+                :href="generateBookingLink(roomIndex, time, 6)"
+                class="table-link"
+              />
             </td>
           </tr>
         </tbody>
@@ -249,21 +339,38 @@
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th v-for="room in liveforlife" :key="room.roomId" class="font-table">
+            <th
+              v-for="room in liveforlife"
+              :key="room.roomId"
+              class="font-table"
+            >
               {{ room.roomName }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
+          <tr
+            v-for="(time, timeIndex) in timeSlots"
+            :key="time"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
+          >
             <td class="time-column font-table">
               {{ time }}
             </td>
-            <td v-for="(room, roomIndex) in liveforlife" :key="roomIndex" class="room1-column"
-              :class="getCellClass(room.roomId, time)?.class" :rowspan="getCellClass(room.roomId, time)?.rowspan"
-              v-show="!getCellClass(room.roomId, time)?.isHidden" @click="selectRoom(room.roomId)">
+            <td
+              v-for="(room, roomIndex) in liveforlife"
+              :key="roomIndex"
+              class="room1-column"
+              :class="getCellClass(room.roomId, time)?.class"
+              :rowspan="getCellClass(room.roomId, time)?.rowspan"
+              v-show="!getCellClass(room.roomId, time)?.isHidden"
+              @click="selectRoom(room.roomId)"
+            >
               {{ getCellClass(room.roomId, time)?.text }}
-              <a :href="generateBookingLink(roomIndex, time, 6)" class="table-link" />
+              <a
+                :href="generateBookingLink(roomIndex, time, 6)"
+                class="table-link"
+              />
             </td>
           </tr>
         </tbody>
@@ -288,19 +395,34 @@
         <thead>
           <tr>
             <th class="time-column font-table">เวลา</th>
-            <th v-for="room in sevenfloor" :key="room.roomId" class="font-table">
+            <th
+              v-for="room in sevenfloor"
+              :key="room.roomId"
+              class="font-table"
+            >
               {{ room.roomName }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(time, timeIndex) in timeSlots" :key="time" :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'">
+          <tr
+            v-for="(time, timeIndex) in timeSlots"
+            :key="time"
+            :class="timeIndex % 2 === 0 ? 'row-even' : 'row-odd'"
+          >
             <td class="time-column font-table">
               {{ time }}
             </td>
-            <td v-for="(room, roomIndex) in sevenfloor" :key="roomIndex" class="room2-column"
-              @click="selectRoom(room.roomId)">
-              <a :href="generateBookingLink(roomIndex, time, 7)" class="table-link" />
+            <td
+              v-for="(room, roomIndex) in sevenfloor"
+              :key="roomIndex"
+              class="room2-column"
+              @click="selectRoom(room.roomId)"
+            >
+              <a
+                :href="generateBookingLink(roomIndex, time, 7)"
+                class="table-link"
+              />
             </td>
           </tr>
         </tbody>
@@ -547,12 +669,14 @@ const generateBookingLink = (
   const currentRoom = roomStore.currentTypeRoom;
   // ถ้าห้องอยู่ในชั้น 2 หรือชั้น 7 ให้ไป booking_meeting
   if (currentRoom.floorId + 1 === 2 || currentRoom.floorId + 1 === 7) {
-    return `/booking_meeting?floor=${floor}&room=${roomIndex + 1
-      }&time=${time}&date=${formattedDate}`;
+    return `/booking_meeting?floor=${floor}&room=${
+      roomIndex + 1
+    }&time=${time}&date=${formattedDate}`;
   } else {
     // // ค่าเริ่มต้นสำหรับหน้า booking_study
-    return `/booking_study?floor=${floor}&room=${roomIndex + 1
-      }&time=${time}&date=${formattedDate}`;
+    return `/booking_study?floor=${floor}&room=${
+      roomIndex + 1
+    }&time=${time}&date=${formattedDate}`;
   }
 };
 

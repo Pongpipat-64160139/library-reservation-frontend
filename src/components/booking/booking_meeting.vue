@@ -4,7 +4,7 @@
     <Form_meeting />
     <Form_equipment class="mt-1" />
     <!-- to="/table_meeting" -->
-    <v-btn @click="saveReserved()" type="submit" class="save-btn custom-btn">
+    <v-btn type="submit" class="save-btn custom-btn" @click="saveReserved()">
       <v-icon left> mdi-content-save </v-icon>
       จองห้อง
     </v-btn>

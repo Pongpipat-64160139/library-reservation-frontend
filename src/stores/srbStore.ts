@@ -1,14 +1,29 @@
 import { defineStore } from "pinia";
-import floorService from "../services/floorService";
 import specialRoomService from "../services/specialRoomService";
 import {
   PostSpecialRoom,
   UpdateSpecialRoom,
 } from "../types/specialRoomBooking";
+import { ref } from "vue";
 
 export const useSpecialRoomStore = defineStore("specialRoom", () => {
   const srbService = specialRoomService;
-
+  const newSRB = ref<PostSpecialRoom>({
+    people_Count: 0, // ค่าเริ่มต้นเป็น 0 (ยังไม่มีคน)
+    contract_Number: "", // ค่าเริ่มต้นเป็น String ว่าง
+    start_Date: "", // ค่าเริ่มต้นให้เป็นค่าว่าง
+    start_Time: "",
+    end_Date: "",
+    end_Time: "",
+    stage_Name: "",
+    equip_Descript: "",
+    order_Description: "",
+    document: 0, // ID เอกสารเป็น 0
+    userId: 0, // ค่าเริ่มต้นให้เป็น 0 (ยังไม่มีการระบุผู้ใช้)
+    reason: "",
+    cancelTime: "",
+    roomId: 0, // ค่าเริ่มต้นให้เป็น 0
+  });
   async function createSpecialRoom(srb: PostSpecialRoom) {
     const res = await srbService.createSpecialRoomBooking(srb);
     return res.data;
@@ -45,6 +60,7 @@ export const useSpecialRoomStore = defineStore("specialRoom", () => {
     return res.data;
   }
   return {
+    newSRB,
     cancelResevedSpecial,
     updateReseveStatus,
     getOneById,

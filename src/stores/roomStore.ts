@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 import roomService from "../services/roomService";
 import { ref } from "vue";
 import { GetRoomType } from "../types/getRoomType";
-import { CurrentRoom } from "../types/currentRoom";
 
 export const useRoomStore = defineStore("room", () => {
   const roomservice = roomService;

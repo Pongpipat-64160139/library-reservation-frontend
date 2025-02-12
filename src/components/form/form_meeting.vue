@@ -21,23 +21,21 @@
         />
         <h1 class="ps-15 pt-5 head1-title">จำนวนคน</h1>
         <v-text-field
-          v-model="numPeople"
+          v-model="srbStore.newSRB.people_Count"
           class="width-formamount text-field-rounded"
           single-line
           label=""
           :rules="[(v) => /^\d+$/.test(v) || '', (v) => v > 0 || '']"
           @input="validateNumber"
         />
-        {{ numPeople }}
         <h1 class="ps-15 pt-5 head1-title">เบอร์โทรติดต่อ</h1>
         <v-text-field
-          v-model="phoneNumber"
+          v-model="srbStore.newSRB.contract_Number"
           class="width-formtell text-field-rounded pe-7"
           single-line
           label=""
           :rules="[(v) => /^\d{10}$/.test(v) || '']"
         />
-        {{ phoneNumber }}
       </span>
       <!-- span3 -->
       <span class="d-flex">
@@ -47,6 +45,7 @@
           single-line
           outlined
           label="กรุณาแจ้งล่วงหน้า 3 วันทำการ"
+          :v-model="srbStore.newSRB.stage_Name"
         />
         <h1 class="mg-floor pt-5 head1-title">ชั้น</h1>
         <v-select
@@ -174,30 +173,29 @@
         <h1 class="ps-5 pt-5 head1-title">เวลา</h1>
         <v-select
           v-model="endTime"
-          :items="filteredEndTimes"
+          :items="filteredEndTimes()"
           outlined
           label=""
           class="width-formtime1 text-field-rounded pe-7"
         />
       </span>
-
-    
     </v-sheet>
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { useRoomStore } from "@/stores/roomStore";
+import { useSpecialRoomStore } from "@/stores/srbStore";
+import { useTimeStore } from "@/stores/timeStore";
 import { ref, computed, watch, onMounted } from "vue";
-
+const srbStore = useSpecialRoomStore();
 const numPeople = ref("");
-const phoneNumber = ref("");
-const menu = ref(false);
+const timeStore = useTimeStore();
+const roomStore = useRoomStore();
 const startMenu = ref(false);
 const endMenu = ref(false);
 const startDate = ref<Date | null>(null);
 const endDate = ref<Date | null>(null);
-const endRepeatMenu = ref(false);
 const endRepeatDate = ref<Date | null>(null);
 const startTime = ref("08:00");
 const endTime = ref("08:30");
@@ -205,29 +203,6 @@ const floor = ref(2);
 const room = ref("201");
 const repeatOption = ref("ไม่");
 const holidays = ref<string[]>([]);
-const timeOptions = [
-  "08:00",
-  "08:30",
-  "09:00",
-  "09:30",
-  "10:00",
-  "10:30",
-  "11:00",
-  "11:30",
-  "12:00",
-  "12:30",
-  "13:00",
-  "13:30",
-  "14:00",
-  "14:30",
-  "15:00",
-  "15:30",
-  "16:00",
-  "16:30",
-  "17:00",
-  "17:30",
-  "18:00",
-];
 const floorRooms = {
   2: ["201"],
   5: ["Lecturer's Room 1", "Lecturer's Room 2", "Lecturer's Room 3"],
@@ -241,11 +216,6 @@ const floorRooms = {
   7: ["706", "707"],
 };
 const currentDate = ref<string | null>(null);
-const showStartDatePicker = ref(false);
-const showEndDatePicker = ref(false);
-const currentStartDate = ref("");
-const currentEndDate = ref("");
-const roomStore = useRoomStore();
 
 // Lifecycle hooks
 onMounted(async () => {
@@ -255,16 +225,38 @@ onMounted(async () => {
       fetchHolidays(currentYear),
       (currentDate.value = formatDate(new Date())),
     ]);
+    await filteredEndTimes();
   } catch (error) {
     console.error("Error initializing holidays:", error);
   }
 });
-// Computed properties
-const filteredEndTimes = computed(() => {
-  const start = startTime.value;
-  const startIndex = timeOptions.indexOf(start);
-  return startIndex >= 0 ? timeOptions.slice(startIndex + 1) : [];
-});
+function updateEndTimeSlots() {
+  endTime.value = timeStore.updateEndTime(startTime.value!);
+}
+
+function generateStartTime() {
+  // เวลาถัดไป
+  const nextTime = timeStore.findNextAvailableTime();
+  startTime.value = nextTime!;
+  updateEndTimeSlots();
+  const endTime = "19:30";
+  timeStore.generateTimeSlots(startTime.value, endTime);
+}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const callFunction_GenerateTime = generateStartTime();
+const timeOptions = timeStore.timeSlots;
+
+const filteredEndTimes = () => {
+  const maxHours = roomStore.currentTypeRoom.maxHours;
+  const times = ref<string[]>([]);
+  const clossingTime = "20:30";
+  if (maxHours) {
+    times.value = [];
+    timeStore.generateEndTimeSlots(startTime.value, maxHours, clossingTime);
+    times.value = timeStore.endTimeSlots;
+    return times.value;
+  }
+};
 
 const availableRooms = computed(() => {
   return floor.value in floorRooms
@@ -274,13 +266,15 @@ const availableRooms = computed(() => {
 
 // Watchers
 watch(startTime, (newStartTime) => {
-  const availableTimes = filteredEndTimes.value;
-  endTime.value = availableTimes[0] || "08:30";
+  console.log("Now start time :", newStartTime);
 });
-
+watch(endTime, (newEndTime) => {
+  console.log("Now end time :", newEndTime);
+});
 watch(floor, (newFloor) => {
   const firstRoom = floorRooms[newFloor as keyof typeof floorRooms]?.[0] || "";
   room.value = firstRoom;
+  console.log("now floor :", floor.value);
 });
 
 // Methods
