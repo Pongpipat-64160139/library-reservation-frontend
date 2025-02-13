@@ -1,15 +1,15 @@
 <template>
   <Header_page />
 
-  <v-container fluid class="back-ground ms-kob">
-    <h1 class="pt-5 head-title text-center pb-10">สถานะการจอง</h1>
+  <v-container fluid class="back-ground mg-toppage">
+    <h1 class="topic-text">สถานะการจอง</h1>
 
     <!-- Tabs for floors -->
     <v-tabs v-model="selectedFloor" background-color="#cdbba7">
       <v-tab
         v-for="floor in availableFloors"
         :key="floor"
-        class="tab-text"
+        class="tabfloor-text"
         :value="floor"
       >
         ชั้น {{ floor }}
@@ -21,13 +21,15 @@
       :headers="headers"
       :items="filteredData"
       style="background-color: #cdbba7"
-      class="rd-test"
+      class="border-table"
     >
       <template #item="{ item, index }">
-        <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
+        <tr
+          :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
+          class="table-font"
+        >
           <td>{{ index + 1 }}</td>
-          <td>{{ item.firstName }} - {{ item.lastName }}</td>
-          <td>{{ item.floorNumber }}</td>
+          <td>-</td>
           <td>{{ item.roomName }}</td>
           <td>{{ item.startDate }}</td>
           <td>{{ item.startTime }} - {{ item.endTime }}</td>
@@ -38,7 +40,7 @@
               icon="mdi-magnify"
               width="40"
               height="40"
-              class="rd-btndetail"
+              class="border-btndetail"
               @click="showDialog(item)"
             />
           </td>
@@ -50,121 +52,93 @@
   <!-- Dialog รายละเอียดการจองห้อง -->
 
   <v-dialog v-model="dialog" max-width="600px">
-    <v-card class="rd-dialog">
-      <span class="head-detailuser">
-        <div class="head-detail"><strong>ผู้ใช้</strong> -</div>
+    <v-card class="border-dialog">
+      <span class="user-text">
+        <div class="headdialog-text"><strong>ผู้ใช้</strong> -</div>
       </span>
 
-      <span class="head-detailname">
-        <div class="head-detail"><strong>ชื่อ</strong> -</div>
+      <span class="name-text">
+        <div class="headdialog-text"><strong>ชื่อ</strong> -</div>
       </span>
 
-      <span class="d-flex head-detaildate1">
+      <span class="d-flex startdate-text">
         <v-row>
-          <v-col cols="5">
-            <div class="head-detail">
+          <v-col cols="7">
+            <div class="headdialog-text">
               <strong>วันที่เริ่ม</strong> {{ selectedItem?.startDate }}
             </div>
           </v-col>
           <v-col>
-            <div class="head-detail ms-10">
+            <div class="headdialog-text ms-10">
               <strong>เวลา</strong> {{ selectedItem?.startTime }}
             </div>
           </v-col>
         </v-row>
       </span>
 
-      <span class="d-flex head-detaildate2">
+      <span class="d-flex enddate-text">
         <v-row>
-          <v-col cols="5">
-            <div class="head-detail">
+          <v-col cols="7">
+            <div class="headdialog-text">
               <strong>วันที่จบ</strong> {{ selectedItem?.endDate }}
             </div>
           </v-col>
           <v-col>
-            <div class="head-detail ms-10">
+            <div class="headdialog-text ms-10">
               <strong>เวลา</strong> {{ selectedItem?.endTime }}
             </div>
           </v-col>
         </v-row>
       </span>
 
-      <span class="d-flex head-detailfloor">
+      <span class="d-flex floor-text">
         <v-row>
-          <v-col cols="5">
-            <div class="head-detail">
+          <v-col cols="7">
+            <div class="headdialog-text">
               <strong>ชั้น</strong> {{ selectedItem?.floorNumber }}
             </div>
           </v-col>
           <v-col>
-            <div class="head-detail ms-10">
+            <div class="headdialog-text ms-10">
               <strong>ห้อง</strong> {{ selectedItem?.roomName }}
             </div>
           </v-col>
         </v-row>
       </span>
 
-      <span class="d-flex head-detail">
-        <div class="head-detail">
+      <span class="d-flex headdialog-text">
+        <div class="headdialog-text">
           <strong>รายละเอียด</strong> {{ selectedItem?.details }}
-        </div>
-      </span>
-
-      <span v-if="selectedItem?.cancelReason" class="d-flex head-detail">
-        <div class="head-detail">
-          <strong>เหตุผลการยกเลิก</strong> {{ selectedItem.cancelReason }}
         </div>
       </span>
 
       <v-card-text />
       <v-card-actions class="d-flex justify-center mb-8">
         <v-btn
-          class="rd-btncanceldia"
+          class="border-btncanceldialog"
           text="ยกเลิกจอง"
           :disabled="
             selectedItem?.status === 'ยกเลิก' ||
             selectedItem?.status === 'อนุมัติ'
           "
-          @click="reasonDialog = true"
+          @click="cancelBooking(selectedItem)"
         >
           ยกเลิกจอง
         </v-btn>
 
-        <v-btn class="rd-btnclose" text="ปิด" @click="dialog = false">
+        <v-btn class="border-btnclose" text="ปิด" @click="dialog = false">
           ปิด
         </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 
-  <!-- Dialog กรอกเหตุผลในการยกเลิกจองห้อง -->
-  <v-dialog v-model="reasonDialog" max-width="400px">
-    <v-card>
-      <v-card-title class="text-center mt-5">
-        <span>ต้องการ "ยกเลิกการจองห้อง" ใช่หรือไม่ ? </span>
-      </v-card-title>
-      <v-card-text>
-        <v-text-field
-          v-model="cancelReason"
-          label="กรอกเหตุผลในการยกเลิก"
-          variant="outlined"
-          :rules="[(v) => !!v || '']"
-        ></v-text-field>
-      </v-card-text>
-      <v-card-actions class="d-flex justify-center mt-2">
-        <v-btn class="rd-btncancel" @click="() => (reasonDialog = false)"
-          >ยกเลิก</v-btn
-        >
-        <v-btn class="rd-btnconfirm" @click="confirmCancel"> ตกลง </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
   <v-snackbar
     v-model="snackbar"
     color="#b5cfb7"
     timeout="3000"
     top
-    class="text-center"
+    class="text-center mx-auto"
   >
     ยกเลิกการจองห้องสำเร็จ !
   </v-snackbar>
@@ -204,6 +178,47 @@ const selectedFloor = ref(2); // ค่าเริ่มต้นของแ�
 const availableFloors = ref<number[]>([2, 3, 4, 5, 6, 7]); // รายการชั้นที่มี
 
 // ฟังก์ชันช่วย
+const cancelBooking = async (booking: BookingDetail | null) => {
+  if (!booking) return;
+
+  try {
+    const cancelTime = getCurrentTime(); // เรียกใช้ฟังก์ชัน
+
+    await nrbStore.cancelReseved(
+      booking.numb,
+      cancelReason.value || "ยกเลิกโดยผู้ใช้",
+      "ยกเลิก",
+      cancelTime
+    );
+
+    // อัปเดต UI
+    booking.status = "ยกเลิก";
+    booking.cancelReason = cancelReason.value || "ยกเลิกโดยผู้ใช้";
+    booking.cancelTime = cancelTime;
+
+    // แสดงข้อความแจ้งเตือน
+    snackbar.value = true;
+
+    // ปิด Dialog
+    dialog.value = false;
+    reasonDialog.value = false;
+  } catch (error) {
+    console.error("Error canceling booking:", error);
+  }
+};
+
+const getCurrentTime = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
+
 const formatTime = (time: string): string => {
   return time.slice(0, 5);
 };
@@ -247,7 +262,6 @@ const formatThaiDate = (dateString: string | number | Date) => {
 const headers = [
   { title: "ลำดับ", align: "start", key: "numb" },
   { title: "ชื่อ", key: "details" },
-  { title: "ชั้น", key: "floorNumber" },
   { title: "ห้อง", key: "roomName" },
   { title: "วันที่", key: "startDate" },
   { title: "เวลา", key: "startTime" },
@@ -314,23 +328,8 @@ const showDialog = (item: BookingDetail) => {
   color: #493628;
 }
 
-.row-even {
-  background-color: #f2efea;
-}
-
-.row-odd {
-  background-color: #e6dfd5;
-}
-
-.head-title {
-  font-weight: 600;
-  font-size: 24px;
-}
-
-th {
-  background-color: #cdbba7;
-  font-weight: bold;
-  font-size: 16px;
+.mg-toppage {
+  margin-top: -600px;
 }
 
 .back-ground {
@@ -341,77 +340,98 @@ th {
   background-position: top left;
 }
 
-.ms-kob {
-  margin-top: -600px;
-}
-
-.head-detailuser {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
-}
-
-.head-detailname {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
-}
-
-.head-detaildate1 {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
-}
-
-.head-detaildate2 {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: -10px;
-  margin-left: 25px;
-}
-
-.head-detailfloor {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
-}
-
-.head-detailrepeat {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: -10px;
-  margin-left: 25px;
-}
-
-.head-detail {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
-}
 .back-ground {
   background-color: #f9f3ea;
 }
 
-.ms-kob {
-  margin-top: -600px;
+.topic-text {
+  font-weight: 600;
+  font-size: 24px;
+  text-align: center;
+  margin-top: 12px;
+  margin-bottom: 38px;
 }
 
-.rd-btndetail {
+.row-even {
+  background-color: #f2efea;
+}
+
+.row-odd {
+  background-color: #e6dfd5;
+}
+
+.tabfloor-text {
+  font-weight: 400;
+  font-size: 17px;
+}
+
+.border-table {
+  border-radius: 10px;
+  border: 1px solid #cdbba7; /* กำหนดกรอบของตาราง */
+  color: #493628;
+  border-collapse: collapse; /* ให้กรอบรวมกัน */
+  font-weight: 400;
+  font-size: 18px;
+}
+
+tr {
+  font-weight: 400;
+  font-size: 17px;
+}
+
+.user-text {
+  font-weight: 300;
+  font-size: 18px;
+  margin-top: 40px;
+  margin-left: 25px;
+}
+
+.name-text {
+  font-weight: 300;
+  font-size: 18px;
+  margin-top: 20px;
+  margin-left: 25px;
+}
+
+.startdate-text {
+  font-weight: 300;
+  font-size: 18px;
+  margin-top: 20px;
+  margin-left: 25px;
+}
+
+.enddate-text {
+  font-weight: 300;
+  font-size: 18px;
+  margin-top: -10px;
+  margin-left: 25px;
+}
+
+.floor-text {
+  font-weight: 300;
+  font-size: 18px;
+  margin-top: 20px;
+  margin-left: 25px;
+}
+
+.headdialog-text {
+  font-weight: 300;
+  font-size: 18px;
+  margin-top: 20px;
+  margin-left: 25px;
+}
+
+.border-btndetail {
   background-color: #f5eded;
   border-radius: 10px;
   border: 1px solid #493628;
 }
 
-.rd-dialog {
+.border-dialog {
   background-color: #f5eded;
   border-radius: 20px;
 }
-.rd-btncanceldia {
+.border-btncanceldialog {
   font-weight: 400;
   font-size: 16px;
   color: #493628;
@@ -422,7 +442,7 @@ th {
   margin-right: 30px;
 }
 
-.rd-btncancel {
+.border-btncancel {
   font-weight: 400;
   font-size: 16px;
   color: #493628;
@@ -434,35 +454,12 @@ th {
   margin-top: -40px;
 }
 
-.rd-btnconfirm {
-  font-weight: 400;
-  font-size: 16px;
-  color: #493628;
-  background-color: #b5cfb7;
-  width: 100px;
-  border-radius: 10px;
-  margin-top: -40px;
-  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
-}
-
-.rd-btnclose {
+.border-btnclose {
   font-weight: 400;
   font-size: 16px;
   background-color: #dad0c2;
   width: 100px;
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
-}
-
-.rd-test {
-  background-color: #f5eded;
-  border-radius: 10px;
-  border: 1px solid #cdbba7; /* กำหนดกรอบของตาราง */
-  border-collapse: collapse; /* ให้กรอบรวมกัน */
-}
-
-.tab-text {
-  font-weight: 400;
-  font-size: 15px;
 }
 </style>

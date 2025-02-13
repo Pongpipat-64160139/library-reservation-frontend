@@ -6,7 +6,7 @@
     <!-- ชื่อหน้าหลัก -->
     <h1 class="toppic-font mg-btmtoppic">ประเภทห้อง</h1>
 
-    <!-- 🔹 Section: Group Study Room -->
+    <!-- Section: Group Study Room -->
     <v-sheet class="mx-auto study_sheet">
       <span class="d-flex">
         <h1 class="type_font">Group Study Room</h1>
@@ -35,7 +35,7 @@
       </v-slide-group>
     </v-sheet>
 
-    <!-- 🔹 Section: Entertainment Room -->
+    <!-- Section: Entertainment Room -->
     <v-sheet class="mx-auto entertain_sheet">
       <span class="d-flex">
         <h1 class="type_font">Entertain Room</h1>
@@ -62,7 +62,7 @@
       </v-slide-group>
     </v-sheet>
 
-    <!-- 🔹 Section: Meeting Room -->
+    <!-- Section: Meeting Room -->
     <v-sheet class="mx-auto meeting_sheet">
       <span class="d-flex">
         <h1 class="type_font">Meeting Room</h1>
@@ -86,11 +86,11 @@
       </v-slide-group>
     </v-sheet>
 
-    <!-- 🔹 Dialog สำหรับแสดงรายละเอียดห้อง -->
+    <!-- Dialog สำหรับแสดงรายละเอียดห้อง -->
     <v-dialog v-model="dialog" overlay max-width="900px">
       <v-card class="style_dialog">
         <v-card-text>
-          <!-- ✅ ปุ่มเลือกห้อง (ถ้ามีห้องให้เลือก) -->
+          <!-- ปุ่มเลือกห้อง (ถ้ามีห้องให้เลือก) -->
           <div v-if="selectedGroup?.rooms" class="d-flex justify-center mb-4">
             <v-btn
               v-for="(room, index) in selectedGroup.rooms"
@@ -105,7 +105,7 @@
             </v-btn>
           </div>
 
-          <!-- ✅ แสดงข้อมูลห้องที่เลือก -->
+          <!-- แสดงข้อมูลห้องที่เลือก -->
           <div v-if="selectedRoom" class="text-center">
             <h2 class="room_fontdialog">{{ selectedRoom.room_Name }}</h2>
             <v-row>
@@ -403,6 +403,7 @@ function selectRoom(room: Room) {
   background-color: #fff;
   max-width: 800px;
   box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
+  margin-left: 50px;
 }
 
 .room_fontdialog {
