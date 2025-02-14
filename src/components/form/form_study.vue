@@ -1,23 +1,18 @@
 <template class="back-ground">
-  <v-container fluid class="back-ground ms-kob">
-    <v-sheet
-      class="mx-auto mt-1"
-      elevation="8"
-      max-width="700"
-      style="background-color: #dfd3c3; border-radius: 16px"
-    >
-      <h1 class="pt-5 head-title text-center pb-5">จองห้อง</h1>
+  <v-container fluid class="back-ground mg-toppage">
+    <v-sheet class="mx-auto size-sheet" elevation="8">
+      <h1 class="topic-text">จองห้อง</h1>
 
       <!-- span1 -->
       <span class="d-flex">
-        <h1 class="mg-name pt-5 head1-title">ชื่อ</h1>
+        <h1 class="mg-name head-text">ชื่อ</h1>
         <v-text-field
           class="width-formname text-field-rounded"
           v-model="numPeople"
           single-line
           outlined
           :rules="[(v) => !!v || '']"
-          label=""
+          :disabled="true"
         />
       </span>
 
@@ -27,24 +22,21 @@
         :key="index"
       >
         <span class="d-flex">
-          <h1 class="mg-name pt-5 head1-title">ชื่อ</h1>
+          <h1 class="mg-name head-text">ชื่อ</h1>
           <v-text-field
             class="width-formname text-field-rounded"
             v-model="listparticipants[index]"
             single-line
             outlined
-            :rules="[
-              (v) => !!v || 'กรุณากรอกชื่อ', // ตรวจสอบว่าต้องไม่ว่าง
-              (v) => (v && v.trim().length > 0) || 'ห้ามใช้ช่องว่างล้วนๆ', // ตรวจสอบห้ามมีแค่ช่องว่าง
-            ]"
-            label=""
+            :placeholder="'กรุณากรอกชื่อ'"
+            :rules="[(v) => !!v || '']"
           />
         </span>
       </div>
 
       <!-- span2 -->
       <span class="d-flex">
-        <h1 class="mg-date1 head1-title">วันที่เริ่ม</h1>
+        <h1 class="mg-startdate head-text">วันที่เริ่ม</h1>
         <v-menu
           v-model="startMenu"
           v-model:return-value="startDate"
@@ -54,7 +46,7 @@
         >
           <template #activator="{ props }">
             <v-text-field
-              class="width-formdate1 text-field-rounded"
+              class="width-startdate text-field-rounded"
               v-bind="props"
               :value="
                 startDate ? formatDate(startDate) : formatDate(new Date())
@@ -70,17 +62,17 @@
           />
         </v-menu>
 
-        <h1 class="mg-time1 head1-title">เวลา</h1>
+        <h1 class="mg-starttime head-text">เวลา</h1>
         <v-select
           v-model="startTime"
           :items="timeOptions"
           outlined
           label="เวลาเริ่มต้น"
-          class="width-formtime1 text-field-rounded"
+          class="width-starttime text-field-rounded"
         />
       </span>
       <span class="d-flex">
-        <h1 class="mg-date2 head1-title">วันที่จบ</h1>
+        <h1 class="mg-enddate head-text">วันที่จบ</h1>
         <v-menu
           v-model="endMenu"
           v-model:return-value="endDate"
@@ -90,7 +82,7 @@
         >
           <template #activator="{ props }">
             <v-text-field
-              class="width-formdate2 text-field-rounded"
+              class="width-enddate text-field-rounded"
               v-bind="props"
               :value="endDate ? formatDate(endDate) : formatDate(new Date())"
               readonly
@@ -107,39 +99,39 @@
             "
           />
         </v-menu>
-        <h1 class="mg-time2 head1-title">เวลา</h1>
+        <h1 class="mg-endtime head-text">เวลา</h1>
         <v-select
           v-model="endTime"
           :items="filteredEndTimes()"
           outlined
           label="เวลาจบ"
-          class="width-formtime2 text-field-rounded"
+          class="width-endtime text-field-rounded"
         />
       </span>
 
       <!-- span3 -->
       <span class="d-flex">
-        <h1 class="mg-floor head1-title">ชั้น</h1>
+        <h1 class="mg-floor head-text">ชั้น</h1>
         <v-select
           v-model="floor"
           :items="availableFloors"
           outlined
           label="ชั้น"
-          class="width-formfloor text-field-rounded"
+          class="width-floor text-field-rounded"
         />
-        <h1 class="mg-room head1-title">ห้อง</h1>
+        <h1 class="mg-room head-text">ห้อง</h1>
         <v-select
           v-model="roomName"
           :items="availableRooms"
           outlined
           label="ห้อง"
-          class="width-formroom text-field-rounded"
+          class="width-room text-field-rounded"
         />
       </span>
 
       <!-- span4 -->
       <span class="d-flex">
-        <h1 class="head1-title mg-detail">รายละเอียด</h1>
+        <h1 class="head-text mg-detail">รายละเอียด</h1>
         <v-textarea
           v-model="formDetail"
           label=""
@@ -151,10 +143,10 @@
       <!-- to="/table_study" -->
       <v-btn
         type="submit"
-        class="save-btn custom-btn"
+        class="save-btn"
+        :disabled="!isFormValid"
         @click="submitBookingRoom()"
       >
-        <v-icon left>mdi-content-save</v-icon>
         จองห้อง
       </v-btn>
     </v-sheet>
@@ -181,7 +173,10 @@ import { useParticipantStore } from "@/stores/participant";
 
 // Types
 import type { GetRoomType } from "@/types/getRoomType";
-import type { NormalRoomBooking, PostNormalReseved } from "@/types/normalRoomBooking";
+import type {
+  NormalRoomBooking,
+  PostNormalReseved,
+} from "@/types/normalRoomBooking";
 import type { UBPostpayload, UserBooking } from "@/types/userBooking";
 import type { User } from "@/types/user";
 
@@ -214,6 +209,15 @@ const currentDate = ref(""); // วันที่ปัจจุบัน
 const saveSelectRoom = ref<GetRoomType>(); // ห้องที่ถูกเลือก
 const normalRoomBooking = ref<PostNormalReseved>(); // การจองห้องปกติ
 const user = ref<User>(); // ข้อมูลผู้ใช้
+
+const isFormValid = computed(() => {
+  // ตรวจสอบว่า listparticipants มีข้อมูลครบถ้วนและจำนวนผู้เข้าร่วมอย่างน้อยตามที่กำหนด
+  const participantCount = listparticipants.value.length + 1; // เพิ่มจำนวนสมาชิกผู้ล็อกอิน
+  return (
+    listparticipants.value.every((name) => name.trim() !== "") &&
+    participantCount >= roomStore.currentTypeRoom.roomMinimum
+  );
+});
 
 // ---------------------
 // Functions and Computed
@@ -529,42 +533,58 @@ watch(roomName, (newRoom) => {
   color: #493628;
 }
 
-.head-title {
-  font-weight: 600;
-  font-size: 20px;
+.back-ground {
+  background-color: #f9f3ea;
 }
 
-.head1-title {
+.mg-toppage {
+  margin-top: -280px;
+}
+
+.size-sheet {
+  height: 1000px;
+  width: 800px;
+  height: 720px;
+  background-color: #dfd3c3;
+  border-radius: 8px;
+}
+
+.topic-text {
+  font-weight: 600;
+  font-size: 20px;
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 25px;
+}
+
+.head-text {
   font-weight: 400;
   font-size: 15px;
   font-weight: 600;
   margin-top: -1px;
-}
-
-.text-center {
-  text-align: center;
+  margin-top: 20px;
 }
 
 .mg-name {
   margin-left: 71px;
 }
 
-.mg-date1 {
+.mg-startdate {
   margin-left: 41px;
   margin-top: 10px;
 }
 
-.mg-date2 {
+.mg-enddate {
   margin-left: 45px;
   margin-top: 10px;
 }
 
-.mg-time1 {
+.mg-starttime {
   margin-left: 25px;
   margin-top: 10px;
 }
 
-.mg-time2 {
+.mg-endtime {
   margin-left: 25px;
   margin-top: 10px;
 }
@@ -579,31 +599,12 @@ watch(roomName, (newRoom) => {
   margin-top: 10px;
 }
 
-.mg-repeat {
-  margin-left: 57px;
-  margin-top: 10px;
-}
-
-.mg-date3 {
-  margin-left: -4px;
-  margin-top: 10px;
-}
-
 .mg-detail {
   margin-left: 19px;
   margin-top: 10px;
 }
 
-.back-ground {
-  background-color: #f9f3ea;
-}
-
-.ms-kob {
-  margin-top: -700px;
-}
-
 .width-formname {
-  width: 100px;
   margin-left: 20px;
   margin-right: 20px;
   color: #493628;
@@ -616,21 +617,21 @@ watch(roomName, (newRoom) => {
   margin-top: -10px;
 }
 
-.width-formdate1 {
+.width-startdate {
   width: 100px;
   margin-left: 20px;
   color: #493628;
   margin-top: -10px;
 }
 
-.width-formdate2 {
+.width-enddate {
   width: 100px;
   margin-left: 19px;
   color: #493628;
   margin-top: -10px;
 }
 
-.width-formtime1 {
+.width-starttime {
   margin-left: 20px;
   margin-right: 20px;
   color: #493628;
@@ -638,7 +639,7 @@ watch(roomName, (newRoom) => {
   margin-top: -10px;
 }
 
-.width-formtime2 {
+.width-endtime {
   margin-left: 20px;
   margin-right: 20px;
   color: #493628;
@@ -646,40 +647,18 @@ watch(roomName, (newRoom) => {
   margin-top: -10px;
 }
 
-.width-formtime3 {
-  margin-left: 20px;
-  margin-right: 20px;
-  color: #493628;
-  width: 100px;
-  margin-top: -10px;
-}
-
-.width-formrepeat {
-  margin-left: 20px;
-  margin-right: 20px;
-  color: #493628;
-  width: 100px;
-  margin-top: -10px;
-}
-
-.width-formfloor {
+.width-floor {
   width: 100px;
   margin-left: 19px;
   color: #493628;
   margin-top: -10px;
 }
 
-.width-formroom {
+.width-room {
   width: 100px;
   margin-left: 20px;
   margin-right: 20px;
   margin-top: -10px;
-  color: #493628;
-}
-
-.width-formblank1 {
-  width: 460px;
-  margin-left: 20px;
   color: #493628;
 }
 
@@ -694,18 +673,13 @@ watch(roomName, (newRoom) => {
 }
 
 .save-btn {
+  background-color: #f5eded !important;
+  color: #493628 !important;
+  margin-left: 630px;
   margin-top: -10px;
   margin-bottom: 20px;
   font-weight: 600;
   font-size: 16px;
-}
-
-/* กำหนดสีพื้นหลังและสีข้อความของปุ่ม */
-.custom-btn {
-  background-color: #f5eded !important;
-  /* ใช้ !important เพื่อให้แน่ใจว่าการตั้งค่านี้จะถูกใช้ */
-  color: #493628 !important;
-  margin-left: 530px;
   width: 150px;
   height: 35px;
   border: 2px solid #493628;
