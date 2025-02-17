@@ -18,12 +18,14 @@ import { useOrderDetialStore } from "@/stores/orderStore";
 import { useSpecialRoomStore } from "@/stores/srbStore";
 import type { GetSpecialRoomBooking } from "@/types/specialRoomBooking";
 import { onMounted } from "vue";
+import { useRouter } from "vue-router";
 
 const eqStore = useEquipmentStore();
 const orderStore = useOrderDetialStore();
 const documentFileStore = useDocumentStore();
 const eqbStore = useEqBookStore();
 const srbStore = useSpecialRoomStore();
+const router = useRouter();
 onMounted(() => {
   try {
   } catch (error) {
@@ -57,23 +59,88 @@ function getDatesBetween(startDate: string, endDate: string): string[] {
 
   return dates; // 🛠️ ส่งคืน array ของวันที่ทั้งหมด
 }
+function resetDate() {
+  srbStore.newSRB = {
+    people_Count: 0, // ค่าเริ่มต้นเป็น 0 (ยังไม่มีคน)
+    contract_Number: "", // ค่าเริ่มต้นเป็น String ว่าง
+    start_Date: "", // ค่าเริ่มต้นให้เป็นค่าว่าง
+    start_Time: "",
+    end_Date: "",
+    end_Time: "",
+    stage_Name: "",
+    reseve_status: "อนุมัติ",
+    equip_Descript: "",
+    order_Description: "",
+    document: 0, // ID เอกสารเป็น 0
+    userId: 0, // ค่าเริ่มต้นให้เป็น 0 (ยังไม่มีการระบุผู้ใช้)
+    reason: "",
+    cancelTime: "",
+    roomId: 0, // ค่าเริ่มต้นให้เป็น 0
+  };
+  orderStore.orders = [];
+  eqStore.selectedEQForm = [];
+  documentFileStore.currentDocument = null;
+}
 async function saveReserved() {
-  // const file = await documentFileStore.currentDocument;
-  // const newFile = await documentFileStore.newDocumentFile(file!);
-  // srbStore.newSRB.document = newFile.id;
-  // modifyReserved();
-  // const createdNewSRB = await srbStore.createSpecialRoom(srbStore.newSRB);
-  // const newSRBChangeType = createdNewSRB as GetSpecialRoomBooking;
-  // console.log("New Reserved :", newSRBChangeType);
-  // if (orderStore.orders.length > 0) {
-  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //   const createOrder = await orderStore.createdOrder(createdNewSRB.srb_Id);
-  // }
-  // if (eqStore.selectedEQForm.length > 0) {
-  //   for (let i = 0; i < eqStore.selectedEQForm.length; i++) {
-  //     eqbStore.createdEQB(newSRBChangeType.srb_Id!, eqStore.selectedEQForm[i].eq_Id);
-  //   }
-  // }
+  const dateBetween = getDatesBetween(
+    srbStore.newSRB.start_Date,
+    srbStore.newSRB.end_Date
+  );
+  const file = await documentFileStore.currentDocument;
+  const newFile = await documentFileStore.newDocumentFile(file!);
+  if (!newFile) {
+    console.error("Can't create new document");
+    return;
+  }
+  if (dateBetween.length > 1) {
+    try {
+      for (let i = 0; i < dateBetween.length; i++) {
+        srbStore.newSRB.document = newFile.id;
+        srbStore.newSRB.start_Date = dateBetween[i];
+        modifyReserved();
+        const createdNewSRB = await srbStore.createSpecialRoom(srbStore.newSRB);
+        const newSRBChangeType = createdNewSRB as GetSpecialRoomBooking;
+        console.log("New Reserved :", newSRBChangeType);
+        if (orderStore.orders.length > 0) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const createOrder = await orderStore.createdOrder(
+            createdNewSRB.srb_Id
+          );
+        }
+        if (eqStore.selectedEQForm.length > 0) {
+          for (let i = 0; i < eqStore.selectedEQForm.length; i++) {
+            eqbStore.createdEQB(
+              newSRBChangeType.srb_Id!,
+              eqStore.selectedEQForm[i].eq_Id
+            );
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  } else if (dateBetween.length == 1) {
+    srbStore.newSRB.document = newFile.id;
+    srbStore.newSRB.start_Date = dateBetween[0];
+    modifyReserved();
+    const createdNewSRB = await srbStore.createSpecialRoom(srbStore.newSRB);
+    const newSRBChangeType = createdNewSRB as GetSpecialRoomBooking;
+    console.log("New Reserved :", newSRBChangeType);
+    if (orderStore.orders.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const createOrder = await orderStore.createdOrder(createdNewSRB.srb_Id);
+    }
+    if (eqStore.selectedEQForm.length > 0) {
+      for (let i = 0; i < eqStore.selectedEQForm.length; i++) {
+        eqbStore.createdEQB(
+          newSRBChangeType.srb_Id!,
+          eqStore.selectedEQForm[i].eq_Id
+        );
+      }
+    }
+  }
+  resetDate();
+  router.push("/table_meeting");
 }
 </script>
 <style scoped>

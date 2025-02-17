@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import floorService from "../services/floorService";
 import orderDetailService from "../services/orderDetailService";
 import { OrderDetail } from "../types/orderDetail";
 import { ref } from "vue";
