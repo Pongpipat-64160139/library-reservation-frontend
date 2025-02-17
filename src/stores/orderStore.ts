@@ -13,6 +13,7 @@ export const useOrderDetialStore = defineStore("orderDetials", () => {
   }
   function createdOrder(specialID: number) {
     for (let i = 0; i < orders.value.length; i++) {
+      // eslint-disable-next-line prefer-const
       let newOrder = orderService.createOrder({
         srb_Id: specialID,
         Serve_Time: orders.value[i].Serve_Time,

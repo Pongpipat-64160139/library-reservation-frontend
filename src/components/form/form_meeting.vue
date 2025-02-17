@@ -13,11 +13,14 @@
       <span class="d-flex">
         <h1 class="mg-name pt-5 head1-title">ชื่อ</h1>
         <v-text-field
+          v-if="user"
+          v-model="user.username"
           class="width-formname text-field-rounded"
           single-line
           outlined
           :rules="[(v) => !!v || '']"
           label=""
+          readonly
         />
         <h1 class="ps-15 pt-5 head1-title">จำนวนคน</h1>
         <v-text-field
@@ -41,16 +44,16 @@
       <span class="d-flex">
         <h1 class="ps-2 pt-5 head1-title">ชื่อป้ายเวที</h1>
         <v-text-field
+          v-model="srbStore.newSRB.stage_Name"
           class="width-formtag text-field-rounded"
           single-line
           outlined
           label="กรุณาแจ้งล่วงหน้า 3 วันทำการ"
-          :v-model="srbStore.newSRB.stage_Name"
         />
         <h1 class="mg-floor pt-5 head1-title">ชั้น</h1>
         <v-select
           v-model="floor"
-          :items="[2, 5, 6, 7]"
+          :items="availableFloors"
           outlined
           label=""
           class="width-formfloor text-field-rounded"
@@ -68,7 +71,6 @@
       <!-- span2 -->
       <span class="d-flex">
         <h1 class="mg-date pt-5 head1-title">วันที่เริ่ม</h1>
-
         <v-menu
           v-model="startMenu"
           v-model:return-value="startDate"
@@ -109,8 +111,6 @@
             @update:model-value="
               (val) => {
                 startDate = val;
-                endDate = val; // ตั้งค่า endDate ให้เท่ากับ startDate
-                endRepeatDate = val;
                 startMenu = false;
               }
             "
@@ -156,8 +156,6 @@
                       day: 'numeric',
                     })
               "
-              readonly
-              :disabled="true"
             />
           </template>
           <v-date-picker
@@ -187,37 +185,29 @@
 import { useRoomStore } from "@/stores/roomStore";
 import { useSpecialRoomStore } from "@/stores/srbStore";
 import { useTimeStore } from "@/stores/timeStore";
+import { useUserStore } from "@/stores/userStore";
+import type { SelectedRoom } from "@/types/room";
+import type { User } from "@/types/user";
 import { ref, computed, watch, onMounted } from "vue";
 const srbStore = useSpecialRoomStore();
-const numPeople = ref("");
 const timeStore = useTimeStore();
 const roomStore = useRoomStore();
+const userStore = useUserStore();
+
+const currentRoom = roomStore.currentTypeRoom;
 const startMenu = ref(false);
 const endMenu = ref(false);
-const startDate = ref<Date | null>(null);
-const endDate = ref<Date | null>(null);
-const endRepeatDate = ref<Date | null>(null);
-const startTime = ref("08:00");
-const endTime = ref("08:30");
-const floor = ref(2);
-const room = ref("201");
-const repeatOption = ref("ไม่");
+const startDate = ref<string>();
+const endDate = ref<string>();
+// const endRepeatDate = ref<Date | null>(null);
+const startTime = ref();
+const endTime = ref();
+const floor = ref();
+const room = ref();
 const holidays = ref<string[]>([]);
-const floorRooms = {
-  2: ["201"],
-  5: ["Lecturer's Room 1", "Lecturer's Room 2", "Lecturer's Room 3"],
-  6: [
-    "604 Smart Board",
-    "Mini Studio",
-    "Cyber Zone 1",
-    "Cyber Zone 2",
-    "Live for Life",
-  ],
-  7: ["706", "707"],
-};
-const currentDate = ref<string | null>(null);
-
-// Lifecycle hooks
+const numPeople = ref("");
+const user = ref<User>();
+const saveSelctedRoom = ref<SelectedRoom[]>([]);
 onMounted(async () => {
   try {
     const currentYear = new Date().getFullYear().toString();
@@ -226,10 +216,40 @@ onMounted(async () => {
       (currentDate.value = formatDate(new Date())),
     ]);
     await filteredEndTimes();
+    await getUser();
+    await roomStore.filteredMeetingRooms();
+    await setStartDate();
+    await setDataForm();
+    await setDateForReserved();
   } catch (error) {
-    console.error("Error initializing holidays:", error);
+    console.error("Error loaded data :", error);
   }
 });
+
+async function getUser() {
+  const res = await userStore.getUserById(64160100);
+  user.value = res;
+}
+function setDataForm() {
+  floor.value = currentRoom.floorId + 1;
+  room.value = currentRoom.roomName;
+}
+function setDateForReserved() {
+  srbStore.newSRB.start_Time = startTime.value;
+  srbStore.newSRB.end_Time = endTime.value;
+  srbStore.newSRB.start_Date = formatDateToYYYYMMDD(new Date());
+  srbStore.newSRB.end_Date = formatDateToYYYYMMDD(new Date());
+  srbStore.newSRB.roomId = currentRoom.roomId;
+  srbStore.newSRB.userId = user.value?.userId ?? 0;
+}
+const availableFloors = computed(() => {
+  if (currentRoom.roomType == "Meeting") {
+    return [2, 5, 6, 7];
+  }
+});
+const currentDate = ref<string | null>(null);
+
+// Lifecycle hooks
 function updateEndTimeSlots() {
   endTime.value = timeStore.updateEndTime(startTime.value!);
 }
@@ -259,24 +279,112 @@ const filteredEndTimes = () => {
 };
 
 const availableRooms = computed(() => {
-  return floor.value in floorRooms
-    ? floorRooms[floor.value as keyof typeof floorRooms]
-    : [];
+  if (currentRoom.roomType == "Meeting") {
+    if (floor.value == 2) {
+      console.log(roomStore.room201.map((r) => r.roomName));
+      return roomStore.room201.map((r) => r.roomName);
+    } else if (floor.value == 5) {
+      return roomStore.lectureRooms.map((r) => r.roomName);
+    } else if (floor.value == 6) {
+      const selectedFloor6 = ref<string[]>([]);
+      selectedFloor6.value.push(
+        roomStore.smartRooms.map((r) => r.roomName).toString()
+      );
+      selectedFloor6.value.push(
+        roomStore.miniStudioRoom.map((r) => r.roomName).toString()
+      );
+      selectedFloor6.value.push(
+        roomStore.cyberZoneRooms.find((r) => r.roomName === "CYBER ZONE I")
+          ?.roomName || ""
+      );
+      selectedFloor6.value.push(
+        roomStore.cyberZoneRooms.find((r) => r.roomName === "CYBER ZONE II")
+          ?.roomName || ""
+      );
+      selectedFloor6.value.push(
+        roomStore.liveForLifeRoom.map((r) => r.roomName).toString()
+      );
+      return selectedFloor6.value;
+    } else if (floor.value == 7) {
+      const selectedFloor7 = ref<string[]>([]);
+      selectedFloor7.value.push(
+        roomStore.meetingRoomFloor7
+          .find((r) => r.roomName == "ห้อง 706")
+          ?.roomName.toString() || " "
+      );
+      selectedFloor7.value.push(
+        roomStore.meetingRoomFloor7
+          .find((r) => r.roomName == "ห้อง 707")
+          ?.roomName.toString() || " "
+      );
+      return selectedFloor7.value;
+    }
+  }
 });
+
+function setStartDate() {
+  const startDateInput = new Date();
+  const selectedDate = formatDateToYYYYMMDD(startDateInput);
+  console.log("วันที่เริ่มต้น :", selectedDate);
+  return selectedDate;
+}
+function formatDateToYYYYMMDD(date: Date | string) {
+  if (!date) {
+    console.error("📛 Invalid date input:", date);
+    return "Invalid date";
+  }
+
+  const d = new Date(date);
+  if (isNaN(d.getTime())) {
+    console.error("❌ Failed to parse date:", date);
+    return "Invalid date";
+  }
+
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 // Watchers
 watch(startTime, (newStartTime) => {
-  console.log("Now start time :", newStartTime);
+  srbStore.newSRB.start_Time = newStartTime;
+  console.log("Now start time :", srbStore.newSRB.start_Time);
 });
 watch(endTime, (newEndTime) => {
-  console.log("Now end time :", newEndTime);
+  srbStore.newSRB.end_Time = newEndTime;
+  console.log("Now end time :", srbStore.newSRB.end_Time);
 });
 watch(floor, (newFloor) => {
-  const firstRoom = floorRooms[newFloor as keyof typeof floorRooms]?.[0] || "";
-  room.value = firstRoom;
-  console.log("now floor :", floor.value);
+  console.log("now floor :", newFloor);
 });
-
+watch(room, async (newRoom) => {
+  const findRoom = await roomStore.selectedRoom(floor.value, newRoom);
+  saveSelctedRoom.value = findRoom.data;
+  srbStore.newSRB.roomId = saveSelctedRoom.value[0]?.roomId;
+  console.log("found room :", srbStore.newSRB);
+});
+watch(startDate, (newDate) => {
+  srbStore.newSRB.start_Date = formatDateToYYYYMMDD(newDate!);
+  console.log("Now start date :", srbStore.newSRB.start_Date);
+  endDate.value = startDate.value;
+});
+watch(endDate, (newEndDate) => {
+  srbStore.newSRB.end_Date = formatDateToYYYYMMDD(newEndDate!);
+  console.log("Now End date :", srbStore.newSRB.end_Date);
+});
+watch(
+  () => srbStore.isBook,
+  () => {
+    if (srbStore.isBook) {
+      const res = getDatesBetween(
+        srbStore.newSRB.start_Date,
+        srbStore.newSRB.end_Date
+      );
+      console.log("Dates between :", res);
+    }
+  }
+);
 // Methods
 async function fetchHolidays(year: string) {
   try {
@@ -330,12 +438,6 @@ function formatDate(date: Date) {
     year: "numeric",
   };
   return new Intl.DateTimeFormat("th-TH", options).format(date);
-}
-
-function onRepeatOptionChange() {
-  if (repeatOption.value === "ไม่") {
-    endRepeatDate.value = null;
-  }
 }
 </script>
 

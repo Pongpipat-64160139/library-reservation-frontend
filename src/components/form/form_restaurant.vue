@@ -152,6 +152,7 @@
           <div>
             <h1 class="head-more ms-10">รายละเอียดเพิ่มเติม</h1>
             <v-textarea
+              v-model="srbStore.newSRB.order_Description"
               label=""
               rows="3"
               outlined
@@ -169,14 +170,15 @@
 // Import Modules and Types
 // -----------------------------
 import { useOrderDetialStore } from "@/stores/orderStore"; // ใช้งาน store สำหรับจัดการ OrderDetail
+import { useSpecialRoomStore } from "@/stores/srbStore";
 import type { OrderDetail } from "@/types/orderDetail"; // ประเภทข้อมูลสำหรับ OrderDetail
-import { computed, ref, watch } from "vue"; // เครื่องมือของ Vue สำหรับ reactive และการติดตามค่า
+import { ref, watch } from "vue"; // เครื่องมือของ Vue สำหรับ reactive และการติดตามค่า
 
 // -----------------------------
 // Store Initialization
 // -----------------------------
 const orderStore = useOrderDetialStore(); // สร้าง store สำหรับจัดการคำสั่งซื้อ
-
+const srbStore = useSpecialRoomStore();
 // -----------------------------
 // Reactive Variables
 // -----------------------------
@@ -295,9 +297,7 @@ watch(isEnableLunch, async (newValue, oldValue) => {
     );
   }
 });
-
 </script>
-
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");

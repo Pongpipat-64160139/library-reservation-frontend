@@ -1,5 +1,5 @@
 import type { Equipment } from "./equipment";
-import type { SpecialRoomBooking } from "./specialRoomBooking";
+import { GetSpecialRoomBooking } from "./specialRoomBooking";
 
 export interface EquipmentBooking {
   eqb_Id: number;
@@ -8,5 +8,10 @@ export interface EquipmentBooking {
 
   equipmnet: Equipment;
 
-  srb: SpecialRoomBooking;
+  srb: GetSpecialRoomBooking;
+}
+export interface PostEquipmentBooking {
+  require?: "ต้องการ";
+  equipmnetId: number;
+  srbId: number;
 }

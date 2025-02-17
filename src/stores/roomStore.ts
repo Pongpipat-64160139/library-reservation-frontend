@@ -187,8 +187,13 @@ export const useRoomStore = defineStore("room", () => {
     const findRoom = response.data;
     return findRoom;
   }
+  async function selectedRoom(floor: number, name: string) {
+    const res = await roomservice.selectedRoom(floor, name);
+    return res;
+  }
   return {
     getAllRooms,
+    selectedRoom,
     groupStudyRooms,
     getRoomGroupStudy,
     studyFloor3,

@@ -16,6 +16,7 @@ export const useSpecialRoomStore = defineStore("specialRoom", () => {
     end_Date: "",
     end_Time: "",
     stage_Name: "",
+    reseve_status: "อนุมัติ",
     equip_Descript: "",
     order_Description: "",
     document: 0, // ID เอกสารเป็น 0
@@ -24,6 +25,7 @@ export const useSpecialRoomStore = defineStore("specialRoom", () => {
     cancelTime: "",
     roomId: 0, // ค่าเริ่มต้นให้เป็น 0
   });
+  const isBook = ref(false);
   async function createSpecialRoom(srb: PostSpecialRoom) {
     const res = await srbService.createSpecialRoomBooking(srb);
     return res.data;
@@ -60,6 +62,7 @@ export const useSpecialRoomStore = defineStore("specialRoom", () => {
     return res.data;
   }
   return {
+    isBook,
     newSRB,
     cancelResevedSpecial,
     updateReseveStatus,

@@ -1,6 +1,6 @@
 import { Confirmation } from "./confirmation";
 import { RoleAssignment } from "./roleAssignment";
-import { SpecialRoomBooking } from "./specialRoomBooking";
+import { GetSpecialRoomBooking } from "./specialRoomBooking";
 import { UserBooking } from "./userBooking";
 
 export interface User {
@@ -22,5 +22,5 @@ export interface User {
 
   userBookings: UserBooking[];
 
-  specialRoomBookings: SpecialRoomBooking[];
+  specialRoomBookings: GetSpecialRoomBooking[];
 }

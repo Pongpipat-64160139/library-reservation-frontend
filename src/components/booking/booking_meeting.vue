@@ -12,25 +12,68 @@
 </template>
 <script setup lang="ts">
 import { useDocumentStore } from "@/stores/documentStore";
+import { useEqBookStore } from "@/stores/eqBookStore";
 import { useEquipmentStore } from "@/stores/equipmentStore";
 import { useOrderDetialStore } from "@/stores/orderStore";
+import { useSpecialRoomStore } from "@/stores/srbStore";
+import type { GetSpecialRoomBooking } from "@/types/specialRoomBooking";
 import { onMounted } from "vue";
 
 const eqStore = useEquipmentStore();
 const orderStore = useOrderDetialStore();
 const documentFileStore = useDocumentStore();
+const eqbStore = useEqBookStore();
+const srbStore = useSpecialRoomStore();
 onMounted(() => {
   try {
   } catch (error) {
     console.error("error load data ", error);
   }
 });
+function modifyReserved() {
+  srbStore.newSRB.people_Count = Number(srbStore.newSRB.people_Count);
+  if (srbStore.newSRB.equip_Descript.length < 0) {
+    srbStore.newSRB.equip_Descript = "-";
+  }
+  if (srbStore.newSRB.order_Description.length < 0) {
+    srbStore.newSRB.order_Description = "-";
+  }
+  if (srbStore.newSRB.stage_Name.length < 0) {
+    srbStore.newSRB.stage_Name = "-";
+  }
+}
+function getDatesBetween(startDate: string, endDate: string): string[] {
+  const dates = []; // 📝 เตรียมตัวแปรสำหรับเก็บวันที่ทั้งหมด
+  // eslint-disable-next-line prefer-const
+  let current = new Date(startDate); // 🕒 แปลงวันที่เริ่มต้นให้เป็น Date object
+  const end = new Date(endDate); // ⏰ แปลงวันที่สิ้นสุดให้เป็น Date object
+
+  // 🔁 วนลูปไปเรื่อยๆ จนกว่าถึงวันที่สิ้นสุด
+  while (current <= end) {
+    const formattedDate = current.toISOString().split("T")[0]; // 📆 แปลงวันที่ให้อยู่ในรูปแบบ YYYY-MM-DD
+    dates.push(formattedDate); // 🗂️ เพิ่มวันที่ลงใน array
+    current.setDate(current.getDate() + 1); // ➡️ ขยับไปวันถัดไป
+  }
+
+  return dates; // 🛠️ ส่งคืน array ของวันที่ทั้งหมด
+}
 async function saveReserved() {
-  const eq = await eqStore.selectedEQForm;
-  const orders = await orderStore.orders;
-  const file = await documentFileStore.currentDocument;
-  const res = await documentFileStore.newDocumentFile(file!);
-  await console.log("DocumentStore :", res);
+  // const file = await documentFileStore.currentDocument;
+  // const newFile = await documentFileStore.newDocumentFile(file!);
+  // srbStore.newSRB.document = newFile.id;
+  // modifyReserved();
+  // const createdNewSRB = await srbStore.createSpecialRoom(srbStore.newSRB);
+  // const newSRBChangeType = createdNewSRB as GetSpecialRoomBooking;
+  // console.log("New Reserved :", newSRBChangeType);
+  // if (orderStore.orders.length > 0) {
+  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //   const createOrder = await orderStore.createdOrder(createdNewSRB.srb_Id);
+  // }
+  // if (eqStore.selectedEQForm.length > 0) {
+  //   for (let i = 0; i < eqStore.selectedEQForm.length; i++) {
+  //     eqbStore.createdEQB(newSRBChangeType.srb_Id!, eqStore.selectedEQForm[i].eq_Id);
+  //   }
+  // }
 }
 </script>
 <style scoped>

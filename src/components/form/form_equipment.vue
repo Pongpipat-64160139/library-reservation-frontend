@@ -66,7 +66,7 @@
 import { useDocumentStore } from "@/stores/documentStore";
 import { useEquipmentStore } from "@/stores/equipmentStore";
 import type { Equipment } from "@/types/equipment";
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 
 const equipmentStore = useEquipmentStore();
 // อาร์เรย์ของรายการอุปกรณ์
@@ -74,10 +74,13 @@ const equipmentList = ref<Equipment[]>([]);
 const eqother = ref<string>();
 const selectedFile = ref<File | null>(null);
 const documentFileStore = useDocumentStore();
-watch(selectedFile, (newFile, oldFile) => {
+watch(selectedFile, (newFile) => {
   documentFileStore.currentDocument = newFile;
   console.log("File :", documentFileStore.currentDocument);
 });
+watch(eqother,(newEq)=>{
+  console.log("Selected equipment : ", newEq);
+})
 async function selectedEquipment(itemIndex: number) {
   const findEQ = equipmentList.value.find((eq) => eq.eq_Id === itemIndex + 1);
   let selected = equipmentStore.selectedEQForm;

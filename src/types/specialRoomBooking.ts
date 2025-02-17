@@ -1,4 +1,3 @@
-
 import { Document } from "./document";
 import { EquipmentBooking } from "./equipmentBooking";
 import { OrderDetail } from "./orderDetail";
@@ -51,6 +50,7 @@ export interface PostSpecialRoom {
   end_Date: string; // วันที่สิ้นสุด (YYYY-MM-DD)
   end_Time: string; // เวลาที่สิ้นสุด (HH-MM-SS)
   stage_Name: string; // ชื่อเวที (ถ้ามี)
+  reseve_status: string; // สถานะการจอง
   equip_Descript: string; // รายละเอียดอุปกรณ์ที่ต้องการ
   order_Description: string; // คำอธิบายการสั่งอาหาร
   document: number; // จำนวนเอกสารที่แนบ
@@ -75,5 +75,5 @@ export interface UpdateSpecialRoom {
   reason?: string; // เหตุผลในการจอง หรือยกเลิก (อาจว่าง)
   cancelTime?: string; // เวลาที่ยกเลิก (อาจว่าง)
   roomId?: number; // รหัสห้องที่จอง
-  reseve_status?:string; // 
+  reseve_status?: string; //
 }

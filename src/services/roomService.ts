@@ -25,7 +25,14 @@ export function getRoomTypes(types: string) {
   });
 }
 
+export function selectedRoom(floorNumber: number, roomName: string) {
+  return http.get(`/rooms/selectedRoom`, {
+    params: { floorNumber: floorNumber, roomName: roomName }, // ใช้ params เพื่อส่ง Query String
+  });
+}
+
 export default {
+  selectedRoom,
   getAllRooms,
   getRoomById,
   createRoom,
