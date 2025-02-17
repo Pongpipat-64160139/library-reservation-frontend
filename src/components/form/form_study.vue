@@ -37,74 +37,42 @@
       <!-- span2 -->
       <span class="d-flex">
         <h1 class="mg-startdate head-text">วันที่เริ่ม</h1>
-        <v-menu
-          v-model="startMenu"
-          v-model:return-value="startDate"
-          :close-on-content-click="false"
-          transition="scale-transition"
-          offset-y
-        >
-          <template #activator="{ props }">
-            <v-text-field
-              class="width-startdate text-field-rounded"
-              v-bind="props"
-              :value="
-                startDate ? formatDate(startDate) : formatDate(new Date())
-              "
-              readonly
-            />
-          </template>
-          <v-date-picker
-            v-model="startDate"
-            :allowed-dates="allowedDates"
-            :min="new Date().toISOString().split('T')[0]"
-            @update:model-value="handleDateUpdate"
-          />
-        </v-menu>
-
+        <vue-flatpickr
+          v-model="startDate"
+          class="width-startdate"
+          :config="flatpickrConfig"
+          :allowed-dates="allowedDates"
+          :min="new Date().toISOString().split('T')[0]"
+          @update:model-value="handleDateUpdate"
+        />
         <h1 class="mg-starttime head-text">เวลา</h1>
         <v-select
           v-model="startTime"
           :items="timeOptions"
           outlined
-          label="เวลาเริ่มต้น"
           class="width-starttime text-field-rounded"
         />
       </span>
       <span class="d-flex">
         <h1 class="mg-enddate head-text">วันที่จบ</h1>
-        <v-menu
-          v-model="endMenu"
-          v-model:return-value="endDate"
-          :close-on-content-click="false"
+        <vue-flatpickr
+          v-model="endDate"
+          class="width-startdate disabled-datepicker"
+          :config="flatpickrConfig"
           transition="scale-transition"
           offset-y
-        >
-          <template #activator="{ props }">
-            <v-text-field
-              class="width-enddate text-field-rounded"
-              v-bind="props"
-              :value="endDate ? formatDate(endDate) : formatDate(new Date())"
-              readonly
-              :disabled="true"
-            />
-          </template>
-          <v-date-picker
-            v-model="endDate"
-            @update:model-value="
-              (val) => {
-                endDate = val;
-                endMenu = false;
-              }
-            "
-          />
-        </v-menu>
+          @update:model-value="
+            (val) => {
+              endDate = val;
+              endMenu = false;
+            }
+          "
+        />
         <h1 class="mg-endtime head-text">เวลา</h1>
         <v-select
           v-model="endTime"
           :items="filteredEndTimes()"
           outlined
-          label="เวลาจบ"
           class="width-endtime text-field-rounded"
         />
       </span>
@@ -116,7 +84,6 @@
           v-model="floor"
           :items="availableFloors"
           outlined
-          label="ชั้น"
           class="width-floor text-field-rounded"
         />
         <h1 class="mg-room head-text">ห้อง</h1>
@@ -124,7 +91,6 @@
           v-model="roomName"
           :items="availableRooms"
           outlined
-          label="ห้อง"
           class="width-room text-field-rounded"
         />
       </span>
@@ -180,6 +146,9 @@ import type {
 import type { UBPostpayload, UserBooking } from "@/types/userBooking";
 import type { User } from "@/types/user";
 
+import VueFlatpickr from "vue-flatpickr-component";
+import "flatpickr/dist/flatpickr.css";
+import { Thai } from "flatpickr/dist/l10n/th.js";
 // ---------------------
 // Store Initialization
 // ---------------------
@@ -200,7 +169,7 @@ const formDetail = ref<string>(""); // รายละเอียดในฟ�
 const startMenu = ref(false); // เมนูเริ่มต้น
 const endMenu = ref(false); // เมนูสิ้นสุด
 const startDate = ref<Date | null>(null); // วันที่เริ่มต้น
-const endDate = ref<Date | null>(null); // วันที่สิ้นสุด
+const endDate = ref<Date | null>(startDate.value); // วันที่จบให้เท่ากับวันที่เริ่มต้น
 const startTime = ref(""); // เวลาเริ่มต้น
 const endTime = ref(""); // เวลาสิ้นสุด
 const floor = ref<number>(); // ชั้นของห้อง
@@ -209,6 +178,8 @@ const currentDate = ref(""); // วันที่ปัจจุบัน
 const saveSelectRoom = ref<GetRoomType>(); // ห้องที่ถูกเลือก
 const normalRoomBooking = ref<PostNormalReseved>(); // การจองห้องปกติ
 const user = ref<User>(); // ข้อมูลผู้ใช้
+const selectedDate = ref<string>(""); // ใช้เป็น string แทน null
+const currentReserveDate = ref<string>(); // เก็บวันที่ปัจจุบัน หรือ วันที่ๆ เลือกใหม่และมีการอัพเดทตามตารางตลอด
 
 const isFormValid = computed(() => {
   // ตรวจสอบว่า listparticipants มีข้อมูลครบถ้วนและจำนวนผู้เข้าร่วมอย่างน้อยตามที่กำหนด
@@ -218,6 +189,218 @@ const isFormValid = computed(() => {
     participantCount >= roomStore.currentTypeRoom.roomMinimum
   );
 });
+
+const updateDisabledDatesStyle = (instance: any) => {
+  setTimeout(() => {
+    instance.calendarContainer
+      .querySelectorAll(".flatpickr-disabled")
+      .forEach((el) => {
+        (el as HTMLElement).style.color = "#d1d1d1"; // เปลี่ยนเป็นสีเข้มขึ้น
+        (el as HTMLElement).style.opacity = "1"; // ลดความโปร่งใส
+      });
+  }, 10); // หน่วงเวลาเล็กน้อยเพื่อให้ UI อัปเดตก่อน
+};
+
+const flatpickrConfig = ref({
+  locale: Thai,
+  dateFormat: "d-m-Y",
+  defaultDate: new Date(),
+  enableTime: false,
+  minDate: "today",
+  maxDate: new Date(new Date().setDate(new Date().getDate() + 4)),
+  disable: [
+    function (date: Date) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const maxDate = new Date();
+      maxDate.setDate(today.getDate() + 4);
+
+      return date < today || date > maxDate;
+    },
+  ],
+  formatDate: (date: Date) => {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    };
+    const thaiYear = date.getFullYear() + 543;
+    const formattedDate = new Intl.DateTimeFormat("th-TH", options).format(
+      date
+    );
+    return formattedDate.replace(
+      date.getFullYear().toString(),
+      thaiYear.toString()
+    );
+  },
+  onChange: (
+    selectedDates: Date[],
+    dateStr: string,
+    instance: { yearElements: any[]; currentYear: number }
+  ) => {
+    updateDisabledDatesStyle(instance);
+    if (selectedDates.length > 0) {
+      selectedDate.value = dateStr;
+      console.log("Selected date:", dateStr);
+    }
+
+    // อัปเดต Dropdown ของปีให้แสดงปีพุทธศักราช (พ.ศ.)
+    const updateYearDropdown = () => {
+      const yearSelect = instance?.yearElements?.[0]; // ตรวจสอบว่า instance และ yearElements มีค่าหรือไม่
+      if (yearSelect && yearSelect.options) {
+        yearSelect.value = (instance.currentYear + 543).toString();
+        Array.from(yearSelect.options).forEach((option) => {
+          const optionYear = parseInt(option.value, 10);
+          option.textContent = (optionYear + 543).toString();
+        });
+      }
+    };
+
+    updateYearDropdown();
+  },
+  onReady: (selectedDates: Date[], dateStr: string, instance: any) => {
+    // สีตัวเลขในปฏิทิน
+    updateDisabledDatesStyle(instance);
+
+    const prevButton = instance.calendarContainer.querySelector(
+      ".flatpickr-prev-month"
+    );
+    const nextButton = instance.calendarContainer.querySelector(
+      ".flatpickr-next-month"
+    );
+    if (prevButton) prevButton.style.display = "none";
+    if (nextButton) nextButton.style.display = "none";
+
+    const yearDropdown = instance.calendarContainer.querySelector(
+      ".flatpickr-monthDropdown-months ~ .numInputWrapper input"
+    );
+    if (yearDropdown) {
+      const updateYearsToThai = () => {
+        const currentYear = parseInt(yearDropdown.value, 10);
+        yearDropdown.value = (currentYear + 543).toString();
+      };
+
+      updateYearsToThai();
+      yearDropdown.addEventListener("change", updateYearsToThai);
+    }
+  },
+  onYearChange: (
+    selectedDates: any,
+    dateStr: any,
+    instance: { yearElements: any[]; currentYear: number }
+  ) => {
+    const updateYearDropdown = () => {
+      const yearSelect = instance.yearElements[0];
+      if (yearSelect) {
+        // ปรับค่าปีใน dropdown เป็น พ.ศ.
+        yearSelect.value = (instance.currentYear + 543).toString();
+        Array.from(yearSelect.options).forEach((option) => {
+          const optionYear = parseInt(option.value, 10);
+          option.textContent = (optionYear + 543).toString();
+        });
+      }
+    };
+
+    updateYearDropdown();
+  },
+  onMonthChange: (
+    selectedDates: any,
+    dateStr: any,
+    instance: { yearElements: any[]; currentYear: number }
+  ) => {
+    updateDisabledDatesStyle(instance);
+    const updateYearDropdown = () => {
+      const yearSelect = instance.yearElements[0];
+      if (yearSelect) {
+        yearSelect.value = (instance.currentYear + 543).toString();
+        Array.from(yearSelect.options).forEach((option) => {
+          const optionYear = parseInt(option.value, 10);
+          option.textContent = (optionYear + 543).toString();
+        });
+      }
+    };
+
+    updateYearDropdown();
+  },
+});
+
+function parseThaiDate(thaiDateString: string): Date | null {
+  const thaiMonths = [
+    "มกราคม",
+    "กุมภาพันธ์",
+    "มีนาคม",
+    "เมษายน",
+    "พฤษภาคม",
+    "มิถุนายน",
+    "กรกฎาคม",
+    "สิงหาคม",
+    "กันยายน",
+    "ตุลาคม",
+    "พฤศจิกายน",
+    "ธันวาคม",
+  ];
+
+  const regex = /(\d{1,2}) (\S+) (\d{4})/; // Match "17 กุมภาพันธ์ 2568"
+  const match = thaiDateString.match(regex);
+
+  if (!match) return null;
+
+  const [, day, month, year] = match;
+  const monthIndex = thaiMonths.indexOf(month);
+
+  if (monthIndex === -1) return null;
+
+  const christianYear = parseInt(year) - 543; // Convert 2568 -> 2025
+  return new Date(christianYear, monthIndex, parseInt(day));
+}
+
+watch(selectedDate, (newDate, oldDate) => {
+  if (!newDate || newDate === oldDate) return; // หยุดการทำงานถ้าค่าเดิมกับค่าที่เปลี่ยนเหมือนกัน
+
+  const parsedDate = parseThaiDate(newDate);
+  if (parsedDate && !isNaN(parsedDate.getTime())) {
+    const formattedDate = formatDate(parsedDate);
+    if (formattedDate !== currentReserveDate.value) {
+      // ป้องกันอัปเดตซ้ำ
+      currentReserveDate.value = formattedDate;
+      console.log("Updated Reserve Date:", currentReserveDate.value);
+      loadedReserveRoom(currentReserveDate.value);
+    }
+  } else {
+    console.error("Invalid date format:", newDate);
+  }
+});
+
+function formatDate(date: Date | string) {
+  const d = new Date(date);
+  if (isNaN(d.getTime())) {
+    console.error("Invalid date input for formatDate:", date);
+    return "Invalid date";
+  }
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getCurrentReserveDate() {
+  if (selectedDate.value === null) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    currentReserveDate.value = `${year}-${month}-${day}`;
+    console.log("Reserve Date: " + currentReserveDate.value);
+    return currentReserveDate;
+  }
+}
+
+async function loadedReserveRoom(selectedDate: string) {
+  const loadedRoom = await nrbStore.getStatusReserve(selectedDate);
+  nrbStore.bookings = loadedRoom;
+}
 
 // ---------------------
 // Functions and Computed
@@ -304,33 +487,66 @@ const validateNumber = () => {
   numPeople.value = numPeople.value.replace(/\D/g, "");
 };
 
-const formatDate = (date: Date) => {
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  };
-  return new Intl.DateTimeFormat("th-TH", options).format(date);
-};
-
 const allowedDates = (date: Date) => {
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    return false; // Invalid date
+  }
   const today = new Date();
   const maxDate = new Date();
-  maxDate.setDate(today.getDate() + 4); // นับรวมวันที่ล่าสุด (วันที่ที่ 5)
+  maxDate.setDate(today.getDate() + 4); // Limit to 5 days ahead
 
-  // ทำให้เวลาใน today และ maxDate เท่ากับ 00:00:00 เพื่อเปรียบเทียบอย่างถูกต้อง
   today.setHours(0, 0, 0, 0);
   maxDate.setHours(0, 0, 0, 0);
 
-  // ตรวจสอบว่าวันที่อยู่ในช่วงหรือไม่
   return date >= today && date <= maxDate;
 };
 
+watch(startDate, (newStartDate, oldStartDate) => {
+  if (!newStartDate) return; // ถ้าไม่มีค่าให้หยุดทำงาน
+
+  let parsedDate: Date | null = null;
+
+  // แปลง `newStartDate` ให้เป็น Date object ถ้ายังไม่ใช่
+  if (typeof newStartDate === "string") {
+    parsedDate = parseThaiDate(newStartDate);
+  } else if (newStartDate instanceof Date) {
+    parsedDate = newStartDate;
+  }
+
+  if (!parsedDate || isNaN(parsedDate.getTime())) {
+    console.error("Invalid newStartDate:", newStartDate);
+    return;
+  }
+
+  // ตรวจสอบว่า `oldStartDate` เป็น `Date` object ก่อนใช้ `.getTime()`
+  if (
+    oldStartDate instanceof Date &&
+    parsedDate.getTime() === oldStartDate.getTime()
+  ) {
+    return; // ถ้าค่าไม่เปลี่ยนแปลง ให้หยุดทำงาน
+  }
+
+  // อัปเดต endDate เมื่อค่ามีการเปลี่ยนแปลง
+  endDate.value = new Date(parsedDate);
+});
+
 const handleDateUpdate = (val: any) => {
-  startDate.value = val;
-  endDate.value = val;
-  startMenu.value = false;
+  if (!val || val === startDate.value) return; // ป้องกันอัปเดตซ้ำ
+
+  let parsedDate: Date | null = null;
+  if (typeof val === "string") {
+    parsedDate = parseThaiDate(val);
+  } else if (val instanceof Date) {
+    parsedDate = val;
+  }
+
+  if (parsedDate && !isNaN(parsedDate.getTime())) {
+    startDate.value = parsedDate;
+    endDate.value = new Date(parsedDate);
+    console.log("Converted Start Date:", startDate.value);
+  } else {
+    console.error("Invalid date selected:", val);
+  }
 };
 
 const fetchHolidays = async () => {
@@ -424,12 +640,27 @@ async function getCurrentDate() {
   return `${day}-${month}-${year}`;
 }
 
-function formatToDDMMYYYY(date: Date): string {
-  const day = date.getDate().toString().padStart(2, "0"); // ดึงวันที่ และเติม 0 หากมีตัวเลขหลักเดียว
-  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // ดึงเดือน (เพิ่ม +1 เนื่องจาก getMonth() เริ่มจาก 0)
-  const year = date.getFullYear(); // ดึงปี
-  return `${day}-${month}-${year}`; // จัดเรียงรูปแบบ dd-mm-yyyy
+function formatToDDMMYYYY(date: Date | string): string {
+  if (typeof date === "string") {
+    const parsedDate = parseThaiDate(date);
+    if (!parsedDate || isNaN(parsedDate.getTime())) {
+      console.error("Invalid date input:", date);
+      throw new Error("Invalid date");
+    }
+    date = parsedDate;
+  }
+
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    console.error("Invalid date input:", date);
+    throw new Error("Invalid date");
+  }
+
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
 }
+
 async function createdUserBookAndParticipant(nrb: NormalRoomBooking) {
   // เก็บข้อมูลของ user book
   const newUserBook = ref<UBPostpayload>();
@@ -618,10 +849,17 @@ watch(roomName, (newRoom) => {
 }
 
 .width-startdate {
-  width: 100px;
-  margin-left: 20px;
+  width: 300px;
+  height: 60px;
+  margin-left: 19px;
   color: #493628;
   margin-top: -10px;
+  z-index: 1000;
+  background-color: #f5eded;
+  border-radius: 5px;
+  border: 2px solid #493628;
+  text-align: left; /* ทำให้ข้อความชิดซ้าย */
+  padding-left: 15px; /* เพิ่มช่องว่างระหว่างขอบซ้ายและข้อความ */
 }
 
 .width-enddate {
@@ -629,6 +867,14 @@ watch(roomName, (newRoom) => {
   margin-left: 19px;
   color: #493628;
   margin-top: -10px;
+}
+
+.disabled-datepicker {
+  background-color: #f5eded !important; /* สีเทา */
+  color: #8a8a8a !important; /* สีข้อความ */
+  cursor: not-allowed; /* เปลี่ยนเมาส์เป็นไอคอนห้ามคลิก */
+  pointer-events: none; /* ปิดการโต้ตอบ */
+  opacity: 0.7;
 }
 
 .width-starttime {
