@@ -7,167 +7,95 @@
       <!-- span1 -->
       <span class="d-flex">
         <h1 class="mg-name head-text">ชื่อ</h1>
-        <v-text-field
-          v-if="user"
-          v-model="user.username"
-          class="width-formname text-field-rounded"
-          single-line
-          outlined
-          :rules="[(v) => !!v || '']"
-          :disabled="true"
-        />
+        <v-text-field v-if="user" v-model="user.username" class="width-formname text-field-rounded" single-line outlined
+          :rules="[(v) => !!v || '']" :disabled="true" />
 
         <h1 class="mg-amount head-text">จำนวนคน*</h1>
-        <v-text-field
-          v-model="srbStore.newSRB.people_Count"
-          class="width-formamount text-field-rounded"
-          single-line
-          :rules="[(v) => /^\d+$/.test(v) || '', (v) => v > 0 || '']"
-          @input="validateNumber"
-        />
+        <v-text-field v-model="srbStore.newSRB.people_Count" class="width-formamount text-field-rounded" single-line
+          :rules="[(v) => /^\d+$/.test(v) || '', (v) => v > 0 || '']" @input="validateNumber" />
 
         <h1 class="mg-tell head-text">เบอร์โทร*</h1>
-        <v-text-field
-          v-model="srbStore.newSRB.contract_Number"
-          class="width-formtell text-field-rounded"
-          single-line
-          :rules="[(v) => /^\d{10}$/.test(v) || '']"
-          @input="validateNumber"
-        />
+        <v-text-field v-model="srbStore.newSRB.contract_Number" class="width-formtell text-field-rounded" single-line
+          :rules="[(v) => /^\d{10}$/.test(v) || '']" @input="validateNumber" />
 
         <h1 class="mg-tag head-text">ชื่อป้ายเวที</h1>
-        <v-text-field
-          v-model="srbStore.newSRB.stage_Name"
-          class="width-formtag text-field-rounded"
-          single-line
-          outlined
-          label="แจ้งล่วงหน้า 3 วันทำการ"
-        />
+        <v-text-field v-model="srbStore.newSRB.stage_Name" class="width-formtag text-field-rounded" single-line outlined
+          label="แจ้งล่วงหน้า 3 วันทำการ" />
       </span>
 
       <!-- span3 -->
       <span class="d-flex">
         <h1 class="mg-startdate head-text">วันที่เริ่ม</h1>
-        <v-menu
-          v-model="startMenu"
-          v-model:return-value="startDate"
-          class="width-formdate text-field-rounded"
-          :close-on-content-click="false"
-          transition="scale-transition"
-          offset-y
-        >
+        <v-menu v-model="startMenu" v-model:return-value="startDate" :close-on-content-click="false"
+          transition="scale-transition" offset-y>
           <template #activator="{ props }">
-            <v-text-field
-              class="width-formstartdate text-field-rounded"
-              v-bind="props"
-              :value="
-                startDate
-                  ? new Date(startDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-              "
-              readonly
-            />
+            <v-text-field class="width-formstartdate text-field-rounded" v-bind="props" :value="startDate
+              ? new Date(startDate).toLocaleDateString('th-TH', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })
+              : new Date().toLocaleDateString('th-TH', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })
+              " readonly />
           </template>
-          <v-date-picker
-            v-model="startDate"
-            :min="new Date().toISOString().split('T')[0]"
-            :allowed-dates="allowedDates"
+          <v-date-picker v-model="startDate" :min="new Date().toISOString().split('T')[0]" :allowed-dates="allowedDates"
             @update:model-value="
               (val) => {
                 startDate = val;
                 startMenu = false;
               }
-            "
-          />
+            " />
         </v-menu>
 
         <h1 class="mg-starttime head-text">เวลา</h1>
-        <v-select
-          v-model="startTime"
-          :items="timeOptions"
-          outlined
-          label=""
-          class="width-formstarttime text-field-rounded"
-        />
+        <v-select v-model="startTime" :items="timeOptions" outlined label=""
+          class="width-formstarttime text-field-rounded" />
 
         <h1 class="mg-floor head-text">⠀ชั้น</h1>
-        <v-select
-          v-model="floor"
-          :items="availableFloors"
-          outlined
-          label=""
-          class="width-formfloor text-field-rounded"
-        />
+        <v-select v-model="floor" :items="availableFloors" outlined label=""
+          class="width-formfloor text-field-rounded" />
       </span>
 
       <!-- span2 -->
       <span class="d-flex">
         <h1 class="mg-enddate head-text">วันที่จบ</h1>
-        <v-menu
-          v-model="endMenu"
-          v-model:return-value="endDate"
-          :close-on-content-click="false"
-          transition="scale-transition"
-          offset-y
-        >
+        <v-menu v-model="endMenu" v-model:return-value="endDate" :close-on-content-click="false"
+          transition="scale-transition" offset-y>
           <template #activator="{ props }">
-            <v-text-field
-              class="width-formenddate text-field-rounded"
-              v-bind="props"
-              :value="
-                endDate
-                  ? new Date(endDate).toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : new Date().toLocaleDateString('th-TH', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-              "
-            />
+            <v-text-field class="width-formenddate text-field-rounded" v-bind="props" :value="endDate
+              ? new Date(endDate).toLocaleDateString('th-TH', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })
+              : new Date().toLocaleDateString('th-TH', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })
+              " />
           </template>
-          <v-date-picker
-            v-model="endDate"
-            @update:model-value="
-              (val) => {
-                endDate = val;
-                endMenu = false;
-              }
-            "
-          />
+          <v-date-picker v-model="endDate" @update:model-value="
+            (val) => {
+              endDate = val;
+              endMenu = false;
+            }
+          " />
         </v-menu>
         <h1 class="mg-endtime head-text">เวลา</h1>
-        <v-select
-          v-model="endTime"
-          :items="filteredEndTimes()"
-          outlined
-          label=""
-          class="width-formendtime text-field-rounded"
-        />
+        <v-select v-model="endTime" :items="filteredEndTimes()" outlined label=""
+          class="width-formendtime text-field-rounded" />
 
         <h1 class="mg-room head-text">ห้อง</h1>
-        <v-select
-          v-model="room"
-          :items="availableRooms"
-          outlined
-          label=""
-          class="width-formroom text-field-rounded"
-        />
+        <v-select v-model="room" :items="availableRooms" outlined label="" class="width-formroom text-field-rounded" />
       </span>
     </v-sheet>
   </v-container>
@@ -423,9 +351,8 @@ function validateNumber() {
     /\D/g,
     ""
   );
-  srbStore.newSRB.people_Count = `${srbStore.newSRB.people_Count}`.replace(
-    /\D/g,
-    ""
+  srbStore.newSRB.people_Count = Number(
+    `${srbStore.newSRB.people_Count}`.replace(/\D/g, "")
   );
 }
 

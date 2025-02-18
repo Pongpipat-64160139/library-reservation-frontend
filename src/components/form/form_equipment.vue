@@ -1,45 +1,22 @@
-<template class="back-ground">
-  <!-- ส่วน container หลักที่ครอบทุกองค์ประกอบ -->
-  <v-container fluid class="back-ground ms-kob">
-    <!-- Sheet1: ส่วนของฟอร์มการจองห้อง -->
-    <v-sheet
-      class="mx-auto mt-10"
-      elevation="8"
-      max-width="1200"
-      style="background-color: #dfd3c3; border-radius: 16px"
-    >
-      <!-- หัวข้อหลัก -->
-      <h1 class="pt-7 head-equipment ms-10">อุปกรณ์ที่ต้องการ</h1>
-      <h1 class="head-plsselect ms-10 pb-5">กรุณาเลือกอุปกรณ์ที่ต้องการ</h1>
+<template>
+  <v-container fluid>
+    <v-sheet class="mx-auto size-sheet" elevation="8">
+      <h1 class="equipment-text">อุปกรณ์ที่ต้องการ</h1>
 
       <!-- ส่วน checkbox สำหรับเลือกอุปกรณ์แบบวนลูป -->
       <v-container>
         <v-row cols="12">
-          <v-col
-            v-for="(item, index) in equipmentList"
-            :key="item.eq_Id"
-            cols="4"
-          >
-            <v-checkbox
-              class="head-selectequipment width-formcheckbox"
-              :label="item.equip_Name"
-              :value="item.eq_Id"
-              @click="selectedEquipment(index)"
-            />
+          <v-col v-for="(item, index) in equipmentList" :key="item.eq_Id" cols="4">
+            <v-checkbox class="select-box width-formcheckbox" :label="item.equip_Name" :value="item.eq_Id"
+              @click="selectedEquipment(index)" />
           </v-col>
         </v-row>
       </v-container>
 
       <!-- ส่วนฟอร์มสำหรับอุปกรณ์เพิ่มเติม -->
       <span>
-        <h1 class="head-another ms-10">อื่น ๆ</h1>
-        <v-textarea
-          v-model="eqother"
-          label=""
-          rows="3"
-          outlined
-          class="ms-13 text-field-rounded me-7 mt-2"
-        />
+        <h1 class="head-text">อื่น ๆ</h1>
+        <v-textarea v-model="eqother" label="" rows="3" outlined class="text-field-rounded" />
       </span>
 
       <!-- คอมโพเนนต์สำหรับเลือกร้านอาหาร -->
@@ -49,14 +26,9 @@
 
       <!-- ส่วนการแนบไฟล์เพิ่มเติม -->
       <span>
-        <h1 class="head-more ms-10 mt-5">ไฟล์เอกสารเพิ่มเติม</h1>
-        <v-file-input
-          v-model="selectedFile"
-          class="text-field-rounded width-file mt-2"
-          label="เพิ่มไฟล์"
-          single-line
-          outlined
-        />
+        <h1 class="head-text">ไฟล์เอกสารเพิ่มเติม</h1>
+        <v-file-input v-model="selectedFile" class="text-field-rounded-file width-file" label="เพิ่มไฟล์" single-line
+          outlined />
       </span>
     </v-sheet>
   </v-container>
@@ -78,9 +50,9 @@ watch(selectedFile, (newFile) => {
   documentFileStore.currentDocument = newFile;
   console.log("File :", documentFileStore.currentDocument);
 });
-watch(eqother,(newEq)=>{
+watch(eqother, (newEq) => {
   console.log("Selected equipment : ", newEq);
-})
+});
 async function selectedEquipment(itemIndex: number) {
   const findEQ = equipmentList.value.find((eq) => eq.eq_Id === itemIndex + 1);
   let selected = equipmentStore.selectedEQForm;
@@ -118,86 +90,64 @@ onMounted(async () => {
   color: #493628;
 }
 
-.head-equipment {
-  font-weight: 600;
-  font-size: 16px;
+.size-sheet {
+  width: 1190px;
+  height: auto;
+  background-color: #dfd3c3;
+  border-radius: 8px;
+  margin-top: 20px;
 }
 
-.head-plsselect {
-  font-weight: 100;
+.equipment-text {
   font-size: 15px;
+  font-weight: 600;
+  margin-left: 24px;
+  padding-top: 20px;
+  padding-bottom: 30px;
 }
 
-.head-selectequipment {
+.select-box {
   font-size: 18px;
   color: #493628;
 }
 
-.head-selectequipment ::v-deep(.v-label) {
+.select-box ::v-deep(.v-label) {
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 400;
   color: #493628;
-}
-
-.head-another {
-  font-size: 16px;
-  color: #493628;
-  margin-top: -15px;
-}
-
-.head-more {
-  font-weight: 600;
-  font-size: 16px;
-  color: #493628;
-  margin-top: 10px;
-}
-
-.pd-more {
-  padding-right: 80px;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.mt-2 {
-  margin-top: 10px;
-}
-
-.back-ground {
-  background-color: #f9f3ea;
-}
-
-.ms-kob {
-  margin-top: -700px;
 }
 
 .width-formcheckbox {
   width: 300px;
-  margin-left: 40px;
+  margin-left: 25px;
   color: #493628;
-  margin-top: -25px;
+  margin-top: -40px;
 }
 
-.width-file {
-  margin-left: 12px;
-  color: #493628;
-  padding-right: 28px;
-}
-
-.width-formblank1 {
-  width: 465px;
-  margin-left: 20px;
-  color: #493628;
+.head-text {
+  font-size: 15px;
+  font-weight: 600;
+  margin-left: 24px;
+  padding-bottom: 10px;
 }
 
 .text-field-rounded ::v-deep(.v-input__control) {
   background-color: #f5eded;
   border-radius: 5px;
   border: 2px solid #493628;
+  margin-left: 45px;
+  margin-right: 20px;
 }
 
-.text-field-rounded ::v-deep(.v-input) {
-  border-radius: 10px;
+.width-file {
+  margin-left: 5px;
+  color: #493628;
+}
+
+.text-field-rounded-file ::v-deep(.v-input__control) {
+  background-color: #f5eded;
+  border-radius: 5px;
+  border: 2px solid #493628;
+  margin-right: 20px;
 }
 </style>

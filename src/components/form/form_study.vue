@@ -6,56 +6,113 @@
       <!-- span1 -->
       <span class="d-flex">
         <h1 class="mg-name head-text">ชื่อ</h1>
-        <v-text-field class="width-formname text-field-rounded" v-model="numPeople" single-line outlined
-          :rules="[(v) => !!v || '']" :disabled="true" />
+        <v-text-field
+          class="width-formname text-field-rounded"
+          v-model="numPeople"
+          single-line
+          outlined
+          :rules="[(v) => !!v || '']"
+          :disabled="true"
+        />
       </span>
 
       <!-- สร้างช่องกรอกรายชื่อตามจำนวนที่กำหนด -->
-      <div v-for="(item, index) in roomStore.currentTypeRoom.roomMinimum - 1" :key="index">
+      <div
+        v-for="(item, index) in roomStore.currentTypeRoom.roomMinimum - 1"
+        :key="index"
+      >
         <span class="d-flex">
           <h1 class="mg-name head-text">ชื่อ</h1>
-          <v-text-field class="width-formname text-field-rounded" v-model="listparticipants[index]" single-line outlined
-            :placeholder="'กรุณากรอกชื่อ'" :rules="[(v) => !!v || '']" />
+          <v-text-field
+            class="width-formname text-field-rounded"
+            v-model="listparticipants[index]"
+            single-line
+            outlined
+            :placeholder="'กรุณากรอกชื่อ'"
+            :rules="[(v) => !!v || '']"
+          />
         </span>
       </div>
 
       <!-- span2 -->
       <span class="d-flex">
         <h1 class="mg-startdate head-text">วันที่เริ่ม</h1>
-        <vue-flatpickr v-model="startDate" class="width-startdate" :config="flatpickrConfig"
-          :allowed-dates="allowedDates" :min="new Date().toISOString().split('T')[0]"
-          @update:model-value="handleDateUpdate" />
+        <vue-flatpickr
+          v-model="startDate"
+          class="width-startdate"
+          :config="flatpickrConfig"
+          :allowed-dates="allowedDates"
+          :min="new Date().toISOString().split('T')[0]"
+          @update:model-value="handleDateUpdate"
+        />
         <h1 class="mg-starttime head-text">เวลา</h1>
-        <v-select v-model="startTime" :items="timeOptions" outlined class="width-starttime text-field-rounded" />
+        <v-select
+          v-model="startTime"
+          :items="timeOptions"
+          outlined
+          class="width-starttime text-field-rounded"
+        />
       </span>
       <span class="d-flex">
         <h1 class="mg-enddate head-text">วันที่จบ</h1>
-        <vue-flatpickr v-model="endDate" class="width-startdate disabled-datepicker" :config="flatpickrConfig"
-          transition="scale-transition" offset-y @update:model-value="
+        <vue-flatpickr
+          v-model="endDate"
+          class="width-startdate disabled-datepicker"
+          :config="flatpickrConfig"
+          transition="scale-transition"
+          offset-y
+          @update:model-value="
             (val) => {
               endDate = val;
               endMenu = false;
             }
-          " />
+          "
+        />
         <h1 class="mg-endtime head-text">เวลา</h1>
-        <v-select v-model="endTime" :items="filteredEndTimes()" outlined class="width-endtime text-field-rounded" />
+        <v-select
+          v-model="endTime"
+          :items="filteredEndTimes()"
+          outlined
+          class="width-endtime text-field-rounded"
+        />
       </span>
 
       <!-- span3 -->
       <span class="d-flex">
         <h1 class="mg-floor head-text">ชั้น</h1>
-        <v-select v-model="floor" :items="availableFloors" outlined class="width-floor text-field-rounded" />
+        <v-select
+          v-model="floor"
+          :items="availableFloors"
+          outlined
+          class="width-floor text-field-rounded"
+        />
         <h1 class="mg-room head-text">ห้อง</h1>
-        <v-select v-model="roomName" :items="availableRooms" outlined class="width-room text-field-rounded" />
+        <v-select
+          v-model="roomName"
+          :items="availableRooms"
+          outlined
+          class="width-room text-field-rounded"
+        />
       </span>
 
       <!-- span4 -->
       <span class="d-flex">
         <h1 class="head-text mg-detail">รายละเอียด</h1>
-        <v-textarea v-model="formDetail" label="" rows="3" outlined class="width-detail text-field-rounded" />
+        <v-textarea
+          v-model="formDetail"
+          label=""
+          rows="3"
+          outlined
+          class="width-detail text-field-rounded"
+        />
       </span>
       <!-- to="/table_study" -->
-      <v-btn type="submit" class="save-btn" :disabled="!isFormValid" @click="submitBookingRoomAndNavigate()">
+      <v-btn
+        type="submit"
+        class="save-btn"
+        :disabled="!isFormValid"
+        @click="submitBookingRoomAndNavigate()"
+      >
         จองห้อง
       </v-btn>
     </v-sheet>
@@ -820,9 +877,7 @@ watch(roomName, (newRoom) => {
   border-radius: 5px;
   border: 2px solid #493628;
   text-align: left;
-  /* ทำให้ข้อความชิดซ้าย */
   padding-left: 15px;
-  /* เพิ่มช่องว่างระหว่างขอบซ้ายและข้อความ */
 }
 
 .width-enddate {
