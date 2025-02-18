@@ -55,7 +55,7 @@
         <v-textarea v-model="formDetail" label="" rows="3" outlined class="width-detail text-field-rounded" />
       </span>
       <!-- to="/table_study" -->
-      <v-btn type="submit" class="save-btn" :disabled="!isFormValid" @click="submitBookingRoom()">
+      <v-btn type="submit" class="save-btn" :disabled="!isFormValid" @click="submitBookingRoomAndNavigate()">
         จองห้อง
       </v-btn>
     </v-sheet>
@@ -70,7 +70,7 @@
 import { ref, computed, watch, onMounted } from "vue";
 
 // Vue Router
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 // Stores
 import { useRoomStore } from "@/stores/roomStore";
@@ -681,6 +681,12 @@ onMounted(async () => {
   }
 });
 
+const router = useRouter();
+async function submitBookingRoomAndNavigate() {
+  await submitBookingRoom(); // เรียกฟังก์ชันจองห้องเดิม
+  router.push("/table_study"); // เปลี่ยนเส้นทางไปยังหน้า table_study
+}
+
 // Watchers
 watch(startTime, (newStartTime) => {
   console.log("Start Time:", newStartTime);
@@ -730,9 +736,8 @@ watch(roomName, (newRoom) => {
 }
 
 .size-sheet {
-  height: 1000px;
   width: 800px;
-  height: 720px;
+  height: auto;
   background-color: #dfd3c3;
   border-radius: 8px;
 }
