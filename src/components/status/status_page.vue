@@ -6,28 +6,15 @@
 
     <!-- Tabs for floors -->
     <v-tabs v-model="selectedFloor" background-color="#cdbba7">
-      <v-tab
-        v-for="floor in availableFloors"
-        :key="floor"
-        class="tabfloor-text"
-        :value="floor"
-      >
+      <v-tab v-for="floor in availableFloors" :key="floor" class="tabfloor-text" :value="floor">
         ชั้น {{ floor }}
       </v-tab>
     </v-tabs>
 
     <!-- Data Table -->
-    <v-data-table
-      :headers="headers"
-      :items="filteredData"
-      style="background-color: #cdbba7"
-      class="border-table"
-    >
+    <v-data-table :headers="headers" :items="filteredData" style="background-color: #cdbba7" class="border-table">
       <template #item="{ item, index }">
-        <tr
-          :class="index % 2 === 0 ? 'row-even' : 'row-odd'"
-          class="table-font"
-        >
+        <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'" class="table-font">
           <td>{{ index + 1 }}</td>
           <td>-</td>
           <td>{{ item.roomName }}</td>
@@ -35,14 +22,8 @@
           <td>{{ item.startTime }} - {{ item.endTime }}</td>
           <td>{{ item.status }}</td>
           <td>
-            <v-btn
-              color="#F5EDED"
-              icon="mdi-magnify"
-              width="40"
-              height="40"
-              class="border-btndetail"
-              @click="showDialog(item)"
-            />
+            <v-btn color="#F5EDED" icon="mdi-magnify" width="40" height="40" class="border-btndetail"
+              @click="showDialog(item)" />
           </td>
         </tr>
       </template>
@@ -112,17 +93,18 @@
         </div>
       </span>
 
+      <span class="d-flex headdialog-text" v-if="selectedItem?.status === 'ยกเลิก'">
+        <div class="headdialog-text">
+          <strong>สาเหตุยกเลิกการจอง</strong> {{ selectedItem?.cancelReason }}
+        </div>
+      </span>
+
       <v-card-text />
+
       <v-card-actions class="d-flex justify-center mb-8">
-        <v-btn
-          class="border-btncanceldialog"
-          text="ยกเลิกจอง"
-          :disabled="
-            selectedItem?.status === 'ยกเลิก' ||
-            selectedItem?.status === 'อนุมัติ'
-          "
-          @click="cancelBooking(selectedItem)"
-        >
+        <v-btn class="border-btncanceldialog" text="ยกเลิกจอง" :disabled="selectedItem?.status === 'ยกเลิก' ||
+          selectedItem?.status === 'อนุมัติ'
+          " @click="showConfirmCancelDialog">
           ยกเลิกจอง
         </v-btn>
 
@@ -133,13 +115,22 @@
     </v-card>
   </v-dialog>
 
-  <v-snackbar
-    v-model="snackbar"
-    color="#b5cfb7"
-    timeout="3000"
-    top
-    class="text-center mx-auto"
-  >
+  <!-- Dialog ยกเลิกการจองห้อง -->
+
+  <v-dialog v-model="confirmCancelDialog" class="confirmdialog-text">
+    <v-card>
+      <v-card-text class="mt-5">
+        ต้องการ "ยกเลิกการจองห้อง" ใช่หรือไม่ ?
+      </v-card-text>
+      <v-card-actions class="d-flex justify-center">
+        <v-btn class="border-btnclosedialog" @click="confirmCancelDialog = false">ยกเลิก</v-btn>
+        <v-btn class="border-btnconfirmdialog" @click="confirmCancelBooking">ยืนยัน</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- แจ้งเตือนยกเลิกการจองห้องสำเร็จ -->
+  <v-snackbar v-model="snackbar" timeout="3000" top class="snackbar-text" color="#b5cfb7">
     ยกเลิกการจองห้องสำเร็จ !
   </v-snackbar>
 </template>
@@ -160,7 +151,7 @@ interface BookingDetail {
   status: string;
   details: string;
   cancelReason: string;
-  cancelTime?: string; // ฟิลด์สำหรับเก็บเวลายกเลิก
+  cancelTime?: string;
 }
 
 // Store
@@ -174,15 +165,15 @@ const selectedItem = ref<BookingDetail | null>(null);
 const reasonDialog = ref(false);
 const cancelReason = ref("");
 const snackbar = ref(false);
-const selectedFloor = ref(2); // ค่าเริ่มต้นของแท็บ (2)
-const availableFloors = ref<number[]>([2, 3, 4, 5, 6, 7]); // รายการชั้นที่มี
+const selectedFloor = ref(3);
+const availableFloors = ref<number[]>([3, 4, 5, 6]);
 
 // ฟังก์ชันช่วย
 const cancelBooking = async (booking: BookingDetail | null) => {
   if (!booking) return;
 
   try {
-    const cancelTime = getCurrentTime(); // เรียกใช้ฟังก์ชัน
+    const cancelTime = getCurrentTime();
 
     await nrbStore.cancelReseved(
       booking.numb,
@@ -266,6 +257,7 @@ const headers = [
   { title: "วันที่", key: "startDate" },
   { title: "เวลา", key: "startTime" },
   { title: "สถานะ", key: "status" },
+  { title: "เพิ่มเติม", key: "more" },
 ];
 
 // Computed Data
@@ -286,15 +278,15 @@ onMounted(async () => {
           const roomResponse = await roomStore.getRoomByID(roomId);
           bookingDetails.value.push({
             numb: booking.nrbId,
-            floorNumber: roomResponse.floor?.floor_Number || "ไม่มีข้อมูลชั้น",
-            roomName: roomResponse.room_Name || "ไม่มีชื่อห้อง",
+            floorNumber: roomResponse.floor?.floor_Number,
+            roomName: roomResponse.room_Name,
             startDate: formatThaiDate(booking.startDate),
             startTime: formatTime(booking.startTime),
             endDate: formatThaiDate(booking.endDate),
             endTime: formatTime(booking.endTime),
-            status: booking.reseve_status || "ไม่มีสถานะ",
-            details: booking.details || "ไม่มีรายละเอียด",
-            cancelReason: booking.reason || "",
+            status: booking.reseve_status,
+            details: booking.details,
+            cancelReason: booking.reason,
           });
         }
       }
@@ -317,6 +309,25 @@ onMounted(async () => {
 const showDialog = (item: BookingDetail) => {
   selectedItem.value = item;
   dialog.value = true;
+};
+
+// State
+const confirmCancelDialog = ref(false); // ตัวแปรสำหรับเปิด/ปิด Dialog ยืนยันการยกเลิก
+
+// ฟังก์ชันแสดง Dialog ยืนยันการยกเลิก
+const showConfirmCancelDialog = () => {
+  confirmCancelDialog.value = true; // เปิด Dialog ยืนยันการยกเลิก
+};
+
+// ฟังก์ชันยืนยันการยกเลิกการจอง
+const confirmCancelBooking = async () => {
+  if (!selectedItem.value) return;
+
+  // เรียกฟังก์ชัน cancelBooking เพื่อยกเลิกการจอง
+  await cancelBooking(selectedItem.value);
+
+  // ปิด Dialog ยืนยันการยกเลิก
+  confirmCancelDialog.value = false;
 };
 </script>
 
@@ -367,9 +378,11 @@ const showDialog = (item: BookingDetail) => {
 
 .border-table {
   border-radius: 10px;
-  border: 1px solid #cdbba7; /* กำหนดกรอบของตาราง */
+  border: 1px solid #cdbba7;
+  /* กำหนดกรอบของตาราง */
   color: #493628;
-  border-collapse: collapse; /* ให้กรอบรวมกัน */
+  border-collapse: collapse;
+  /* ให้กรอบรวมกัน */
   font-weight: 400;
   font-size: 18px;
 }
@@ -379,47 +392,44 @@ tr {
   font-size: 17px;
 }
 
-.user-text {
+.headdialog-text {
   font-weight: 300;
-  font-size: 18px;
+  font-size: 17px;
+  margin-top: 20px;
+  margin-left: 25px;
+}
+
+.user-text {
+
   margin-top: 40px;
   margin-left: 25px;
 }
 
 .name-text {
-  font-weight: 300;
-  font-size: 18px;
+
   margin-top: 20px;
   margin-left: 25px;
 }
 
 .startdate-text {
-  font-weight: 300;
-  font-size: 18px;
+
   margin-top: 20px;
   margin-left: 25px;
 }
 
 .enddate-text {
-  font-weight: 300;
-  font-size: 18px;
+
   margin-top: -10px;
   margin-left: 25px;
 }
 
 .floor-text {
-  font-weight: 300;
-  font-size: 18px;
+
   margin-top: 20px;
   margin-left: 25px;
 }
 
-.headdialog-text {
-  font-weight: 300;
-  font-size: 18px;
-  margin-top: 20px;
-  margin-left: 25px;
-}
+
 
 .border-btndetail {
   background-color: #f5eded;
@@ -431,6 +441,7 @@ tr {
   background-color: #f5eded;
   border-radius: 20px;
 }
+
 .border-btncanceldialog {
   font-weight: 400;
   font-size: 16px;
@@ -442,18 +453,6 @@ tr {
   margin-right: 30px;
 }
 
-.border-btncancel {
-  font-weight: 400;
-  font-size: 16px;
-  color: #493628;
-  background-color: #dad0c2;
-  width: 100px;
-  border-radius: 10px;
-  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
-  margin-right: 30px;
-  margin-top: -40px;
-}
-
 .border-btnclose {
   font-weight: 400;
   font-size: 16px;
@@ -461,5 +460,40 @@ tr {
   width: 100px;
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+.confirmdialog-text {
+  font-weight: 400;
+  font-size: 17px;
+  text-align: center;
+  width: 500px;
+}
+
+.border-btnclosedialog {
+  font-weight: 400;
+  font-size: 16px;
+  color: #493628;
+  background-color: #dad0c2;
+  width: 100px;
+  border-radius: 10px;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+  margin-bottom: 25px;
+}
+
+.border-btnconfirmdialog {
+  font-weight: 400;
+  font-size: 16px;
+  color: #493628;
+  background-color: #ea8a8a;
+  width: 100px;
+  border-radius: 10px;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+  margin-bottom: 25px;
+  margin-left: 50px;
+}
+
+.snackbar-text {
+  font-weight: 400;
+  font-size: 16px;
 }
 </style>
