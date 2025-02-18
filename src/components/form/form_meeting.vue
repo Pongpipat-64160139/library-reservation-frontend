@@ -1,17 +1,12 @@
-<template class="back-ground">
-  <v-container fluid class="back-ground ms-kob">
+<template>
+  <v-container fluid class="back-ground mg-toppage">
     <!-- Sheet1 จองห้อง -->
-    <v-sheet
-      class="mx-auto mt-10"
-      elevation="8"
-      max-width="1200"
-      style="background-color: #dfd3c3; border-radius: 16px"
-    >
-      <h1 class="pt-5 head-title text-center pb-10">จองห้องประชุม</h1>
+    <v-sheet class="mx-auto size-sheet" elevation="8">
+      <h1 class="pt-5 topic-text">จองห้องประชุม</h1>
 
       <!-- span1 -->
       <span class="d-flex">
-        <h1 class="mg-name pt-5 head1-title">ชื่อ</h1>
+        <h1 class="mg-name head-text">ชื่อ</h1>
         <v-text-field
           v-if="user"
           v-model="user.username"
@@ -19,58 +14,40 @@
           single-line
           outlined
           :rules="[(v) => !!v || '']"
-          label=""
-          readonly
+          :disabled="true"
         />
-        <h1 class="ps-15 pt-5 head1-title">จำนวนคน</h1>
+
+        <h1 class="mg-amount head-text">จำนวนคน*</h1>
         <v-text-field
           v-model="srbStore.newSRB.people_Count"
           class="width-formamount text-field-rounded"
           single-line
-          label=""
           :rules="[(v) => /^\d+$/.test(v) || '', (v) => v > 0 || '']"
           @input="validateNumber"
         />
-        <h1 class="ps-15 pt-5 head1-title">เบอร์โทรติดต่อ</h1>
+
+        <h1 class="mg-tell head-text">เบอร์โทร*</h1>
         <v-text-field
           v-model="srbStore.newSRB.contract_Number"
-          class="width-formtell text-field-rounded pe-7"
+          class="width-formtell text-field-rounded"
           single-line
-          label=""
           :rules="[(v) => /^\d{10}$/.test(v) || '']"
+          @input="validateNumber"
         />
-      </span>
-      <!-- span3 -->
-      <span class="d-flex">
-        <h1 class="ps-2 pt-5 head1-title">ชื่อป้ายเวที</h1>
+
+        <h1 class="mg-tag head-text">ชื่อป้ายเวที</h1>
         <v-text-field
           v-model="srbStore.newSRB.stage_Name"
           class="width-formtag text-field-rounded"
           single-line
           outlined
-          label="กรุณาแจ้งล่วงหน้า 3 วันทำการ"
-        />
-        <h1 class="mg-floor pt-5 head1-title">ชั้น</h1>
-        <v-select
-          v-model="floor"
-          :items="availableFloors"
-          outlined
-          label=""
-          class="width-formfloor text-field-rounded"
-        />
-        <h1 class="mg-room ps-15 pt-5 head1-title">ห้อง</h1>
-        <v-select
-          v-model="room"
-          :items="availableRooms"
-          outlined
-          label=""
-          class="width-formroom text-field-rounded pe-7"
+          label="แจ้งล่วงหน้า 3 วันทำการ"
         />
       </span>
 
-      <!-- span2 -->
+      <!-- span3 -->
       <span class="d-flex">
-        <h1 class="mg-date pt-5 head1-title">วันที่เริ่ม</h1>
+        <h1 class="mg-startdate head-text">วันที่เริ่ม</h1>
         <v-menu
           v-model="startMenu"
           v-model:return-value="startDate"
@@ -79,12 +56,9 @@
           transition="scale-transition"
           offset-y
         >
-          <template
-            #activator="{ props }"
-            class="width-formdate text-field-rounded"
-          >
+          <template #activator="{ props }">
             <v-text-field
-              class="width-formdate text-field-rounded"
+              class="width-formstartdate text-field-rounded"
               v-bind="props"
               :value="
                 startDate
@@ -117,29 +91,38 @@
           />
         </v-menu>
 
-        <h1 class="ps-5 pt-5 head1-title">เวลา</h1>
+        <h1 class="mg-starttime head-text">เวลา</h1>
         <v-select
           v-model="startTime"
           :items="timeOptions"
           outlined
           label=""
-          class="width-formtime text-field-rounded pe-7"
+          class="width-formstarttime text-field-rounded"
         />
-        <h1 class="pt-5 head1-title">วันที่จบ</h1>
+
+        <h1 class="mg-floor head-text">⠀ชั้น</h1>
+        <v-select
+          v-model="floor"
+          :items="availableFloors"
+          outlined
+          label=""
+          class="width-formfloor text-field-rounded"
+        />
+      </span>
+
+      <!-- span2 -->
+      <span class="d-flex">
+        <h1 class="mg-enddate head-text">วันที่จบ</h1>
         <v-menu
           v-model="endMenu"
           v-model:return-value="endDate"
-          class="width-formdate text-field-rounded"
           :close-on-content-click="false"
           transition="scale-transition"
           offset-y
         >
-          <template
-            #activator="{ props }"
-            class="width-formdate text-field-rounded"
-          >
+          <template #activator="{ props }">
             <v-text-field
-              class="width-formdate text-field-rounded"
+              class="width-formenddate text-field-rounded"
               v-bind="props"
               :value="
                 endDate
@@ -168,13 +151,22 @@
             "
           />
         </v-menu>
-        <h1 class="ps-5 pt-5 head1-title">เวลา</h1>
+        <h1 class="mg-endtime head-text">เวลา</h1>
         <v-select
           v-model="endTime"
           :items="filteredEndTimes()"
           outlined
           label=""
-          class="width-formtime1 text-field-rounded pe-7"
+          class="width-formendtime text-field-rounded"
+        />
+
+        <h1 class="mg-room head-text">ห้อง</h1>
+        <v-select
+          v-model="room"
+          :items="availableRooms"
+          outlined
+          label=""
+          class="width-formroom text-field-rounded"
         />
       </span>
     </v-sheet>
@@ -427,7 +419,14 @@ function allowedDates(date: Date) {
 }
 
 function validateNumber() {
-  numPeople.value = numPeople.value.replace(/\D/g, "");
+  srbStore.newSRB.contract_Number = srbStore.newSRB.contract_Number.replace(
+    /\D/g,
+    ""
+  );
+  srbStore.newSRB.people_Count = `${srbStore.newSRB.people_Count}`.replace(
+    /\D/g,
+    ""
+  );
 }
 
 function formatDate(date: Date) {
@@ -449,123 +448,125 @@ function formatDate(date: Date) {
   color: #493628;
 }
 
-.head-title {
-  font-weight: 600;
-  font-size: 20px;
-}
-
-.head1-title {
-  font-weight: 400;
-  font-size: 15px;
-  font-weight: 600;
-  margin-top: -1px;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.mt-2 {
-  margin-top: 10px;
-}
-
-.mg-name {
-  margin-left: 54px;
-}
-
-.mg-date {
-  margin-left: 25px;
-}
-
-.mg-floor {
-  margin-left: 26px;
-}
-
-.mg-room {
-  margin-left: 65px;
-}
-
-.width-formtag {
-  width: 194px;
-  margin-left: 20px;
-  margin-right: 77px;
-  color: #493628;
-}
-
-.mg-repeat {
-  margin-left: 43px;
-}
-
 .back-ground {
   background-color: #f9f3ea;
 }
 
-.ms-kob {
-  margin-top: -700px;
+.mg-toppage {
+  margin-top: -280px;
+}
+
+.size-sheet {
+  width: 1190px;
+  height: auto;
+  background-color: #dfd3c3;
+  border-radius: 8px;
+}
+
+.topic-text {
+  font-weight: 600;
+  font-size: 20px;
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 25px;
+}
+
+.head-text {
+  font-weight: 400;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 20px;
+}
+
+.mg-name {
+  margin-left: 54px;
+  margin-right: 20px;
+}
+
+.mg-amount {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.mg-tell {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.mg-tag {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.mg-startdate {
+  margin-left: 24px;
+  margin-right: 20px;
+}
+
+.mg-enddate {
+  margin-left: 28px;
+  margin-right: 20px;
+}
+
+.mg-starttime {
+  margin-left: 20px;
+}
+
+.mg-endtime {
+  margin-left: 20px;
+}
+
+.mg-floor {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.mg-room {
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .width-formname {
-  width: 195px;
-  height: 1px;
-  font-weight: 500;
-  margin-left: 21px;
-  color: #493628;
+  width: 250px;
 }
 
 .width-formamount {
-  margin-left: 20px;
-  color: #493628;
-  width: 65px;
-}
-
-.width-formdate {
-  width: 280px;
-  height: 1px;
-  font-weight: 500;
-  margin-left: 20px;
-  color: #493628;
-}
-
-.width-formtime {
-  margin-left: 20px;
-  color: #493628;
-  width: 135px;
-}
-
-.width-formtime1 {
-  margin-left: 20px;
-  color: #493628;
-  width: 135px;
+  width: 15px;
 }
 
 .width-formtell {
-  width: 200px;
-  font-size: 50px;
+  width: 80px;
+}
+
+.width-formtag {
+  width: 170px;
+  margin-right: 20px;
+}
+
+.width-formstartdate {
+  width: 100px;
+}
+
+.width-formenddate {
+  width: 100px;
+}
+
+.width-formstarttime {
   margin-left: 20px;
-  color: #493628;
+}
+
+.width-formendtime {
+  margin-left: 20px;
 }
 
 .width-formfloor {
-  width: 65px;
-  margin-left: 20px;
-  color: #493628;
+  width: 100px;
+  margin-right: 20px;
 }
 
-.width-formrepeat {
-  width: 65px;
-  margin-left: 18px;
-  color: #493628;
-}
 .width-formroom {
-  width: 200px;
-  margin-left: 20px;
-  color: #493628;
-}
-
-.width-formblank1 {
-  width: 460px;
-  margin-left: 20px;
-  color: #493628;
+  width: 100px;
+  margin-right: 20px;
 }
 
 .text-field-rounded ::v-deep(.v-input__control) {

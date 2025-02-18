@@ -754,7 +754,6 @@ watch(roomName, (newRoom) => {
   font-weight: 400;
   font-size: 15px;
   font-weight: 600;
-  margin-top: -1px;
   margin-top: 20px;
 }
 
