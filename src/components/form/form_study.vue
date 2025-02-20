@@ -127,7 +127,12 @@
 import { ref, computed, watch, onMounted } from "vue";
 
 // Vue Router
+<<<<<<< Updated upstream
 import { useRoute, useRouter } from "vue-router";
+=======
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { useRoute } from "vue-router";
+>>>>>>> Stashed changes
 
 // Stores
 import { useRoomStore } from "@/stores/roomStore";

@@ -92,6 +92,7 @@ const submitForm = async () => {
     if (userStore.isLoign) {
       userStore.getLocalStorageUser()
       router.push("/home/home_page");
+      console.log("Login successful")
     }
   }
 };
