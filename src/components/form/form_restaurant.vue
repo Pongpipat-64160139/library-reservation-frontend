@@ -3,70 +3,156 @@
 
   <!-- ส่วนของแผงขยายข้อมูลตัวเลือกเพิ่มเติม -->
   <v-expansion-panels class="size-panel">
-    <v-expansion-panel class="expansion-panel" title="ต้องการอาหารว่าง/กลางวัน (กรุณาแจ้งล่วงหน้า 2 วันทำการ)">
+    <v-expansion-panel
+      class="expansion-panel"
+      title="ต้องการอาหารว่าง/กลางวัน (กรุณาแจ้งล่วงหน้า 2 วันทำการ)"
+    >
       <template #text>
         <div>
           <!-- ส่วนของตัวเลือกอาหารว่าง -->
           <h4 class="head-text">อาหารว่าง</h4>
 
           <!-- Break เช้า -->
-          <v-checkbox class="d-flex break-text" label="Break เช้า" v-model="isEnableBreakMorning" />
+          <v-checkbox
+            class="d-flex break-text"
+            label="Break เช้า"
+            v-model="isEnableBreakMorning"
+          />
           <div class="d-flex flex-wrap">
-            <v-select v-model="breakMorning.Serve_Time" label="เวลา" :items="times"
-              class="me-4 text-field-rounded width-time" :menu-props="{ maxHeight: 200 }"
-              :disabled="!isEnableBreakMorning" />
+            <v-select
+              v-model="breakMorning.Serve_Time"
+              label="เวลา"
+              :items="times"
+              class="me-4 text-field-rounded width-time"
+              :menu-props="{ maxHeight: 200 }"
+              :disabled="!isEnableBreakMorning"
+            />
 
-            <v-text-field v-model="breakMorning.Quantity" label="จำนวนคน" type="number"
-              class="text-field-rounded width-amount" :disabled="!isEnableBreakMorning" />
+            <v-text-field
+              v-model="breakMorning.Quantity"
+              label="จำนวนคน"
+              type="number"
+              class="text-field-rounded width-amount"
+              :disabled="!isEnableBreakMorning"
+            />
 
-            <v-text-field v-model="breakMorning.CostPerson" class="text-field-rounded width-money" label="งบประมาณต่อคน"
-              type="number" :disabled="!isEnableBreakMorning" />
+            <v-text-field
+              v-model="breakMorning.CostPerson"
+              class="text-field-rounded width-money"
+              label="งบประมาณต่อคน"
+              type="number"
+              :disabled="!isEnableBreakMorning"
+            />
           </div>
 
           <!-- Break กลางวัน -->
-          <v-checkbox class="d-flex break-text" label="Break กลางวัน" v-model="isEnableBreakmidday" />
+          <v-checkbox
+            class="d-flex break-text"
+            label="Break กลางวัน"
+            v-model="isEnableBreakmidday"
+          />
           <div class="d-flex flex-wrap">
-            <v-select v-model="breakLunch.Serve_Time" label="เวลา" :items="times" class="text-field-rounded width-time"
-              :menu-props="{ maxHeight: 200 }" :disabled="!isEnableBreakmidday" />
+            <v-select
+              v-model="breakLunch.Serve_Time"
+              label="เวลา"
+              :items="times"
+              class="text-field-rounded width-time"
+              :menu-props="{ maxHeight: 200 }"
+              :disabled="!isEnableBreakmidday"
+            />
 
-            <v-text-field v-model="breakLunch.Quantity" label="จำนวนคน" type="number"
-              class="text-field-rounded width-amount" :disabled="!isEnableBreakmidday" />
+            <v-text-field
+              v-model="breakLunch.Quantity"
+              label="จำนวนคน"
+              type="number"
+              class="text-field-rounded width-amount"
+              :disabled="!isEnableBreakmidday"
+            />
 
-            <v-text-field v-model="breakLunch.CostPerson" class="text-field-rounded width-money" label="งบประมาณต่อคน"
-              type="number" :disabled="!isEnableBreakmidday" />
+            <v-text-field
+              v-model="breakLunch.CostPerson"
+              class="text-field-rounded width-money"
+              label="งบประมาณต่อคน"
+              type="number"
+              :disabled="!isEnableBreakmidday"
+            />
           </div>
 
           <!-- Break บ่าย -->
-          <v-checkbox class="d-flex break-text" label="Break บ่าย" v-model="isEnableBreakAfternoon" />
+          <v-checkbox
+            class="d-flex break-text"
+            label="Break บ่าย"
+            v-model="isEnableBreakAfternoon"
+          />
           <div class="d-flex flex-wrap">
-            <v-select v-model="breakAfternoon.Serve_Time" label="เวลา" :items="times"
-              class="text-field-rounded width-time" :menu-props="{ maxHeight: 200 }"
-              :disabled="!isEnableBreakAfternoon" />
+            <v-select
+              v-model="breakAfternoon.Serve_Time"
+              label="เวลา"
+              :items="times"
+              class="text-field-rounded width-time"
+              :menu-props="{ maxHeight: 200 }"
+              :disabled="!isEnableBreakAfternoon"
+            />
 
-            <v-text-field v-model="breakAfternoon.Quantity" label="จำนวนคน" type="number"
-              class="text-field-rounded width-amount" :disabled="!isEnableBreakAfternoon" />
+            <v-text-field
+              v-model="breakAfternoon.Quantity"
+              label="จำนวนคน"
+              type="number"
+              class="text-field-rounded width-amount"
+              :disabled="!isEnableBreakAfternoon"
+            />
 
-            <v-text-field v-model="breakAfternoon.CostPerson" class="text-field-rounded width-money"
-              label="งบประมาณต่อคน" type="number" :disabled="!isEnableBreakAfternoon" />
+            <v-text-field
+              v-model="breakAfternoon.CostPerson"
+              class="text-field-rounded width-money"
+              label="งบประมาณต่อคน"
+              type="number"
+              :disabled="!isEnableBreakAfternoon"
+            />
           </div>
 
           <h4 class="head-text">อาหารกลางวัน</h4>
-          <v-checkbox class="d-flex break-text" label="อาหารกลางวัน" v-model="isEnableLunch" />
+          <v-checkbox
+            class="d-flex break-text"
+            label="อาหารกลางวัน"
+            v-model="isEnableLunch"
+          />
           <div class="d-flex">
-            <v-select v-model="lunch!.Serve_Time" label="เวลา" :items="times" class="text-field-rounded width-time"
-              :menu-props="{ maxHeight: 200 }" :disabled="!isEnableLunch" />
+            <v-select
+              v-model="lunch!.Serve_Time"
+              label="เวลา"
+              :items="times"
+              class="text-field-rounded width-time"
+              :menu-props="{ maxHeight: 200 }"
+              :disabled="!isEnableLunch"
+            />
 
-            <v-text-field v-model="lunch!.Quantity" label="จำนวนคน" type="number"
-              class="text-field-rounded width-amount" :disabled="!isEnableLunch" />
+            <v-text-field
+              v-model="lunch!.Quantity"
+              label="จำนวนคน"
+              type="number"
+              class="text-field-rounded width-amount"
+              :disabled="!isEnableLunch"
+            />
 
-            <v-text-field v-model="lunch!.CostPerson" class="text-field-rounded width-money" label="งบประมาณต่อคน"
-              type="number" :disabled="!isEnableLunch" />
+            <v-text-field
+              v-model="lunch!.CostPerson"
+              class="text-field-rounded width-money"
+              label="งบประมาณต่อคน"
+              type="number"
+              :disabled="!isEnableLunch"
+            />
           </div>
 
           <div>
             <h1 class="head-text">รายละเอียดเพิ่มเติม</h1>
-            <v-textarea v-model="srbStore.newSRB.order_Description" label="" rows="3" outlined
-              class="text-field-more" />
+            <v-textarea
+              v-model="srbStore.newSRB.order_Description"
+              label=""
+              rows="3"
+              outlined
+              class="text-field-more"
+            />
           </div>
         </div>
       </template>

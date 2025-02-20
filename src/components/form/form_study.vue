@@ -8,7 +8,7 @@
         <h1 class="mg-name head-text">ชื่อ</h1>
         <v-text-field
           class="width-formname text-field-rounded"
-          v-model="numPeople"
+          v-model="username"
           single-line
           outlined
           :rules="[(v) => !!v || '']"
@@ -164,7 +164,7 @@ const participantStore = useParticipantStore();
 // Data Properties
 // ---------------------
 // ตัวแปรแบบ reactive สำหรับจัดการข้อมูลใน component
-const numPeople = ref(""); // จำนวนคนที่เข้าร่วม
+const username = ref("");
 const formDetail = ref<string>(""); // รายละเอียดในฟอร์ม
 const startMenu = ref(false); // เมนูเริ่มต้น
 const endMenu = ref(false); // เมนูสิ้นสุด
@@ -407,11 +407,6 @@ async function loadedReserveRoom(selectedDate: string) {
 // ---------------------
 // สามารถเพิ่ม watcher, methods หรือ computed properties ตามความเหมาะสม
 
-async function setLeaderUser() {
-  await userStore.getUserById(64160100);
-  user.value = userStore.leaderUser;
-  numPeople.value = `${user.value?.firstName} ${user.value?.lastName}`;
-}
 // computed properties
 function updateEndTimeSlots() {
   endTime.value = timeStore.updateEndTime(startTime.value!);
@@ -663,13 +658,17 @@ function formatToDDMMYYYY(date: Date | string): string {
 
 async function createdUserBookAndParticipant(nrb: NormalRoomBooking) {
   // เก็บข้อมูลของ user book
+
   const newUserBook = ref<UBPostpayload>();
-  newUserBook.value = {
-    userId: user.value?.userId!,
-    nrbBookingId: nrb.nrbId!,
-  };
+  const user = userStore.currentUser;
+  if (user) {
+    newUserBook.value = {
+      userId: user?.userId,
+      nrbBookingId: nrb.nrbId!,
+    };
+  }
   // สร้างข้อมูลของ User Booking ผ่าน Store
-  const createUB = await ubStore.createNewUserBook(newUserBook.value);
+  const createUB = await ubStore.createNewUserBook(newUserBook.value!);
   const saveUB = createUB as UserBooking;
   console.log("Data :", saveUB.userbooking_Id);
 
@@ -726,13 +725,15 @@ async function submitBookingRoom() {
 // Lifecycle hooks
 onMounted(async () => {
   try {
+    username.value =
+      userStore.currentUser?.firstname + "" + userStore.currentUser?.lastname;
     await roomStore.filteredEntertainRooms();
     await roomStore.initializeRooms();
     floor.value = roomStore.currentTypeRoom.floorId + 1;
     await filteredEndTimes();
     getCurrentDate();
     saveSelectRoom.value = roomStore.currentTypeRoom;
-    await setLeaderUser();
+    await userStore.getLocalStorageUser();
   } catch (error) {
     console.error("Error loading data:", error);
   }

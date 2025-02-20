@@ -123,6 +123,7 @@ async function saveReserved() {
     srbStore.newSRB.document = newFile.id;
     srbStore.newSRB.start_Date = dateBetween[0];
     modifyReserved();
+    console.log("New Reserved :", srbStore.newSRB);
     const createdNewSRB = await srbStore.createSpecialRoom(srbStore.newSRB);
     const newSRBChangeType = createdNewSRB as GetSpecialRoomBooking;
     console.log("New Reserved :", newSRBChangeType);
@@ -140,7 +141,7 @@ async function saveReserved() {
     }
   }
   resetDate();
-  router.push("/table_meeting");
+  // router.push("/table_meeting");
 }
 </script>
 <style scoped>

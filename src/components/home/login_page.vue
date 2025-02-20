@@ -54,11 +54,15 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import lib from "@/assets/lib.png";
 import buulib from "@/assets/buulib.png";
+import { useUserStore } from "@/stores/userStore";
+import { useRouter } from "vue-router";
+
+const userStore = useUserStore();
 
 const isMobile = ref(false);
 const isTablet = ref(false);
 const isDesktop = ref(false);
-
+const router = useRouter(); //
 const checkScreenSize = () => {
   const width = window.innerWidth;
 
@@ -76,17 +80,19 @@ onUnmounted(() => {
   window.removeEventListener("resize", checkScreenSize);
 });
 
-const username = ref("");
-const password = ref("");
+const username = ref<string>("");
+const password = ref<string>("");
 
-const submitForm = () => {
+const submitForm = async () => {
   if (username.value && password.value) {
-    console.log("Form submitted:", {
-      username: username.value,
-      password: password.value,
-    });
-  } else {
-    console.log("Please enter username and password.");
+    await userStore.checkLoignAndSaveDataUser(
+      username.value.toString(),
+      password.value.toString()
+    );
+    if (userStore.isLoign) {
+      userStore.getLocalStorageUser()
+      router.push("/home/home_page");
+    }
   }
 };
 </script>
@@ -401,16 +407,10 @@ const submitForm = () => {
     margin-left: -1px;
   }
 
-
-
-
-
   .mg-imagelib {
     margin-top: 30px;
     margin-left: 30px;
     width: 700px;
   }
-
-
 }
 </style>

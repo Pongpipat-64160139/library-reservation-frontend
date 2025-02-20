@@ -23,7 +23,7 @@
       </div>
 
       <div class="ms-020 mt-4 text-center">
-        <div class="user-font">64160136</div>
+        <div class="user-font">{{ userStore.currentUser?.Username }}</div>
         <router-link to="/login_page" class="custom-router-link user-font">
           ออกจากระบบ
         </router-link>
@@ -32,16 +32,27 @@
   </v-app>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import logobuu from "@/assets/logobuu.png";
-
+import { useUserStore } from "@/stores/userStore";
+import { onMounted, ref } from "vue";
+const userStore = useUserStore();
+onMounted(() => {
+  try {
+    userStore.getLocalStorageUser();
+  } catch (error) {
+    console.error(error);
+  }
+});
+// 📌 กำหนดประเภทของข้อมูลสำหรับ Breadcrumb
 interface BreadcrumbItem {
   title: string;
   disabled: boolean;
   href: string;
 }
 
-const items: BreadcrumbItem[] = [
+// 📌 ใช้ `ref` เพื่อกำหนดค่าให้กับ `items`
+const items = ref<BreadcrumbItem[]>([
   {
     title: "สถานะการจอง",
     disabled: false,
@@ -52,20 +63,11 @@ const items: BreadcrumbItem[] = [
     disabled: false,
     href: "/manage_status",
   },
-];
+]);
 
-export default {
-  data() {
-    return {
-      logobuu,
-    };
-  },
-  computed: {
-    items() {
-      return items;
-    },
-  },
-};
+// 📌 กำหนดค่าโลโก้เป็นตัวแปรธรรมดา เพราะมันไม่เปลี่ยนแปลง
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const logo = logobuu;
 </script>
 
 <style scoped>
@@ -164,7 +166,6 @@ export default {
     height: 30px;
     margin-left: -50px;
   }
-
 
   .ms-136 {
     margin-left: 60px;

@@ -1,27 +1,27 @@
 import http from "../axios";
-import { User } from "../types/user";
-export function getAllUsers() {
-  return http.get("/users");
-}
-export function getUserById(id: number) {
-  return http.get(`/users/${id}`);
+import { UpdateUser } from "../types/user";
+
+export function checkAndLoginUser(username: string, password: string) {
+  return http.post(`/users/login`, { username, password }); // ✅ ส่งไปใน Body
 }
 
-export function createUser(users: User) {
-  return http.post("/users", users);
+export function updateLastLoginUser(id: number, updateData: Partial<UpdateUser>) {
+  return http.patch(`/users/${id}`, updateData);
 }
 
-export function updateUser(id: string, users: User) {
-  return http.put(`/users/${id}`, users);
+export function getUserByUsername(username: string) {
+  return http.get(`/users/findUserName`, {
+    params: { username: username },
+  });
 }
-
-export function deleteUser(id: string) {
-  return http.delete(`/users/${id}`);
+export function getDataUserformAPI(username: string, password: string) {
+  return http.get(`users/CheckPersonsLogin`, {
+    params: { username: username, password: password }, // ใช้ params เพื่อส่ง Query String
+  });
 }
 export default {
-  getAllUsers,
-  createUser,
-  getUserById,
-  updateUser,
-  deleteUser,
+  checkAndLoginUser,
+  updateLastLoginUser,
+  getUserByUsername,
+  getDataUserformAPI,
 };

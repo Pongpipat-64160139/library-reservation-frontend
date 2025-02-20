@@ -8,8 +8,7 @@
       <span class="d-flex">
         <h1 class="mg-name head-text">ชื่อ</h1>
         <v-text-field
-          v-if="user"
-          v-model="user.username"
+          v-model="fullusername"
           class="width-formname text-field-rounded"
           single-line
           outlined
@@ -116,7 +115,6 @@ import { useSpecialRoomStore } from "@/stores/srbStore";
 import { useTimeStore } from "@/stores/timeStore";
 import { useUserStore } from "@/stores/userStore";
 import type { SelectedRoom } from "@/types/room";
-import type { User } from "@/types/user";
 import { ref, computed, watch, onMounted } from "vue";
 
 import VueFlatpickr from "vue-flatpickr-component";
@@ -139,8 +137,7 @@ const endTime = ref();
 const floor = ref();
 const room = ref();
 const holidays = ref<string[]>([]);
-const numPeople = ref("");
-const user = ref<User>();
+const fullusername = ref();
 const saveSelctedRoom = ref<SelectedRoom[]>([]);
 onMounted(async () => {
   try {
@@ -149,8 +146,10 @@ onMounted(async () => {
       fetchHolidays(currentYear),
       (currentDate.value = formatDate(new Date())),
     ]);
+    await userStore.getLocalStorageUser();
+    srbStore.newSRB.userId = userStore.currentUser?.userId ?? 0;
+    fullusername.value = `${userStore.currentUser?.firstname} ${userStore.currentUser?.lastname}`;
     await filteredEndTimes();
-    await getUser();
     await roomStore.filteredMeetingRooms();
     await setStartDate();
     await setDataForm();
@@ -160,10 +159,6 @@ onMounted(async () => {
   }
 });
 
-async function getUser() {
-  const res = await userStore.getUserById(64160100);
-  user.value = res;
-}
 function setDataForm() {
   floor.value = currentRoom.floorId + 1;
   room.value = currentRoom.roomName;
@@ -183,13 +178,11 @@ function setDateForReserved() {
     !isNaN(endDate.value.getTime())
       ? endDate.value
       : validStartDate;
-
   srbStore.newSRB.start_Time = startTime.value;
   srbStore.newSRB.end_Time = endTime.value;
   srbStore.newSRB.start_Date = formatToDDMMYYYY(validStartDate);
   srbStore.newSRB.end_Date = formatToDDMMYYYY(validEndDate);
   srbStore.newSRB.roomId = currentRoom.roomId;
-  srbStore.newSRB.userId = user.value?.userId ?? 0;
 }
 
 const availableFloors = computed(() => {
@@ -274,23 +267,25 @@ const availableRooms = computed(() => {
 
 function setStartDate() {
   // ตรวจสอบว่า startDate มีค่าเป็นวันที่ที่ถูกต้องหรือไม่
-  if (startDate.value && startDate.value instanceof Date && !isNaN(startDate.value.getTime())) {
+  if (
+    startDate.value &&
+    startDate.value instanceof Date &&
+    !isNaN(startDate.value.getTime())
+  ) {
     const selectedDate = formatToDDMMYYYY(startDate.value);
-  console.log("วันที่เริ่มต้น :", selectedDate);
-  return selectedDate; // Return the date value in the correct format
+    console.log("วันที่เริ่มต้น :", selectedDate);
+    return selectedDate; // Return the date value in the correct format
   } else {
-    const startDateInput = new Date();  // ใช้วันที่ปัจจุบันเป็นค่าเริ่มต้น
+    const startDateInput = new Date(); // ใช้วันที่ปัจจุบันเป็นค่าเริ่มต้น
     if (isNaN(startDateInput.getTime())) {
       console.error("Invalid date selected");
-      return;  // ถ้าเป็นวันที่ไม่ถูกต้อง จะไม่ทำการอัปเดต
+      return; // ถ้าเป็นวันที่ไม่ถูกต้อง จะไม่ทำการอัปเดต
     }
     const defaultDate = formatToDDMMYYYY(startDateInput);
     console.log("วันที่เริ่มต้น : วันที่ปัจจุบัน", defaultDate);
     return defaultDate;
   }
 }
-
-
 
 function formatToDDMMYYYY(date: Date | string): string {
   // ถ้าเป็น string ให้พยายามแปลงเป็น Date
@@ -313,18 +308,15 @@ function formatToDDMMYYYY(date: Date | string): string {
   const day = date.getDate().toString().padStart(2, "0");
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
   const year = date.getFullYear();
-  
+
   return `${day}-${month}-${year}`;
 }
-
 
 // Watchers
 watch(startTime, (newStartTime) => {
   srbStore.newSRB.start_Time = newStartTime;
   console.log("Now start time :", srbStore.newSRB.start_Time);
 });
-
-
 
 watch(endTime, (newEndTime) => {
   srbStore.newSRB.end_Time = newEndTime;
@@ -563,8 +555,18 @@ function parseThaiDate(thaiDateString: string): Date | null {
   const [, day, month, year] = match;
 
   const thaiMonths = [
-    "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-    "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+    "มกราคม",
+    "กุมภาพันธ์",
+    "มีนาคม",
+    "เมษายน",
+    "พฤษภาคม",
+    "มิถุนายน",
+    "กรกฎาคม",
+    "สิงหาคม",
+    "กันยายน",
+    "ตุลาคม",
+    "พฤศจิกายน",
+    "ธันวาคม",
   ];
 
   const monthIndex = thaiMonths.indexOf(month);
@@ -605,8 +607,6 @@ watch(startDate, (newDate) => {
     console.error("Invalid start date:", newDate); // ถ้า newDate เป็น null หรือไม่ใช่ Date
   }
 });
-
-
 
 watch(endDate, (newEndDate) => {
   if (newEndDate instanceof Date && !isNaN(newEndDate.getTime())) {
