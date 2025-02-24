@@ -20,12 +20,18 @@
         <v-text-field
           v-model="srbStore.newSRB.people_Count"
           class="width-formamount text-field-rounded"
+          single-line
+          :rules="[(v) => /^\d+$/.test(v) || '', (v) => v > 0 || '']"
+          @input="validateNumber"
         />
 
         <h1 class="mg-tell head-text">เบอร์โทร*</h1>
         <v-text-field
           v-model="srbStore.newSRB.contract_Number"
           class="width-formtell text-field-rounded"
+          single-line
+          :rules="[(v) => /^\d{10}$/.test(v) || '']"
+          @input="validateNumber"
         />
 
         <h1 class="mg-tag head-text">ชื่อป้ายเวที</h1>

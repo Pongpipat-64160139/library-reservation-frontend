@@ -4,7 +4,16 @@
     <Form_meeting />
     <Form_equipment class="mt-1" />
     <!-- to="/table_meeting" -->
-    <v-btn type="submit" class="save-btn custom-btn" @click="saveReserved()">
+    <v-btn
+      type="submit"
+      class="save-btn custom-btn"
+      @click="saveReserved()"
+      :disabled="
+        srbStore.newSRB.people_Count === 0 ||
+        srbStore.newSRB.contract_Number.length !== 10 ||
+        srbStore.newSRB.document === null
+      "
+    >
       <v-icon left> mdi-content-save </v-icon>
       จองห้อง
     </v-btn>

@@ -127,12 +127,7 @@
 import { ref, computed, watch, onMounted } from "vue";
 
 // Vue Router
-<<<<<<< Updated upstream
 import { useRoute, useRouter } from "vue-router";
-=======
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { useRoute } from "vue-router";
->>>>>>> Stashed changes
 
 // Stores
 import { useRoomStore } from "@/stores/roomStore";
@@ -481,10 +476,6 @@ const filteredEndTimes = () => {
     times.value = timeStore.endTimeSlots;
     return times.value;
   }
-};
-
-const validateNumber = () => {
-  numPeople.value = numPeople.value.replace(/\D/g, "");
 };
 
 const allowedDates = (date: Date) => {
@@ -895,13 +886,9 @@ watch(roomName, (newRoom) => {
 
 .disabled-datepicker {
   background-color: #f5eded !important;
-  /* สีเทา */
   color: #8a8a8a !important;
-  /* สีข้อความ */
   cursor: not-allowed;
-  /* เปลี่ยนเมาส์เป็นไอคอนห้ามคลิก */
   pointer-events: none;
-  /* ปิดการโต้ตอบ */
   opacity: 0.7;
 }
 

@@ -40,7 +40,7 @@
 
       <!-- ส่วนการแนบไฟล์เพิ่มเติม -->
       <span>
-        <h1 class="head-text">ไฟล์เอกสารเพิ่มเติม</h1>
+        <h1 class="head-text">ไฟล์เอกสารเพิ่มเติม*</h1>
         <v-file-input
           v-model="selectedFile"
           class="text-field-rounded-file width-file"
