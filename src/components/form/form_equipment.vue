@@ -6,9 +6,17 @@
       <!-- ส่วน checkbox สำหรับเลือกอุปกรณ์แบบวนลูป -->
       <v-container>
         <v-row cols="12">
-          <v-col v-for="(item, index) in equipmentList" :key="item.eq_Id" cols="4">
-            <v-checkbox class="select-box width-formcheckbox" :label="item.equip_Name" :value="item.eq_Id"
-              @click="selectedEquipment(index)" />
+          <v-col
+            v-for="(item, index) in equipmentList"
+            :key="item.eq_Id"
+            cols="4"
+          >
+            <v-checkbox
+              class="select-box width-formcheckbox"
+              :label="item.equip_Name"
+              :value="item.eq_Id"
+              @click="selectedEquipment(index)"
+            />
           </v-col>
         </v-row>
       </v-container>
@@ -16,7 +24,13 @@
       <!-- ส่วนฟอร์มสำหรับอุปกรณ์เพิ่มเติม -->
       <span>
         <h1 class="head-text">อื่น ๆ</h1>
-        <v-textarea v-model="eqother" label="" rows="3" outlined class="text-field-rounded" />
+        <v-textarea
+          v-model="eqother"
+          label=""
+          rows="3"
+          outlined
+          class="text-field-rounded"
+        />
       </span>
 
       <!-- คอมโพเนนต์สำหรับเลือกร้านอาหาร -->
@@ -27,8 +41,13 @@
       <!-- ส่วนการแนบไฟล์เพิ่มเติม -->
       <span>
         <h1 class="head-text">ไฟล์เอกสารเพิ่มเติม</h1>
-        <v-file-input v-model="selectedFile" class="text-field-rounded-file width-file" label="เพิ่มไฟล์" single-line
-          outlined />
+        <v-file-input
+          v-model="selectedFile"
+          class="text-field-rounded-file width-file"
+          label="เพิ่มไฟล์"
+          single-line
+          outlined
+        />
       </span>
     </v-sheet>
   </v-container>
