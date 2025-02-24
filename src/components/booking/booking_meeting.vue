@@ -25,6 +25,7 @@ const orderStore = useOrderDetialStore();
 const documentFileStore = useDocumentStore();
 const eqbStore = useEqBookStore();
 const srbStore = useSpecialRoomStore();
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const router = useRouter();
 onMounted(() => {
   try {
@@ -141,7 +142,7 @@ async function saveReserved() {
     }
   }
   resetDate();
-  // router.push("/table_meeting");
+  router.push("/table_meeting");
 }
 </script>
 <style scoped>

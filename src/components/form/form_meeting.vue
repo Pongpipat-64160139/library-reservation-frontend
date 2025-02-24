@@ -124,7 +124,7 @@ const currentRoom = roomStore.currentTypeRoom;
 const startMenu = ref(false);
 const endMenu = ref(false);
 const startDate = ref<Date | null>(null); // วันที่เริ่มต้น
-const endDate = ref<Date | null>(startDate.value); // วันที่จบให้เท่ากับวันที่เริ่มต้น
+const endDate = ref<Date | null>(); // วันที่จบให้เท่ากับวันที่เริ่มต้น
 const startTime = ref();
 const endTime = ref();
 const floor = ref();
@@ -149,6 +149,7 @@ onMounted(async () => {
     await userStore.getLocalStorageUser();
     srbStore.newSRB.userId = userStore.currentUser?.userId ?? 0;
     fullusername.value = `${userStore.currentUser?.firstname} ${userStore.currentUser?.lastname}`;
+    console.log("watch date :", startDate.value, endDate.value);
     await filteredEndTimes();
     await roomStore.filteredMeetingRooms();
     await setStartDate();
@@ -222,7 +223,9 @@ function setStartDate() {
     !isNaN(startDate.value.getTime())
   ) {
     const selectedDate = formatToDDMMYYYY(startDate.value);
-    console.log("วันที่เริ่มต้น :", selectedDate);
+    srbStore.newSRB.start_Date = selectedDate;
+    srbStore.newSRB.end_Date = selectedDate;
+    console.log("วันที่เริ่มต้น :", srbStore.newSRB.start_Date);
     return selectedDate; // Return the date value in the correct format
   } else {
     const startDateInput = new Date(); // ใช้วันที่ปัจจุบันเป็นค่าเริ่มต้น
@@ -319,7 +322,7 @@ function formatToDDMMYYYY(date: Date | string): string {
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
   const year = date.getFullYear();
 
-  return `${day}-${month}-${year}`;
+  return `${year}-${month}-${day}`;
 }
 
 // Methods
@@ -594,10 +597,56 @@ const handleEndDateUpdate = (val) => {
     console.error("Invalid date selected:", val); // Show error if date is invalid
   }
 };
+function convertThaiDateToDate(thaiDate: string): Date | null {
+  // รายชื่อเดือนภาษาไทยและเลขที่ตรงกับเดือน
+  const thaiMonths: { [key: string]: number } = {
+    มกราคม: 1,
+    กุมภาพันธ์: 2,
+    มีนาคม: 3,
+    เมษายน: 4,
+    พฤษภาคม: 5,
+    มิถุนายน: 6,
+    กรกฎาคม: 7,
+    สิงหาคม: 8,
+    กันยายน: 9,
+    ตุลาคม: 10,
+    พฤศจิกายน: 11,
+    ธันวาคม: 12,
+  };
+
+  // ใช้ Regular Expression เพื่อดึงข้อมูลจากสตริง
+  const match = thaiDate.match(/(\d{1,2})\s(\S+)\s(\d{4})/);
+
+  if (!match) {
+    console.error("❌ รูปแบบวันที่ไม่ถูกต้อง");
+    return null;
+  }
+
+  const day = parseInt(match[1], 10); // วันที่ (เช่น 25)
+  const monthName = match[2]; // ชื่อเดือนภาษาไทย (เช่น "กุมภาพันธ์")
+  let year = parseInt(match[3], 10); // ปีพุทธศักราช (เช่น 2568)
+
+  // แปลงปี พ.ศ. → ค.ศ. (ลบ 543)
+  year -= 543;
+
+  // แปลงชื่อเดือนไทยเป็นตัวเลข
+  const month = thaiMonths[monthName];
+
+  if (!month) {
+    console.error("❌ ไม่พบชื่อเดือนที่ตรงกัน");
+    return null;
+  }
+
+  // ✅ แปลงค่าเป็น Date Object
+  return new Date(year, month - 1, day);
+}
 
 watch(startDate, (newStartDate, oldStartDate) => {
+  const newDate = formatToDDMMYYYY(newStartDate!);
+  srbStore.newSRB.start_Date = newDate;
+  srbStore.newSRB.end_Date = newDate;
+  console.log(srbStore.newSRB.start_Date, srbStore.newSRB.end_Date);
   if (!newStartDate) return; // ถ้าไม่มีค่าให้หยุดทำงาน
-
   let parsedDate: Date | null = null;
 
   // แปลง `newStartDate` ให้เป็น Date object ถ้ายังไม่ใช่
@@ -623,7 +672,10 @@ watch(startDate, (newStartDate, oldStartDate) => {
   // อัปเดต endDate เมื่อค่ามีการเปลี่ยนแปลง
   endDate.value = new Date(parsedDate);
 });
-
+watch(endDate, (newEndDate) => {
+  srbStore.newSRB.end_Date = formatToDDMMYYYY(endDate.value!);
+  console.log("Now end date :", srbStore.newSRB.end_Date);
+});
 watch(startTime, (newStartTime) => {
   srbStore.newSRB.start_Time = newStartTime;
   console.log("Now start time :", srbStore.newSRB.start_Time);
