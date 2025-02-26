@@ -85,10 +85,7 @@ export const useUserStore = defineStore("user", () => {
     return currentUser.value;
   }
 
-   // ฟังก์ชันเพื่อดึงข้อมูล `agency` จาก `currentUser`
-   function getAgency() {
-    return currentUser.value?.Agency; // หรือใช้ค่าที่ได้จาก currentUser
-  }
+
   
   return {
     checkLoignAndSaveDataUser,

@@ -23,6 +23,7 @@ export default defineConfig({
         "src/components/form",
         "src/components/booking",
         "src/components/testAPI",
+        "src/components/dialog",
       ],
     }),
     Vue({

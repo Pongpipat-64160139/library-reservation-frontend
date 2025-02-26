@@ -9,7 +9,9 @@ declare module 'vue' {
   export interface GlobalComponents {
     Booking_meeting: typeof import('./src/components/booking/booking_meeting.vue')['default']
     Booking_study: typeof import('./src/components/booking/booking_study.vue')['default']
+    copy: typeof import('./src/components/dialog/duplicate_room_booking copy.vue')['default']
     Detail_room: typeof import('./src/components/home/detail_room.vue')['default']
+    Duplicate_room_booking: typeof import('./src/components/dialog/duplicate_room_booking.vue')['default']
     Footer_page: typeof import('./src/components/footer/footer_page.vue')['default']
     Form_equipment: typeof import('./src/components/form/form_equipment.vue')['default']
     Form_meeting: typeof import('./src/components/form/form_meeting.vue')['default']
@@ -17,6 +19,7 @@ declare module 'vue' {
     Form_study: typeof import('./src/components/form/form_study.vue')['default']
     Header_page: typeof import('./src/components/header/header_page.vue')['default']
     Home_page: typeof import('./src/components/home/home_page.vue')['default']
+    Limit_reached_dialog: typeof import('./src/components/dialog/limit_reached_dialog.vue')['default']
     Login_page: typeof import('./src/components/home/login_page.vue')['default']
     Manage_room: typeof import('./src/components/status/manage_room.vue')['default']
     Manage_status: typeof import('./src/components/status/manage_status.vue')['default']
