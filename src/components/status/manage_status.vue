@@ -46,7 +46,10 @@
           <td>
             {{ index + 1 }}
           </td>
-          <td>{{ item.user_name }}</td>
+          <td>
+            {{ userStore.currentUser?.firstname
+            }}{{ userStore.currentUser?.lastname }}
+          </td>
           <td>
             {{ item.floor_number }}
           </td>
@@ -94,13 +97,14 @@
     <v-card class="dialog-detail">
       <span class="text-userdetail">
         <div class="text-headdetail">
-          <strong>ผู้ใช้</strong>
+          <strong>ผู้ใช้</strong> {{ userStore.currentUser?.Username }}
         </div>
       </span>
 
       <span class="text-namedetail">
         <div class="text-headdetail">
-          <strong>ชื่อ</strong>
+          <strong>ชื่อ</strong> {{ userStore.currentUser?.firstname
+          }}{{ userStore.currentUser?.lastname }}
         </div>
       </span>
 
@@ -108,7 +112,7 @@
         <v-row>
           <v-col cols="6">
             <div class="text-headdetail">
-              <strong>วันที่เริ่ม</strong> {{ selectedItem?.startDate }}
+              <strong>วันที่เริ่ม</strong> {{ selectedItem?.start_date }}
             </div>
           </v-col>
           <v-col>
@@ -122,7 +126,7 @@
                 density="compact"
                 class="mg-toptime"
               />
-              <span v-else>{{ selectedItem?.startTime }}</span>
+              <span v-else>{{ selectedItem?.start_time }}</span>
             </div>
           </v-col>
         </v-row>
@@ -132,7 +136,7 @@
         <v-row>
           <v-col cols="6">
             <div class="text-headdetail">
-              <strong>วันที่จบ</strong> {{ selectedItem?.endDate }}
+              <strong>วันที่จบ</strong> {{ selectedItem?.end_date }}
             </div>
           </v-col>
           <v-col>
@@ -146,7 +150,7 @@
                 variant="outlined"
                 class="mg-toptime"
               />
-              <span v-else>{{ selectedItem?.endTime }}</span>
+              <span v-else>{{ selectedItem?.end_time }}</span>
             </div>
           </v-col>
         </v-row>
@@ -165,7 +169,7 @@
                 variant="outlined"
                 @update:model-value="updateAvailableRooms"
               />
-              <span v-else>{{ selectedItem?.floorNumber }}</span>
+              <span v-else>{{ selectedItem?.floor_number }}</span>
             </div>
           </v-col>
           <v-col>
@@ -178,7 +182,7 @@
                 density="compact"
                 variant="outlined"
               />
-              <span v-else>{{ selectedItem?.roomName }}</span>
+              <span v-else>{{ selectedItem?.room_name }}</span>
             </div>
           </v-col>
         </v-row>
@@ -191,17 +195,17 @@
       </span>
 
       <span
-        v-if="selectedItem?.status === 'ยกเลิก'"
+        v-if="selectedItem?.reseve_status === 'ยกเลิก'"
         class="d-flex text-headdetail"
       >
         <div class="text-headdetail">
           <strong>เหตุผลการยกเลิก</strong>
-          {{ selectedItem?.cancelReason || "ยกเลิกการจอง" }}
+          {{ selectedItem?.reason || "ยกเลิกการจอง" }}
         </div>
       </span>
 
       <span
-        v-if="selectedItem?.status === 'ยกเลิก'"
+        v-if="selectedItem?.reseve_status === 'ยกเลิก'"
         class="d-flex mg-leftreason"
       >
         <div class="text-headdetail">
@@ -210,12 +214,12 @@
       </span>
 
       <span
-        v-if="selectedItem?.status === 'ยกเลิก'"
+        v-if="selectedItem?.reseve_status === 'ยกเลิก'"
         class="d-flex mg-leftreason"
       >
         <div class="text-headdetail">
           <strong>เวลาที่ยกเลิก</strong>
-          {{ selectedItem?.cancelTime || "ไม่มีข้อมูล" }}
+          {{ selectedItem?.coalesce_time || "ไม่มีข้อมูล" }}
         </div>
       </span>
 
@@ -293,11 +297,14 @@ import type {
 } from "@/types/normalRoomBooking";
 import type { GetSpecialRoomBooking } from "@/types/specialRoomBooking";
 import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/userStore";
 
+const userStore = useUserStore();
 const roomStore = useRoomStore(); // เชื่อม store ห้อง
 const nrbStore = useNormalRoomBookStore(); // เชื่อม store การจอง
 const srbStore = useSpecialRoomStore(); //
 const bookingDetails = ref<AllReserve[]>([]);
+const selectedItem = ref<AllReserve | null>(null);
 
 const router = useRouter();
 const sortBy = ref([
@@ -323,7 +330,6 @@ const headers = ref([
 ]);
 
 const dialog = ref(false);
-const selectedItem = ref<any>(null);
 const editMode = ref(false);
 const statusChangeDialog = ref(false);
 
@@ -473,9 +479,7 @@ function formatThaiDate(dateString: string) {
   const dayIndex = dateObj.getDay();
 
   // จัดรูปแบบข้อความให้สวยงาม
-  return `วัน${thaiDays[dayIndex]} ที่ ${day} ${thaiMonths[month - 1]} พ.ศ. ${
-    year + 543
-  }`;
+  return `${thaiDays[dayIndex]} ${day} ${thaiMonths[month - 1]}  ${year + 543}`;
 }
 
 const formatTime = (time: string): string => {
@@ -721,53 +725,104 @@ const updateAvailableRooms = () => {
   editedRoom.value = rooms ? rooms[0] : "";
 };
 
-const toggleEditMode = () => {
+const saveChanges = async () => {
+  if (selectedItem.value) {
+    const updatedBooking = {
+      startTime: editedStartTime.value,
+      endTime: editedEndTime.value,
+      floorNumber: editedFloor.value,
+      roomName: editedRoom.value,
+    };
+
+    console.log("Updated booking data:", updatedBooking);
+
+    try {
+      await nrbStore.updateReserve(
+        selectedItem.value.reserved_Id,
+        updatedBooking
+      );
+      console.log("Booking updated successfully");
+    } catch (error) {
+      console.error("Error updating booking:", error);
+    }
+  }
+};
+
+const toggleEditMode = async () => {
+  editedStartTime.value = selectedItem.value?.start_time ?? "";
+  editedEndTime.value = selectedItem.value?.end_time ?? "";
+  editedFloor.value = selectedItem.value?.floor_number ?? 0;
+  editedRoom.value = selectedItem.value?.room_name ?? "";
+
+  console.log("Dialog data:", {
+    startTime: editedStartTime.value,
+    endTime: editedEndTime.value,
+    floor_number: editedFloor.value,
+    room_name: editedRoom.value,
+  });
+
   if (editMode.value) {
     // ตรวจสอบความถูกต้องของเวลา
-    const startIndex = startTimeOptions.value.indexOf(editedStartTime.value);
-    const endIndex = endTimeOptions.value.indexOf(editedEndTime.value);
-
-    if (startIndex >= endIndex) {
+    if (editedStartTime.value >= editedEndTime.value) {
       alert("เวลาเริ่มต้องน้อยกว่าเวลาจบ");
       return;
     }
 
     // บันทึกการแก้ไขลงใน `bookingDetails`
     const index = bookingDetails.value.findIndex(
-      (item) => item.numb === selectedItem.value.numb
+      (item) => item.reserved_Id === selectedItem.value?.reserved_Id
     );
 
     if (index !== -1) {
       bookingDetails.value[index] = {
         ...bookingDetails.value[index],
-        startTime: editedStartTime.value,
-        endTime: editedEndTime.value,
-        floorNumber: editedFloor.value.toString(),
-        roomName: editedRoom.value,
+        start_time: editedStartTime.value,
+        end_time: editedEndTime.value,
+        floor_number: editedFloor.value,
+        room_name: editedRoom.value,
       };
     }
 
+    // เรียกฟังก์ชัน saveChanges เพื่อบันทึกการเปลี่ยนแปลงไปยัง API
+    await saveChanges();
+
     editMode.value = false;
   } else {
+    editedFloor.value = selectedItem.value?.floor_number ?? editedFloor.value;
+    editedRoom.value = selectedItem.value?.room_name ?? editedRoom.value;
+    editedStartTime.value =
+      selectedItem.value?.start_time ?? editedStartTime.value;
+    editedEndTime.value = selectedItem.value?.end_time ?? editedEndTime.value;
     editMode.value = true;
   }
 };
 
-const showDialog = (item: any) => {
-  selectedItem.value = { ...item };
-  editedFloor.value = parseInt(item.floorNumber); // แปลง `floorNumber` เป็นตัวเลข
-  editedRoom.value = item.roomName;
-  editedStartTime.value = item.startTime;
-  editedEndTime.value = item.endTime;
+const showDialog = (item: AllReserve) => {
+  selectedItem.value = item;
   dialog.value = true;
-  editMode.value = false;
 };
+
+interface BookingDetail {
+  numb: number;
+  floorNumber: string;
+  roomName: string;
+  startDate: string;
+  startTime: string;
+  endDate: string;
+  endTime: string;
+  status: string;
+  details: string;
+  cancelReason: string;
+  cancelTime?: string;
+}
 
 const handleCancel = () => {
   if (editMode.value) {
-    editedFloor.value = selectedItem.value.floor;
-    editedRoom.value = selectedItem.value.room;
-    editMode.value = false;
+    editedFloor.value = selectedItem.value?.floor_number ?? editedFloor.value;
+    editedRoom.value = selectedItem.value?.room_name ?? editedRoom.value;
+    editedStartTime.value = selectedItem.value?.start_time ?? editedStartTime.value;
+    editedEndTime.value = selectedItem.value?.end_time ?? editedEndTime.value;
+    editMode.value = false; 
   } else {
     dialog.value = false;
   }
@@ -954,7 +1009,7 @@ th {
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
   margin-right: 30px;
-  margin-bottom: 20px;
+  margin-top: -60px;
 }
 
 .btn-save-editdialog {
@@ -964,7 +1019,7 @@ th {
   width: 100px;
   border-radius: 10px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
-  margin-bottom: 20px;
+  margin-top: -60px;
 }
 
 .btn-cancelreason {
