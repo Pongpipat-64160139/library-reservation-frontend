@@ -1,6 +1,5 @@
 import http from "../axios";
-import {
-  NormalRoomBooking,
+import type {
   PostNormalReseved,
   UpdateNormalRoomBooking,
 } from "../types/normalRoomBooking";

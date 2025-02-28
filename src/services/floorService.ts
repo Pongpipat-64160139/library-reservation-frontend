@@ -1,5 +1,5 @@
 import http from "../axios";
-import { Floor } from "../types/floor";
+import type { Floor } from "../types/floor";
 
 export function getAllFlors() {
   return http.get("/floors");

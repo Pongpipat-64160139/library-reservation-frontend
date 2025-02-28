@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import equipmentService from "../services/equipmentService";
 import { ref } from "vue";
-import { Equipment } from "../types/equipment";
+import type { Equipment } from "../types/equipment";
 
 export const useEquipmentStore = defineStore("equipment", () => {
   const equipmentservice = equipmentService;

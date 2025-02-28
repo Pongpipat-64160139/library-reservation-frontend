@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import orderDetailService from "../services/orderDetailService";
-import { OrderDetail } from "../types/orderDetail";
+import type { OrderDetail } from "../types/orderDetail";
 import { ref } from "vue";
 
 export const useOrderDetialStore = defineStore("orderDetials", () => {

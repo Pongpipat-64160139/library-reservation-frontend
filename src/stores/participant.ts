@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
-import floorService from "../services/floorService";
 import participantService from "../services/participantService";
-import { ParticipantPostPayload } from "../types/participant";
+import type { ParticipantPostPayload } from "../types/participant";
 
 export const useParticipantStore = defineStore("participant", () => {
   const participantservice = participantService;

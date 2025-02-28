@@ -1,7 +1,7 @@
-import { Document } from "./document";
-import { EquipmentBooking } from "./equipmentBooking";
-import { OrderDetail } from "./orderDetail";
-import { Room } from "./room";
+import type { Document } from "./document";
+import type { EquipmentBooking } from "./equipmentBooking";
+import type { OrderDetail } from "./orderDetail";
+import type { Room } from "./room";
 import type { User } from "./user";
 
 export interface GetSpecialRoomBooking {

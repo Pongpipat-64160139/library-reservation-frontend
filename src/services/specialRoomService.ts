@@ -1,5 +1,5 @@
 import http from "../axios";
-import { PostSpecialRoom, UpdateSpecialRoom } from "../types/specialRoomBooking";
+import type { PostSpecialRoom, UpdateSpecialRoom } from "../types/specialRoomBooking";
 export function getAllSpecialRoom() {
   return http.get("/special-room-bookings");
 }

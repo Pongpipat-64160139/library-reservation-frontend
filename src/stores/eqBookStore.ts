@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import eqbSerivce from "../services/eqbSerivce";
-import { PostEquipmentBooking } from "../types/equipmentBooking";
+import type { PostEquipmentBooking } from "../types/equipmentBooking";
 import { ref } from "vue";
 export const useEqBookStore = defineStore("equipmentBook", () => {
   const equipmentBookService = eqbSerivce;

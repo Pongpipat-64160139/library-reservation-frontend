@@ -1,5 +1,5 @@
 import http from "../axios";
-import { OrderDetail } from "../types/orderDetail";
+import type { OrderDetail } from "../types/orderDetail";
 
 export function getAllOrder() {
   return http.get("order-details");

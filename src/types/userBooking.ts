@@ -1,4 +1,4 @@
-import { NormalRoomBooking } from "./normalRoomBooking";
+import type { NormalRoomBooking } from "./normalRoomBooking";
 import type { User } from "./user";
 
 export interface UserBooking {

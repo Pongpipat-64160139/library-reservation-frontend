@@ -1,4 +1,4 @@
-import { Floor } from "./floor";
+import type { Floor } from "./floor";
 export interface Room {
   roomId: number;
 

@@ -1,5 +1,5 @@
 import type { Equipment } from "./equipment";
-import { GetSpecialRoomBooking } from "./specialRoomBooking";
+import type { GetSpecialRoomBooking } from "./specialRoomBooking";
 
 export interface EquipmentBooking {
   eqb_Id: number;

@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import holidayService from "../services/holidayService";
 import { ref } from "vue";
-import { Holiday } from "../types/holidays";
+import type { Holiday } from "../types/holidays";
 
 export const useHolidayStore = defineStore("holiday", () => {
   const holidayservice = holidayService;

@@ -1,5 +1,5 @@
 import http from "../axios";
-import { RoleAssignment } from "../types/roleAssignment";
+import type { RoleAssignment } from "../types/roleAssignment";
 
 export function getAllRoleAssginment() {
   return http.get("/role-assignments");

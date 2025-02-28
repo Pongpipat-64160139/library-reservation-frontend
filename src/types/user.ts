@@ -1,7 +1,7 @@
-import { Confirmation } from "./confirmation";
-import { RoleAssignment } from "./roleAssignment";
-import { GetSpecialRoomBooking } from "./specialRoomBooking";
-import { UserBooking } from "./userBooking";
+import type { Confirmation } from "./confirmation";
+import type { RoleAssignment } from "./roleAssignment";
+import type { GetSpecialRoomBooking } from "./specialRoomBooking";
+import type { UserBooking } from "./userBooking";
 
 export interface User {
   userId: number;

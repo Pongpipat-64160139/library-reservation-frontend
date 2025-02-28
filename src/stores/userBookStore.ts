@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
-import floorService from "../services/floorService";
 import { ref } from "vue";
-import { UBPostpayload, UserBooking } from "../types/userBooking";
+import type { UBPostpayload, UserBooking } from "../types/userBooking";
 import userBookService from "../services/userBookService";
 
 export const useUserBookStore = defineStore("userbooking", () => {

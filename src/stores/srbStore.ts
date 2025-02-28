@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import specialRoomService from "../services/specialRoomService";
-import {
+import type {
   PostSpecialRoom,
   UpdateSpecialRoom,
 } from "../types/specialRoomBooking";

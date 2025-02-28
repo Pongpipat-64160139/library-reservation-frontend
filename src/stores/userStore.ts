@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import userService from "../services/userService";
 
-import { UpdateUser, User } from "../types/user";
+import type { UpdateUser, User } from "../types/user";
 
 import { ref } from "vue";
 

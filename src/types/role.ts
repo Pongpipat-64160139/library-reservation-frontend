@@ -1,6 +1,6 @@
-import { Confirmation } from "./confirmation";
-import { RoleAssignment } from "./roleAssignment";
-import { RoleRoomAccess } from "./roleRoomAccess";
+import type { Confirmation } from "./confirmation";
+import type { RoleAssignment } from "./roleAssignment";
+import type { RoleRoomAccess } from "./roleRoomAccess";
 
 export interface Role {
   roleId: number;

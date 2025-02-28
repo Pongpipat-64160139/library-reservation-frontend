@@ -1,8 +1,7 @@
 import { defineStore } from "pinia";
 import normalBookService from "../services/normalBookService";
-import {
+import type {
   getStatusReserved,
-  NormalRoomBooking,
   PostNormalReseved,
   UpdateNormalRoomBooking,
 } from "../types/normalRoomBooking";

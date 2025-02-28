@@ -1,5 +1,5 @@
 import http from "../axios";
-import { ParticipantPostPayload } from "../types/participant";
+import type { ParticipantPostPayload } from "../types/participant";
 
 export function getAllParticipants() {
   return http.get("/participants");

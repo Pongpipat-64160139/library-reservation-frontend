@@ -1,5 +1,5 @@
 import http from "../axios";
-import { UpdateUser } from "../types/user";
+import type { UpdateUser } from "../types/user";
 
 export function checkAndLoginUser(username: string, password: string) {
   return http.post(`/users/login`, { username, password }); // ✅ ส่งไปใน Body

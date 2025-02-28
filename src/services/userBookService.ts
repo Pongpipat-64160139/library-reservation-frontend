@@ -1,5 +1,5 @@
 import http from "../axios";
-import { UBPostpayload, UserBooking } from "../types/userBooking";
+import type { UBPostpayload } from "../types/userBooking";
 export function getAllUserBooks() {
   return http.get("/user-bookings");
 }
