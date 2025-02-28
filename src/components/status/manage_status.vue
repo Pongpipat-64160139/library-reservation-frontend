@@ -93,7 +93,7 @@
   </v-container>
 
   <!-- Dialog Detail -->
-  <v-dialog v-model="dialog" max-width="630px" max-height="600px">
+  <v-dialog v-model="dialog" max-width="670px" max-height="600px">
     <v-card class="dialog-detail">
       <span class="text-userdetail">
         <div class="text-headdetail">
@@ -108,11 +108,61 @@
         </div>
       </span>
 
+      <span
+        v-if="selectedItem?.floor_number"
+        class="d-flex text-startdatedetail"
+      >
+        <v-row>
+          <v-col cols="6">
+            <div class="text-headdetail size-selectfloor d-flex">
+              <strong class="me-1">ชั้น</strong>
+              <v-select
+                v-if="editMode"
+                v-model="selectedFloorId"
+                :items="floorOptions"
+                item-title="floor_Number"
+                item-value="floorId"
+                variant="outlined"
+                density="compact"
+                class="mg-toptime"
+                @update:model-value="updateAvailableRooms"
+              />
+              <span v-else>{{ selectedItem?.floor_number }}</span>
+            </div>
+          </v-col>
+          <v-col>
+            <div class="text-headdetail size-selectroom d-flex">
+              <strong class="me-1">ห้อง</strong>
+              <v-select
+                v-if="editMode"
+                v-model="selectedRoomId"
+                :items="roomOptions"
+                item-title="room_Name"
+                item-value="roomId"
+                variant="outlined"
+                density="compact"
+                class="mg-toptime"
+                @update:model-value="
+                  (val) => {
+                    console.log('Selected room value:', val);
+                    onRoomSelected(val);
+                  }
+                "
+              />
+              <span v-else>{{ selectedItem?.room_name }}</span>
+            </div>
+          </v-col>
+        </v-row>
+      </span>
+
       <span class="d-flex text-startdatedetail">
         <v-row>
           <v-col cols="6">
             <div class="text-headdetail">
-              <strong>วันที่เริ่ม</strong> {{ selectedItem?.start_date }}
+              <div v-if="selectedItem?.start_date">
+                <strong>วันที่เริ่ม</strong>
+                {{ formatThaiDate(selectedItem.start_date) }}
+              </div>
             </div>
           </v-col>
           <v-col>
@@ -136,7 +186,10 @@
         <v-row>
           <v-col cols="6">
             <div class="text-headdetail">
-              <strong>วันที่จบ</strong> {{ selectedItem?.end_date }}
+              <div v-if="selectedItem?.end_date">
+                <strong>วันที่เริ่ม</strong>
+                {{ formatThaiDate(selectedItem.end_date) }}
+              </div>
             </div>
           </v-col>
           <v-col>
@@ -151,38 +204,6 @@
                 class="mg-toptime"
               />
               <span v-else>{{ selectedItem?.end_time }}</span>
-            </div>
-          </v-col>
-        </v-row>
-      </span>
-
-      <span class="d-flex text-floor-roomdetail">
-        <v-row>
-          <v-col cols="6">
-            <div class="text-headdetail size-selectfloor">
-              <strong class="me-1">ชั้น</strong>
-              <v-select
-                v-if="editMode"
-                v-model="editedFloor"
-                :items="Object.keys(floorRooms)"
-                density="compact"
-                variant="outlined"
-                @update:model-value="updateAvailableRooms"
-              />
-              <span v-else>{{ selectedItem?.floor_number }}</span>
-            </div>
-          </v-col>
-          <v-col>
-            <div class="text-headdetail size-selectroom">
-              <strong class="me-1">ห้อง</strong>
-              <v-select
-                v-if="editMode"
-                v-model="editedRoom"
-                :items="availableRooms"
-                density="compact"
-                variant="outlined"
-              />
-              <span v-else>{{ selectedItem?.room_name }}</span>
             </div>
           </v-col>
         </v-row>
@@ -244,6 +265,10 @@
             color: '#493628',
           }"
           @click="toggleEditMode"
+          :disabled="
+            selectedItem?.reseve_status === 'ยกเลิก' ||
+            selectedItem?.reseve_status === 'อนุมัติ'
+          "
         >
           {{ editMode ? "บันทึก" : "แก้ไข" }}
         </v-btn>
@@ -290,23 +315,26 @@ import { useRoomStore } from "@/stores/roomStore";
 import { useNormalRoomBookStore } from "@/stores/nrbStore";
 import type { AllReserve } from "@/types/allReserved";
 import { useSpecialRoomStore } from "@/stores/srbStore";
-import type {
-  getStatusReserved,
-  NormalRoomBooking,
-  UpdateNormalRoomBooking,
-} from "@/types/normalRoomBooking";
+import type { NormalRoomBooking } from "@/types/normalRoomBooking";
 import type { GetSpecialRoomBooking } from "@/types/specialRoomBooking";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
+import { useFloorStore } from "../../stores/floorStore";
+
+const floorStore = useFloorStore();
+
+// Update onMounted to fetch both floor data and reservation data
+onMounted(async () => {
+  await fetchFloorAndRoomData();
+  await LoadingData();
+});
 
 const userStore = useUserStore();
-const roomStore = useRoomStore(); // เชื่อม store ห้อง
 const nrbStore = useNormalRoomBookStore(); // เชื่อม store การจอง
 const srbStore = useSpecialRoomStore(); //
 const bookingDetails = ref<AllReserve[]>([]);
 const selectedItem = ref<AllReserve | null>(null);
 
-const router = useRouter();
 const sortBy = ref([
   { key: "numb", order: "desc" },
   { key: "numb", order: "asc" },
@@ -341,7 +369,10 @@ const keepTypeForm = ref<string>();
 
 const cancelReason = ref("");
 const selectedFloor = ref(2); // ค่าเริ่มต้นให้ตรงกับชั้นแรกที่มีในแท็บ
-const editedFloor = ref<number>(0);
+const floorOptions = ref<any[]>([]);
+const roomOptions = ref<any[]>([]);
+const selectedRoomId = ref<number | null>(null);
+const selectedFloorId = ref<number | null>(null);
 const editedRoom = ref("");
 const editedStartTime = ref("");
 const editedEndTime = ref("");
@@ -354,18 +385,9 @@ const filteredData = computed(() => {
   );
 });
 
-const availableRooms = computed(() => {
-  return floorRooms[editedFloor.value as keyof typeof floorRooms] || [];
-});
-
 // เพิ่มข้อมูลที่มีโครงสร้างตรงกับ `BookingDetail`
 onMounted(async () => {
-  try {
-    const allReserved = await nrbStore.getAllReservedRooms();
-    bookingDetails.value = allReserved;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
+  await fetchFloorAndRoomData();
 });
 
 // onMounted(() => {
@@ -428,23 +450,58 @@ onMounted(async () => {
 // });
 
 watch(
-  () => editedFloor.value,
-  (newFloor) => {
-    const rooms = floorRooms[newFloor as keyof typeof floorRooms];
-    editedRoom.value = rooms ? rooms[0] : "";
+  () => selectedFloor.value,
+  (newSelect) => {
+    LoadingData(); // โหลดข้อมูลตามชั้นใหม่ทุกครั้งที่เลือก ชั้น
   }
 );
-watch(selectedFloor, (newSelect) => {
-  LoadingData(); // โหลดข้อมูลตามชั้นใหม่ทุกครั้งที่เลือก ชั้น
-});
-async function LoadingData() {
+
+const LoadingData = async () => {
   try {
+    // Store the current selectedItem ID if it exists
+    const selectedItemId = selectedItem.value?.reserved_Id;
+
+    // Load the updated data
     const allReserved = await nrbStore.getAllReservedRooms();
-    bookingDetails.value = allReserved;
+    console.log("Loading reservation data:", allReserved.length, "items");
+
+    // Map room IDs to room names using floorOptions
+    const updatedReservations = allReserved.map((reservation) => {
+      // Find the floor that contains this room
+      const floor = floorOptions.value.find(
+        (f) => f.floor_Number === reservation.floor_number
+      );
+      if (floor) {
+        // Find the room in this floor
+        const room = floor.rooms?.find((r) => r.roomId === reservation.room_id);
+        if (room) {
+          // Update the room_name with the actual name from our options
+          return {
+            ...reservation,
+            room_name: room.room_Name, // ใช้ชื่อห้องจาก room options แทน
+          };
+        }
+      }
+      return reservation;
+    });
+
+    bookingDetails.value = updatedReservations;
+
+    // If we had a selected item, find it again in the updated data
+    if (selectedItemId && dialog.value) {
+      const updatedItem = updatedReservations.find(
+        (item) => item.reserved_Id === selectedItemId
+      );
+
+      if (updatedItem) {
+        console.log("Restoring selected item after data reload:", updatedItem);
+        selectedItem.value = updatedItem;
+      }
+    }
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error("Error loading reservation data:", error);
   }
-}
+};
 
 function formatThaiDate(dateString: string) {
   // Array ของวันในสัปดาห์ภาษาไทย
@@ -482,27 +539,12 @@ function formatThaiDate(dateString: string) {
   return `${thaiDays[dayIndex]} ${day} ${thaiMonths[month - 1]}  ${year + 543}`;
 }
 
-const formatTime = (time: string): string => {
-  return time.slice(0, 5);
-};
 function getCurrentTime(): string {
   const now = new Date();
   const hours = now.getHours().toString().padStart(2, "0"); // ทำให้เป็น 2 หลัก
   const minutes = now.getMinutes().toString().padStart(2, "0");
   return `${hours}:${minutes}`;
 }
-
-const getDetailMessage = (status: string, currentItem: any) => {
-  if (status === "ยกเลิก") {
-    return "รอดำเนินการ";
-  } else if (status === "อนุมัติ") {
-    return "กำลังใช้งาน";
-  } else if (status === "ยกเลิก") {
-    return "ยกเลิกการจอง";
-  }
-
-  return "-";
-};
 
 const handleStatusChange = async (
   id: number,
@@ -518,10 +560,7 @@ const handleStatusChange = async (
   }
   statusChangeDialog.value = true; // เปิด Dialog ยืนยัน
 };
-function formatDateToDDMMYYYY(dateString: string): string {
-  const [year, month, day] = dateString.split("-");
-  return `${day}-${month}-${year}`;
-}
+
 function countTime(startTime: string) {
   const [hour, minutes] = startTime.split(":").map(Number);
   const sumMinites = hour * 60 + minutes;
@@ -556,7 +595,7 @@ async function checkResevedCountTime() {
 
 const startAutoUpdate = () => {
   intervalId = setInterval(() => {
-    console.log("📢 เรียกใช้ฟังก์ชันทุก 30 วินาที");
+    console.log("เรียกใช้ฟังก์ชันทุก 30 วินาที");
     checkResevedCountTime();
   }, 30000); // 30 วินาที
 };
@@ -666,165 +705,221 @@ const endTimeOptions = ref([
   "20:00",
 ]);
 
-const floorRooms = {
-  2: ["201 (20-50)"],
-  3: [
-    "ศึกษากลุ่ม 1 (3-5)",
-    "ศึกษากลุ่ม 2 (3-5)",
-    "ศึกษากลุ่ม 3 (3-5)",
-    "ศึกษากลุ่ม 4 (3-5)",
-    "ศึกษากลุ่ม 5 (3-5)",
-    "ศึกษากลุ่ม 6 (3-5)",
-  ],
-  4: [
-    "ศึกษากลุ่ม 1 (3-5)",
-    "ศึกษากลุ่ม 2 (3-5)",
-    "ศึกษากลุ่ม 3 (3-5)",
-    "ศึกษากลุ่ม 4 (3-5)",
-    "ศึกษากลุ่ม 5 (3-5)",
-  ],
-  5: [
-    "ศึกษากลุ่ม 1 (3-5)",
-    "ศึกษากลุ่ม 2 (3-5)",
-    "ศึกษากลุ่ม 3 (3-5)",
-    "ศึกษากลุ่ม 4 (3-5)",
-    "ศึกษากลุ่ม 5 (3-5)",
-    "Lecturer's Room 1 (3-5)",
-    "Lecturer's Room 2 (3-5)",
-    "Lecturer's Room 3 (3-5)",
-  ],
-  6: [
-    "STV 1 (3-5)",
-    "STV 2 (3-5)",
-    "STV 3 (3-5)",
-    "STV 4 (3-5)",
-    "STV 5 (3-5)",
-    "STV 6 (3-5)",
-    "STV 7 (3-5)",
-    "STV 8 (3-5)",
-    "STV 9 (3-5)",
-    "LIBRA OKE 1 (3-5)",
-    "LIBRA OKE 2 (3-5)",
-    "MINI THEATER (10-30)",
-    "604 Smart Board (8-10)",
-    "Mini Studio",
-    "Cyber Zone 1 (ไม่เกิน 70)",
-    "Cyber Zone 2 (ไม่เกิน 30)",
-    "Live for Life (มากกว่า 3)",
-  ],
-  7: ["706", "707"],
-};
-
 const clearCancelReason = () => {
   cancelReason.value = "";
   statusChangeDialog.value = false;
 };
 
 const updateAvailableRooms = () => {
-  const rooms = floorRooms[editedFloor.value as keyof typeof floorRooms];
-  editedRoom.value = rooms ? rooms[0] : "";
+  if (selectedFloorId.value !== null) {
+    // Find the selected floor in the floorOptions
+    const selectedFloor = floorOptions.value.find(
+      (floor) => floor.floorId === selectedFloorId.value
+    );
+
+    console.log("Selected floor for room options:", selectedFloor);
+
+    if (selectedFloor && selectedFloor.rooms) {
+      // Update room options based on the selected floor
+      roomOptions.value = selectedFloor.rooms;
+      console.log("Room options for selected floor:", roomOptions.value);
+
+      // Check if the current selectedRoomId is in the new room options
+      const currentSelectedRoomStillAvailable = roomOptions.value.some(
+        (room) => room.roomId === selectedRoomId.value
+      );
+
+      // If the current selected room is not in the new options, select the first room
+      if (!currentSelectedRoomStillAvailable && roomOptions.value.length > 0) {
+        const firstRoom = roomOptions.value[0];
+        console.log("Setting selectedRoomId to first room:", firstRoom);
+        selectedRoomId.value = firstRoom.roomId;
+      }
+
+      console.log("selectedRoomId after update:", selectedRoomId.value);
+    } else {
+      console.log("No floor found with ID:", selectedFloorId.value);
+      roomOptions.value = [];
+      selectedRoomId.value = null;
+    }
+  } else {
+    console.log("No floor selected");
+    roomOptions.value = [];
+    selectedRoomId.value = null;
+  }
 };
 
 const saveChanges = async () => {
-  if (selectedItem.value) {
-    const updatedBooking = {
-      startTime: editedStartTime.value,
-      endTime: editedEndTime.value,
-      floorNumber: editedFloor.value,
-      roomName: editedRoom.value,
-    };
+  if (!selectedItem.value) {
+    console.error("No item selected for editing");
+    return;
+  }
 
-    console.log("Updated booking data:", updatedBooking);
+  // ตรวจสอบว่ามี selectedRoomId หรือไม่
+  if (!selectedRoomId.value) {
+    console.error("No room selected");
+    alert("กรุณาเลือกห้องก่อนทำการอัปเดต");
+    return;
+  }
 
-    try {
+  // สร้าง payload สำหรับการอัปเดต
+  const updatedBooking = {
+    roomId: selectedRoomId.value, // ใช้ค่า selectedRoomId โดยตรง
+    startTime: editedStartTime.value,
+    endTime: editedEndTime.value,
+  };
+
+  console.log("Updating booking with data:", updatedBooking);
+
+  try {
+    if (selectedItem.value.reserved_Id) {
       await nrbStore.updateReserve(
         selectedItem.value.reserved_Id,
         updatedBooking
       );
       console.log("Booking updated successfully");
-    } catch (error) {
-      console.error("Error updating booking:", error);
+      await LoadingData();
+      editMode.value = false;
+      dialog.value = false; // ปิด dialog หลังจากอัปเดตสำเร็จ
     }
+  } catch (error) {
+    console.error("Failed to update booking:", error);
+    alert("ไม่สามารถอัปเดตการจองได้ กรุณาลองอีกครั้ง");
   }
 };
 
 const toggleEditMode = async () => {
-  editedStartTime.value = selectedItem.value?.start_time ?? "";
-  editedEndTime.value = selectedItem.value?.end_time ?? "";
-  editedFloor.value = selectedItem.value?.floor_number ?? 0;
-  editedRoom.value = selectedItem.value?.room_name ?? "";
-
-  console.log("Dialog data:", {
-    startTime: editedStartTime.value,
-    endTime: editedEndTime.value,
-    floor_number: editedFloor.value,
-    room_name: editedRoom.value,
-  });
+  if (!selectedItem.value) return;
 
   if (editMode.value) {
-    // ตรวจสอบความถูกต้องของเวลา
-    if (editedStartTime.value >= editedEndTime.value) {
-      alert("เวลาเริ่มต้องน้อยกว่าเวลาจบ");
-      return;
-    }
+    // ถ้ากำลังจะบันทึก
+    await saveChanges();
+  } else {
+    // เข้าสู่โหมดแก้ไข
+    editMode.value = true;
+    editedStartTime.value = selectedItem.value.start_time;
+    editedEndTime.value = selectedItem.value.end_time;
 
-    // บันทึกการแก้ไขลงใน `bookingDetails`
-    const index = bookingDetails.value.findIndex(
-      (item) => item.reserved_Id === selectedItem.value?.reserved_Id
+    // ตั้งค่า floor และ room options
+    const floor = floorOptions.value.find(
+      (f) => f.floor_Number === selectedItem.value.floor_number
     );
 
-    if (index !== -1) {
-      bookingDetails.value[index] = {
-        ...bookingDetails.value[index],
-        start_time: editedStartTime.value,
-        end_time: editedEndTime.value,
-        floor_number: editedFloor.value,
-        room_name: editedRoom.value,
-      };
+    if (floor) {
+      selectedFloorId.value = floor.floorId;
+      roomOptions.value = floor.rooms || [];
+
+      // หา room ที่ตรงกับชื่อห้องแทนการใช้ room_id
+      const matchingRoom = roomOptions.value.find(
+        (room) => room.room_Name === selectedItem.value.room_name
+      );
+
+      if (matchingRoom) {
+        selectedRoomId.value = matchingRoom.roomId;
+        console.log("Found matching room:", {
+          roomName: matchingRoom.room_Name,
+          roomId: matchingRoom.roomId,
+        });
+      }
     }
+  }
+};
 
-    // เรียกฟังก์ชัน saveChanges เพื่อบันทึกการเปลี่ยนแปลงไปยัง API
-    await saveChanges();
+// เพิ่ม watch เพื่อ debug
+watch(selectedRoomId, (newVal) => {
+  console.log("selectedRoomId changed to:", newVal);
+  const selectedRoom = roomOptions.value.find((r) => r.roomId === newVal);
+  console.log("Selected room object:", selectedRoom);
+});
 
-    editMode.value = false;
-  } else {
-    editedFloor.value = selectedItem.value?.floor_number ?? editedFloor.value;
+const onRoomSelected = (roomId: number) => {
+  console.log("Room selected:", roomId);
+  selectedRoomId.value = roomId;
+};
+
+const showDialog = (item: AllReserve) => {
+  console.log("Opening dialog with item:", JSON.stringify(item, null, 2));
+  selectedItem.value = item;
+  dialog.value = true;
+
+  // ตั้งค่าค่าเริ่มต้นสำหรับ floor และ room
+  if (item.floor_number) {
+    const floor = floorOptions.value.find(
+      (f) => f.floor_Number === item.floor_number
+    );
+    if (floor) {
+      selectedFloorId.value = floor.floorId;
+      // อัพเดท room options สำหรับชั้นที่เลือก
+      roomOptions.value = floor.rooms || [];
+
+      // หา room ที่ตรงกับชื่อห้องแทนการใช้ room_id
+      const matchingRoom = roomOptions.value.find(
+        (room) => room.room_Name === item.room_name
+      );
+
+      console.log("Matching room:", matchingRoom);
+
+      if (matchingRoom) {
+        selectedRoomId.value = matchingRoom.roomId;
+      } else {
+        console.log("Room options:", roomOptions.value);
+        console.log("Looking for room name:", item.room_name);
+      }
+    }
+  }
+};
+
+const handleCancel = () => {
+  if (editMode.value) {
+    selectedRoomId.value = selectedItem.value?.roomId ?? selectedRoomId.value;
     editedRoom.value = selectedItem.value?.room_name ?? editedRoom.value;
     editedStartTime.value =
       selectedItem.value?.start_time ?? editedStartTime.value;
     editedEndTime.value = selectedItem.value?.end_time ?? editedEndTime.value;
-    editMode.value = true;
+    editMode.value = false;
+  } else {
+    dialog.value = false;
   }
 };
 
-const showDialog = (item: AllReserve) => {
-  selectedItem.value = item;
-  dialog.value = true;
-};
+const fetchFloorAndRoomData = async () => {
+  try {
+    // Get all reserved rooms for the booking details
+    const allReserved = await nrbStore.getAllReservedRooms();
+    bookingDetails.value = allReserved;
 
-interface BookingDetail {
-  numb: number;
-  floorNumber: string;
-  roomName: string;
-  startDate: string;
-  startTime: string;
-  endDate: string;
-  endTime: string;
-  status: string;
-  details: string;
-  cancelReason: string;
-  cancelTime?: string;
-}
+    // Get floor data from floorStore
+    const floorsResponse = await floorStore.getAllFloors();
+    console.log("Raw floors response:", floorsResponse);
 
-const handleCancel = () => {
-  if (editMode.value) {
-    editedFloor.value = selectedItem.value?.floor_number ?? editedFloor.value;
-    editedRoom.value = selectedItem.value?.room_name ?? editedRoom.value;
-    editedStartTime.value = selectedItem.value?.start_time ?? editedStartTime.value;
-    editedEndTime.value = selectedItem.value?.end_time ?? editedEndTime.value;
-    editMode.value = false; 
-  } else {
-    dialog.value = false;
+    const floors = floorsResponse.data;
+    console.log("Floors data:", floors);
+
+    // Set floor options from floorStore data, using the correct property names from types
+    floorOptions.value = floors.map((floor) => {
+      console.log("Processing floor:", floor);
+      return {
+        floorId: floor.floorId,
+        floor_Number: floor.floor_Number,
+        rooms: Array.isArray(floor.rooms)
+          ? floor.rooms.map((room) => ({
+              roomId: room.roomId,
+              room_Name: room.room_Name,
+            }))
+          : [],
+      };
+    });
+
+    console.log("Floor options after mapping:", floorOptions.value);
+
+    // If there are floors, select the first one by default and update room options
+    if (floorOptions.value.length > 0) {
+      selectedFloorId.value = floorOptions.value[0].floorId;
+      console.log("Selected first floor:", floorOptions.value[0]);
+      updateAvailableRooms();
+    }
+  } catch (error) {
+    console.error("Error fetching floor and room data:", error);
   }
 };
 </script>
@@ -984,11 +1079,11 @@ th {
 }
 
 .size-selectfloor {
-  width: 200px;
+  width: 120px;
 }
 
 .size-selectroom {
-  width: 200px;
+  width: 225px;
   margin-left: 40px;
 }
 
