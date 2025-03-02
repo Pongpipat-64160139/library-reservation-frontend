@@ -115,8 +115,20 @@
       >
         จองห้อง
       </v-btn>
+
     </v-sheet>
   </v-container>
+
+  <!-- Dialog แจ้งเตือนจองห้องสำเร็จ -->
+  <v-dialog v-model="successDialog" max-width="400px" class="success-dialog">
+    <v-card>
+      <v-card-text class="success-text mt-5 text-center">
+        <v-icon icon="mdi-check-circle" color="#b5cfb7" size="60" class="mb-3"></v-icon>
+        <div class="mb-5">จองห้องสำเร็จ !</div>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
 </template>
 
 <script setup lang="ts">
@@ -180,6 +192,8 @@ const normalRoomBooking = ref<PostNormalReseved>(); // การจองห้�
 const user = ref<User>(); // ข้อมูลผู้ใช้
 const selectedDate = ref<string>(""); // ใช้เป็น string แทน null
 const currentReserveDate = ref<string>(); // เก็บวันที่ปัจจุบัน หรือ วันที่ๆ เลือกใหม่และมีการอัพเดทตามตารางตลอด
+const snackbar = ref(false);
+const successDialog = ref(false);
 
 const isFormValid = computed(() => {
   // ตรวจสอบว่า listparticipants มีข้อมูลครบถ้วนและจำนวนผู้เข้าร่วมอย่างน้อยตามที่กำหนด
@@ -737,8 +751,21 @@ onMounted(async () => {
 
 const router = useRouter();
 async function submitBookingRoomAndNavigate() {
-  await submitBookingRoom(); // เรียกฟังก์ชันจองห้องเดิม
-  router.push("/table_study"); // เปลี่ยนเส้นทางไปยังหน้า table_study
+  try {
+    // จองห้องก่อน
+    await submitBookingRoom();
+    
+    // หลังจากจองสำเร็จ แสดง Dialog
+    successDialog.value = true;
+
+    // ปิด Dialog และนำทางไปหน้า table_study หลังจาก 1 วินาที
+    setTimeout(() => {
+      successDialog.value = false;
+      router.push("/table_study");
+    }, 700);
+  } catch (error) {
+    console.error("Error booking room:", error);
+  }
 }
 
 // Watchers
@@ -944,5 +971,15 @@ watch(roomName, (newRoom) => {
   width: 150px;
   height: 35px;
   border: 2px solid #493628;
+}
+
+.success-dialog {
+  border-radius: 20px;
+}
+
+.success-text {
+  font-weight: 400;
+  font-size: 18px;
+  color: #493628;
 }
 </style>

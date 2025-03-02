@@ -5,11 +5,7 @@
     <v-breadcrumbs :items="items" divider=">" class="mg-toptable">
       <!-- Manage Room -->
       <template #item="{ item }">
-        <router-link
-          v-if="!item.disabled && item.href"
-          :to="item.href"
-          class="breadcrumb-link"
-        >
+        <router-link v-if="!item.disabled && item.href" :to="item.href" class="breadcrumb-link">
           {{ item.title }}
         </router-link>
 
@@ -22,33 +18,21 @@
 
     <!-- Tabs for Floors -->
     <v-tabs v-model="selectedFloor" background-color="#cdbba7">
-      <v-tab
-        v-for="floor in [2, 3, 4, 5, 6, 7]"
-        :key="floor"
-        class="tab-text"
-        :value="floor"
-      >
+      <v-tab v-for="floor in [2, 3, 4, 5, 6, 7]" :key="floor" class="tab-text" :value="floor">
         ชั้น {{ floor }}
       </v-tab>
     </v-tabs>
 
     <!-- Data Table -->
-    <v-data-table
-      v-model:sort-by="sortBy"
-      :headers="headers"
-      :items="filteredData"
-      :sort-desc="[true]"
-      style="background-color: #cdbba7"
-      class="rd-datatable table-text"
-    >
+    <v-data-table v-model:sort-by="sortBy" :headers="headers" :items="filteredData" :sort-desc="[true]"
+      style="background-color: #cdbba7" class="rd-datatable table-text">
       <template #item="{ item, index }">
         <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
           <td>
             {{ index + 1 }}
           </td>
           <td>
-            {{ userStore.currentUser?.firstname
-            }}{{ userStore.currentUser?.lastname }}
+            {{ item.fname }} {{ item.lname }}
           </td>
           <td>
             {{ item.floor_number }}
@@ -61,31 +45,17 @@
           </td>
           <td>{{ item.start_time }} - {{ item.end_time }}</td>
           <td class="align-center justify-center">
-            <v-select
-              :model-value="item.reseve_status"
-              :items="['รอ', 'อนุมัติ', 'ยกเลิก']"
-              variant="outlined"
-              density="compact"
-              class="size-selectstatus"
-              :disabled="
-                item.reseve_status === 'อนุมัติ' ||
+            <v-select :model-value="item.reseve_status" :items="['รอ', 'อนุมัติ', 'ยกเลิก']" variant="outlined"
+              density="compact" class="size-selectstatus" :disabled="item.reseve_status === 'อนุมัติ' ||
                 item.reseve_status === 'ยกเลิก'
-              "
-              @update:model-value="
-                (val) =>
-                  handleStatusChange(item.reserved_Id, val, item.formReserved)
-              "
-            />
+                " @update:model-value="
+                  (val) =>
+                    handleStatusChange(item.reserved_Id, val, item.formReserved)
+                " />
           </td>
           <td>
-            <v-btn
-              color="#F5EDED"
-              icon="mdi-magnify"
-              width="40"
-              height="40"
-              class="btn-diadetail"
-              @click="showDialog(item)"
-            />
+            <v-btn color="#F5EDED" icon="mdi-magnify" width="40" height="40" class="btn-diadetail"
+              @click="showDialog(item)" />
           </td>
         </tr>
       </template>
@@ -93,62 +63,39 @@
   </v-container>
 
   <!-- Dialog Detail -->
-  <v-dialog v-model="dialog" max-width="670px" max-height="600px">
+  <v-dialog v-model="dialog" max-width="630px" max-height="600px">
     <v-card class="dialog-detail">
       <span class="text-userdetail">
         <div class="text-headdetail">
-          <strong>ผู้ใช้</strong> {{ userStore.currentUser?.Username }}
+          <strong>ผู้ใช้</strong> {{ selectedItem?.user_name }}
         </div>
       </span>
 
       <span class="text-namedetail">
         <div class="text-headdetail">
-          <strong>ชื่อ</strong> {{ userStore.currentUser?.firstname
-          }}{{ userStore.currentUser?.lastname }}
+          <strong>ชื่อ</strong> {{ selectedItem?.fname }} {{  selectedItem?.lname }}
         </div>
       </span>
 
-      <span
-        v-if="selectedItem?.floor_number"
-        class="d-flex text-startdatedetail"
-      >
+      <span v-if="selectedItem?.floor_number" class="d-flex text-startdatedetail">
         <v-row>
           <v-col cols="6">
-            <div class="text-headdetail size-selectfloor d-flex">
-              <strong class="me-1">ชั้น</strong>
-              <v-select
-                v-if="editMode"
-                v-model="selectedFloorId"
-                :items="floorOptions"
-                item-title="floor_Number"
-                item-value="floorId"
-                variant="outlined"
-                density="compact"
-                class="mg-toptime"
-                @update:model-value="updateAvailableRooms"
-              />
+            <div class="text-headdetail">
+              <strong>ชั้น </strong>
+              <v-select v-if="editMode" v-model="selectedFloorId" :items="floorOptions" item-title="floor_Number"
+                item-value="floorId" variant="outlined" density="compact" class="mg-toptime"
+                @update:model-value="updateAvailableRooms" />
               <span v-else>{{ selectedItem?.floor_number }}</span>
             </div>
           </v-col>
           <v-col>
-            <div class="text-headdetail size-selectroom d-flex">
+            <div class="text-headdetail size-selectfloor">
               <strong class="me-1">ห้อง</strong>
-              <v-select
-                v-if="editMode"
-                v-model="selectedRoomId"
-                :items="roomOptions"
-                item-title="room_Name"
-                item-value="roomId"
-                variant="outlined"
-                density="compact"
-                class="mg-toptime"
-                @update:model-value="
-                  (val) => {
-                    console.log('Selected room value:', val);
-                    onRoomSelected(val);
-                  }
-                "
-              />
+              <v-select v-if="editMode" v-model="selectedRoomId" :items="roomOptions" item-title="room_Name"
+                item-value="roomId" variant="outlined" density="compact" class="mg-toptime" @update:model-value="(val) => {
+                  console.log('Selected room value:', val);
+                  onRoomSelected(val);
+                }" />
               <span v-else>{{ selectedItem?.room_name }}</span>
             </div>
           </v-col>
@@ -159,23 +106,14 @@
         <v-row>
           <v-col cols="6">
             <div class="text-headdetail">
-              <div v-if="selectedItem?.start_date">
-                <strong>วันที่เริ่ม</strong>
-                {{ formatThaiDate(selectedItem.start_date) }}
-              </div>
+              <strong>วันที่เริ่ม</strong> {{ selectedItem?.start_date }}
             </div>
           </v-col>
           <v-col>
             <div class="text-headdetail size-selecttime d-flex">
               <strong class="me-1">เวลาเริ่ม</strong>
-              <v-select
-                v-if="editMode"
-                v-model="editedStartTime"
-                :items="startTimeOptions"
-                variant="outlined"
-                density="compact"
-                class="mg-toptime"
-              />
+              <v-select v-if="editMode" v-model="editedStartTime" :items="startTimeOptions" variant="outlined"
+                density="compact" class="mg-toptime" />
               <span v-else>{{ selectedItem?.start_time }}</span>
             </div>
           </v-col>
@@ -186,23 +124,14 @@
         <v-row>
           <v-col cols="6">
             <div class="text-headdetail">
-              <div v-if="selectedItem?.end_date">
-                <strong>วันที่เริ่ม</strong>
-                {{ formatThaiDate(selectedItem.end_date) }}
-              </div>
+              <strong>วันที่จบ</strong> {{ selectedItem?.end_date }}
             </div>
           </v-col>
           <v-col>
             <div class="text-headdetail size-selecttime d-flex">
               <strong class="me-1">เวลาจบ</strong>
-              <v-select
-                v-if="editMode"
-                v-model="editedEndTime"
-                :items="endTimeOptions"
-                density="compact"
-                variant="outlined"
-                class="mg-toptime"
-              />
+              <v-select v-if="editMode" v-model="editedEndTime" :items="endTimeOptions" density="compact"
+                variant="outlined" class="mg-toptime" />
               <span v-else>{{ selectedItem?.end_time }}</span>
             </div>
           </v-col>
@@ -215,29 +144,20 @@
         </div>
       </span>
 
-      <span
-        v-if="selectedItem?.reseve_status === 'ยกเลิก'"
-        class="d-flex text-headdetail"
-      >
+      <span v-if="selectedItem?.reseve_status === 'ยกเลิก'" class="d-flex text-headdetail">
         <div class="text-headdetail">
           <strong>เหตุผลการยกเลิก</strong>
           {{ selectedItem?.reason || "ยกเลิกการจอง" }}
         </div>
       </span>
 
-      <span
-        v-if="selectedItem?.reseve_status === 'ยกเลิก'"
-        class="d-flex mg-leftreason"
-      >
+      <span v-if="selectedItem?.reseve_status === 'ยกเลิก'" class="d-flex mg-leftreason">
         <div class="text-headdetail">
           <strong>ยกเลิกโดย</strong>
         </div>
       </span>
 
-      <span
-        v-if="selectedItem?.reseve_status === 'ยกเลิก'"
-        class="d-flex mg-leftreason"
-      >
+      <span v-if="selectedItem?.reseve_status === 'ยกเลิก'" class="d-flex mg-leftreason">
         <div class="text-headdetail">
           <strong>เวลาที่ยกเลิก</strong>
           {{ selectedItem?.coalesce_time || "ไม่มีข้อมูล" }}
@@ -247,29 +167,17 @@
       <!-- Button in Dialog -->
       <v-card-text />
       <v-card-actions class="d-flex justify-center mg-btmdiastatus">
-        <v-btn
-          class="btn-close-canceldialog"
-          :style="{
-            backgroundColor: editMode ? '#ea8a8a' : '#dad0c2',
-            color: '#493628',
-          }"
-          @click="handleCancel"
-        >
+        <v-btn class="btn-close-canceldialog" :style="{
+          backgroundColor: editMode ? '#ea8a8a' : '#dad0c2',
+          color: '#493628',
+        }" @click="handleCancel">
           {{ editMode ? "ยกเลิก" : "ปิด" }}
         </v-btn>
 
-        <v-btn
-          class="btn-save-editdialog"
-          :style="{
-            backgroundColor: editMode ? '#B5CFB7' : '#f0c8a4',
-            color: '#493628',
-          }"
-          @click="toggleEditMode"
-          :disabled="
-            selectedItem?.reseve_status === 'ยกเลิก' ||
-            selectedItem?.reseve_status === 'อนุมัติ'
-          "
-        >
+        <v-btn class="btn-save-editdialog" :style="{
+          backgroundColor: editMode ? '#B5CFB7' : '#f0c8a4',
+          color: '#493628',
+        }" @click="toggleEditMode">
           {{ editMode ? "บันทึก" : "แก้ไข" }}
         </v-btn>
       </v-card-actions>
@@ -284,24 +192,15 @@
           ต้องการเปลี่ยนสถานะเป็น "{{ newStatus }}" ใช่หรือไม่ ?
         </div>
 
-        <v-text-field
-          v-if="newStatus === 'ยกเลิก'"
-          v-model="cancelReason"
-          label="กรอกเหตุผลในการยกเลิก"
-          variant="outlined"
-          :rules="[(v) => !!v || '']"
-          class="mg-topdiastatus"
-        />
+        <v-text-field v-if="newStatus === 'ยกเลิก'" v-model="cancelReason" label="กรอกเหตุผลในการยกเลิก"
+          variant="outlined" :rules="[(v) => !!v || '']" class="mg-topdiastatus" />
       </v-card-text>
       <v-card-actions class="d-flex justify-center mg-topdiastatus">
         <v-btn class="btn-cancelreason" @click="clearCancelReason">
           ยกเลิก
         </v-btn>
-        <v-btn
-          class="btn-confirmreason"
-          :disabled="newStatus === 'ยกเลิก' && !cancelReason"
-          @click="confirmStatusChange"
-        >
+        <v-btn class="btn-confirmreason" :disabled="newStatus === 'ยกเลิก' && !cancelReason"
+          @click="confirmStatusChange">
           ยืนยัน
         </v-btn>
       </v-card-actions>
@@ -315,7 +214,11 @@ import { useRoomStore } from "@/stores/roomStore";
 import { useNormalRoomBookStore } from "@/stores/nrbStore";
 import type { AllReserve } from "@/types/allReserved";
 import { useSpecialRoomStore } from "@/stores/srbStore";
-import type { NormalRoomBooking } from "@/types/normalRoomBooking";
+import type {
+  getStatusReserved,
+  NormalRoomBooking,
+  UpdateNormalRoomBooking,
+} from "@/types/normalRoomBooking";
 import type { GetSpecialRoomBooking } from "@/types/specialRoomBooking";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
@@ -330,11 +233,13 @@ onMounted(async () => {
 });
 
 const userStore = useUserStore();
+const roomStore = useRoomStore(); // เชื่อม store ห้อง
 const nrbStore = useNormalRoomBookStore(); // เชื่อม store การจอง
 const srbStore = useSpecialRoomStore(); //
 const bookingDetails = ref<AllReserve[]>([]);
 const selectedItem = ref<AllReserve | null>(null);
 
+const router = useRouter();
 const sortBy = ref([
   { key: "numb", order: "desc" },
   { key: "numb", order: "asc" },
@@ -373,6 +278,7 @@ const floorOptions = ref<any[]>([]);
 const roomOptions = ref<any[]>([]);
 const selectedRoomId = ref<number | null>(null);
 const selectedFloorId = ref<number | null>(null);
+const editedFloor = ref<number>(0);
 const editedRoom = ref("");
 const editedStartTime = ref("");
 const editedEndTime = ref("");
@@ -383,6 +289,10 @@ const filteredData = computed(() => {
   return bookingDetails.value.filter(
     (item) => item.floor_number === selectedFloor.value
   );
+});
+
+const availableRooms = computed(() => {
+  return floorRooms[editedFloor.value as keyof typeof floorRooms] || [];
 });
 
 // เพิ่มข้อมูลที่มีโครงสร้างตรงกับ `BookingDetail`
@@ -466,19 +376,17 @@ const LoadingData = async () => {
     console.log("Loading reservation data:", allReserved.length, "items");
 
     // Map room IDs to room names using floorOptions
-    const updatedReservations = allReserved.map((reservation) => {
+    const updatedReservations = allReserved.map(reservation => {
       // Find the floor that contains this room
-      const floor = floorOptions.value.find(
-        (f) => f.floor_Number === reservation.floor_number
-      );
+      const floor = floorOptions.value.find(f => f.floor_Number === reservation.floor_number);
       if (floor) {
         // Find the room in this floor
-        const room = floor.rooms?.find((r) => r.roomId === reservation.room_id);
+        const room = floor.rooms?.find(r => r.roomId === reservation.room_id);
         if (room) {
           // Update the room_name with the actual name from our options
           return {
             ...reservation,
-            room_name: room.room_Name, // ใช้ชื่อห้องจาก room options แทน
+            room_name: room.room_Name // ใช้ชื่อห้องจาก room options แทน
           };
         }
       }
@@ -490,7 +398,7 @@ const LoadingData = async () => {
     // If we had a selected item, find it again in the updated data
     if (selectedItemId && dialog.value) {
       const updatedItem = updatedReservations.find(
-        (item) => item.reserved_Id === selectedItemId
+        item => item.reserved_Id === selectedItemId
       );
 
       if (updatedItem) {
@@ -539,12 +447,27 @@ function formatThaiDate(dateString: string) {
   return `${thaiDays[dayIndex]} ${day} ${thaiMonths[month - 1]}  ${year + 543}`;
 }
 
+const formatTime = (time: string): string => {
+  return time.slice(0, 5);
+};
 function getCurrentTime(): string {
   const now = new Date();
   const hours = now.getHours().toString().padStart(2, "0"); // ทำให้เป็น 2 หลัก
   const minutes = now.getMinutes().toString().padStart(2, "0");
   return `${hours}:${minutes}`;
 }
+
+const getDetailMessage = (status: string, currentItem: any) => {
+  if (status === "ยกเลิก") {
+    return "รอดำเนินการ";
+  } else if (status === "อนุมัติ") {
+    return "กำลังใช้งาน";
+  } else if (status === "ยกเลิก") {
+    return "ยกเลิกการจอง";
+  }
+
+  return "-";
+};
 
 const handleStatusChange = async (
   id: number,
@@ -561,6 +484,10 @@ const handleStatusChange = async (
   statusChangeDialog.value = true; // เปิด Dialog ยืนยัน
 };
 
+function formatDateToDDMMYYYY(dateString: string): string {
+  const [year, month, day] = dateString.split("-");
+  return `${day}-${month}-${year}`;
+}
 function countTime(startTime: string) {
   const [hour, minutes] = startTime.split(":").map(Number);
   const sumMinites = hour * 60 + minutes;
@@ -705,6 +632,55 @@ const endTimeOptions = ref([
   "20:00",
 ]);
 
+const floorRooms = {
+  2: ["201 (20-50)"],
+  3: [
+    "ศึกษากลุ่ม 1 (3-5)",
+    "ศึกษากลุ่ม 2 (3-5)",
+    "ศึกษากลุ่ม 3 (3-5)",
+    "ศึกษากลุ่ม 4 (3-5)",
+    "ศึกษากลุ่ม 5 (3-5)",
+    "ศึกษากลุ่ม 6 (3-5)",
+  ],
+  4: [
+    "ศึกษากลุ่ม 1 (3-5)",
+    "ศึกษากลุ่ม 2 (3-5)",
+    "ศึกษากลุ่ม 3 (3-5)",
+    "ศึกษากลุ่ม 4 (3-5)",
+    "ศึกษากลุ่ม 5 (3-5)",
+  ],
+  5: [
+    "ศึกษากลุ่ม 1 (3-5)",
+    "ศึกษากลุ่ม 2 (3-5)",
+    "ศึกษากลุ่ม 3 (3-5)",
+    "ศึกษากลุ่ม 4 (3-5)",
+    "ศึกษากลุ่ม 5 (3-5)",
+    "Lecturer's Room 1 (3-5)",
+    "Lecturer's Room 2 (3-5)",
+    "Lecturer's Room 3 (3-5)",
+  ],
+  6: [
+    "STV 1 (3-5)",
+    "STV 2 (3-5)",
+    "STV 3 (3-5)",
+    "STV 4 (3-5)",
+    "STV 5 (3-5)",
+    "STV 6 (3-5)",
+    "STV 7 (3-5)",
+    "STV 8 (3-5)",
+    "STV 9 (3-5)",
+    "LIBRA OKE 1 (3-5)",
+    "LIBRA OKE 2 (3-5)",
+    "MINI THEATER (10-30)",
+    "604 Smart Board (8-10)",
+    "Mini Studio",
+    "Cyber Zone 1 (ไม่เกิน 70)",
+    "Cyber Zone 2 (ไม่เกิน 30)",
+    "Live for Life (มากกว่า 3)",
+  ],
+  7: ["706", "707"],
+};
+
 const clearCancelReason = () => {
   cancelReason.value = "";
   statusChangeDialog.value = false;
@@ -766,7 +742,7 @@ const saveChanges = async () => {
   const updatedBooking = {
     roomId: selectedRoomId.value, // ใช้ค่า selectedRoomId โดยตรง
     startTime: editedStartTime.value,
-    endTime: editedEndTime.value,
+    endTime: editedEndTime.value
   };
 
   console.log("Updating booking with data:", updatedBooking);
@@ -804,21 +780,21 @@ const toggleEditMode = async () => {
     const floor = floorOptions.value.find(
       (f) => f.floor_Number === selectedItem.value.floor_number
     );
-
+    
     if (floor) {
       selectedFloorId.value = floor.floorId;
       roomOptions.value = floor.rooms || [];
-
+      
       // หา room ที่ตรงกับชื่อห้องแทนการใช้ room_id
       const matchingRoom = roomOptions.value.find(
         (room) => room.room_Name === selectedItem.value.room_name
       );
-
+      
       if (matchingRoom) {
         selectedRoomId.value = matchingRoom.roomId;
         console.log("Found matching room:", {
           roomName: matchingRoom.room_Name,
-          roomId: matchingRoom.roomId,
+          roomId: matchingRoom.roomId
         });
       }
     }
@@ -828,7 +804,7 @@ const toggleEditMode = async () => {
 // เพิ่ม watch เพื่อ debug
 watch(selectedRoomId, (newVal) => {
   console.log("selectedRoomId changed to:", newVal);
-  const selectedRoom = roomOptions.value.find((r) => r.roomId === newVal);
+  const selectedRoom = roomOptions.value.find(r => r.roomId === newVal);
   console.log("Selected room object:", selectedRoom);
 });
 
@@ -851,14 +827,14 @@ const showDialog = (item: AllReserve) => {
       selectedFloorId.value = floor.floorId;
       // อัพเดท room options สำหรับชั้นที่เลือก
       roomOptions.value = floor.rooms || [];
-
+      
       // หา room ที่ตรงกับชื่อห้องแทนการใช้ room_id
       const matchingRoom = roomOptions.value.find(
         (room) => room.room_Name === item.room_name
       );
-
+      
       console.log("Matching room:", matchingRoom);
-
+      
       if (matchingRoom) {
         selectedRoomId.value = matchingRoom.roomId;
       } else {
@@ -869,12 +845,25 @@ const showDialog = (item: AllReserve) => {
   }
 };
 
+interface BookingDetail {
+  numb: number;
+  floorNumber: string;
+  roomName: string;
+  startDate: string;
+  startTime: string;
+  endDate: string;
+  endTime: string;
+  status: string;
+  details: string;
+  cancelReason: string;
+  cancelTime?: string;
+}
+
 const handleCancel = () => {
   if (editMode.value) {
     selectedRoomId.value = selectedItem.value?.roomId ?? selectedRoomId.value;
     editedRoom.value = selectedItem.value?.room_name ?? editedRoom.value;
-    editedStartTime.value =
-      selectedItem.value?.start_time ?? editedStartTime.value;
+    editedStartTime.value = selectedItem.value?.start_time ?? editedStartTime.value;
     editedEndTime.value = selectedItem.value?.end_time ?? editedEndTime.value;
     editMode.value = false;
   } else {
@@ -896,17 +885,15 @@ const fetchFloorAndRoomData = async () => {
     console.log("Floors data:", floors);
 
     // Set floor options from floorStore data, using the correct property names from types
-    floorOptions.value = floors.map((floor) => {
+    floorOptions.value = floors.map(floor => {
       console.log("Processing floor:", floor);
       return {
         floorId: floor.floorId,
         floor_Number: floor.floor_Number,
-        rooms: Array.isArray(floor.rooms)
-          ? floor.rooms.map((room) => ({
-              roomId: room.roomId,
-              room_Name: room.room_Name,
-            }))
-          : [],
+        rooms: Array.isArray(floor.rooms) ? floor.rooms.map(room => ({
+          roomId: room.roomId,
+          room_Name: room.room_Name
+        })) : []
       };
     });
 
@@ -922,6 +909,7 @@ const fetchFloorAndRoomData = async () => {
     console.error("Error fetching floor and room data:", error);
   }
 };
+
 </script>
 
 <style scoped>
@@ -1079,11 +1067,11 @@ th {
 }
 
 .size-selectfloor {
-  width: 120px;
+  width: 200px;
 }
 
 .size-selectroom {
-  width: 225px;
+  width: 200px;
   margin-left: 40px;
 }
 

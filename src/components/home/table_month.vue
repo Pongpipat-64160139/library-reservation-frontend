@@ -61,7 +61,6 @@
                 >
                   <p>{{ booking.name }}</p>
                 </div>
-                <p v-if="day.bookings.length > 3">...และอื่น ๆ</p>
               </div>
             </div>
           </td>
@@ -72,9 +71,12 @@
 </template>
 
 <script>
+import { useNormalRoomBookStore } from "@/stores/nrbStore"; // Import the store
+
 export default {
   data() {
     const currentYear = new Date().getFullYear();
+
     return {
       selectedYear: currentYear,
       selectedMonth: new Date().getMonth() + 1,
@@ -105,38 +107,34 @@ export default {
         "เสาร์",
       ],
       calendar: [],
-      bookings: [
-        // Mock Data for Last Year
-        { date: "2024-01-10", name: "สมชาย", status: "จองล่วงหน้า" },
-        { date: "2024-02-15", name: "สายฝน", status: "กำลังใช้งาน" },
-        { date: "2024-03-20", name: "บุญช่วย", status: "กำลังใช้งาน" },
-        { date: "2024-04-25", name: "สมหมาย", status: "จองล่วงหน้า" },
-        { date: "2024-05-05", name: "นฤมล", status: "กำลังใช้งาน" },
-        { date: "2024-06-10", name: "กัลยา", status: "จองล่วงหน้า" },
-        { date: "2024-07-15", name: "ประภา", status: "กำลังใช้งาน" },
-        { date: "2024-08-20", name: "มงคล", status: "จองล่วงหน้า" },
-        { date: "2024-09-25", name: "วรพล", status: "กำลังใช้งาน" },
-        { date: "2024-10-10", name: "สมคิด", status: "กำลังใช้งาน" },
-        { date: "2024-11-15", name: "ปวีณา", status: "จองล่วงหน้า" },
-        { date: "2024-12-20", name: "ณัฐพล", status: "กำลังใช้งาน" },
-
-        // Current Year Data
-        { date: "2025-01-10", name: "กานต์", status: "กำลังใช้งาน" },
-        { date: "2025-01-10", name: "นุชา", status: "จองล่วงหน้า" },
-        { date: "2025-01-10", name: "สมฤดี", status: "กำลังใช้งาน" },
-        { date: "2025-01-15", name: "มานพ", status: "กำลังใช้งาน" },
-        { date: "2025-01-15", name: "วรรณา", status: "จองล่วงหน้า" },
-        { date: "2025-01-15", name: "ประหยัด", status: "กำลังใช้งาน" },
-        { date: "2025-01-20", name: "ณัฐ", status: "กำลังใช้งาน" },
-        { date: "2025-01-20", name: "นภา", status: "จองล่วงหน้า" },
-        { date: "2025-01-20", name: "ศุภชัย", status: "กำลังใช้งาน" },
-        { date: "2025-01-25", name: "วรางค์", status: "กำลังใช้งาน" },
-        { date: "2025-01-25", name: "กาญจนา", status: "จองล่วงหน้า" },
-        { date: "2025-01-25", name: "ปิยะ", status: "กำลังใช้งาน" },
-      ],
+      bookings: [], // Remove mockup data
     };
   },
   methods: {
+    async fetchBookings() {
+      try {
+        const nrbStore = useNormalRoomBookStore();
+        const response = await nrbStore.getAllReserve();
+        console.log("API response:", response);
+
+        if (Array.isArray(response.data)) {
+          this.bookings = response.data.map((booking) => {
+            // ดึง username จาก userBookings array
+            const userName = booking.userBookings && booking.userBookings[0]?.user?.Username || "ไม่ระบุ";
+            return {
+              date: booking.startDate,
+              name: userName,
+              status: booking.reseve_status,
+            };
+          });
+          this.updateCalendar();
+        } else {
+          console.error("Expected an array but got:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+      }
+    },
     updateCalendar() {
       const year = this.selectedYear;
       const month = this.selectedMonth;
@@ -150,10 +148,11 @@ export default {
       }
 
       for (let day = 1; day <= lastDay.getDate(); day++) {
-        const date = new Date(year, month - 1, day).toISOString().split("T")[0];
-        const bookings = this.bookings.filter((b) => b.date === date);
+        const date = new Date(year, month - 1, day);
+        const formattedDate = date.toLocaleDateString("en-CA"); // ให้ผลลัพธ์เป็น YYYY-MM-DD โดยไม่เปลี่ยนเวลา
+        const bookings = this.bookings.filter((b) => b.date === formattedDate);
 
-        week.push({ day, date, bookings });
+        week.push({ day, date: formattedDate, bookings });
 
         if (week.length === 7) {
           calendar.push(week);
@@ -203,8 +202,12 @@ export default {
       return "";
     },
   },
-  mounted() {
-    this.updateCalendar();
+  async mounted() {
+    try {
+      await this.fetchBookings(); // Call the function to fetch bookings
+    } catch (error) {
+      console.error("Error during mounted hook:", error);
+    }
     document.addEventListener("click", this.handleClickOutside);
   },
 };
@@ -272,6 +275,7 @@ export default {
   margin-top: 50px;
   width: 120px;
 }
+
 .dropdown-year {
   position: absolute;
   background-color: #f5eded;
@@ -298,6 +302,7 @@ export default {
   width: 100%;
   border-collapse: collapse;
 }
+
 .calendar-table th {
   border: 2px solid #493628;
   background-color: #f9f3ea;
@@ -306,6 +311,7 @@ export default {
   width: 14.28%;
   height: 30px;
 }
+
 .calendar-table td {
   border: 2px solid #493628;
   background-color: #f9f3ea;
@@ -314,25 +320,32 @@ export default {
   width: 14.28%;
   height: 95px;
 }
+
 .date-cell {
   padding: 5px;
 }
+
 .booking {
   background-color: #b5cfb7;
   padding: 5px;
   border-radius: 5px;
 }
+
 .status-pending {
-  background-color: rgb(196, 196, 196); /* สีเหลืองสำหรับสถานะจองล่วงหน้า */
-  color: #493628; /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
+  background-color: rgb(196, 196, 196);
+  /* สีเหลืองสำหรับสถานะจองล่วงหน้า */
+  color: #493628;
+  /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
   border-radius: 5px;
   padding: 2px;
   margin-top: 5px;
 }
 
 .status-active {
-  background-color: #b5cfb7; /* สีเขียวสำหรับสถานะกำลังใช้งาน */
-  color: #493628; /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
+  background-color: #b5cfb7;
+  /* สีเขียวสำหรับสถานะกำลังใช้งาน */
+  color: #493628;
+  /* เปลี่ยนสีตัวอักษรถ้าจำเป็น */
   border-radius: 5px;
   padding: 2px;
   margin-top: 5px;
@@ -369,6 +382,7 @@ export default {
     width: 70px;
     font-size: 10px;
   }
+
   .dropdown-month {
     position: absolute;
     background-color: #f5eded;
@@ -381,6 +395,7 @@ export default {
     width: 90px;
     font-size: 10px;
   }
+
   .dropdown-year {
     position: absolute;
     background-color: #f5eded;
@@ -394,6 +409,7 @@ export default {
     margin-left: 110px;
     font-size: 10px;
   }
+
   .calendar-table th {
     border: 2px solid #493628;
     background-color: #f9f3ea;
@@ -404,6 +420,7 @@ export default {
     font-size: 8px;
     padding: 5px;
   }
+
   .calendar-table td {
     border: 2px solid #493628;
     background-color: #f9f3ea;
@@ -420,6 +437,7 @@ export default {
   .ms-kob {
     margin-top: -200px;
   }
+
   .calendar-header {
     margin-bottom: 30px;
     display: flex;
@@ -445,6 +463,7 @@ export default {
     width: 70px;
     font-size: 10px;
   }
+
   .dropdown-month {
     position: absolute;
     background-color: #f5eded;
@@ -457,6 +476,7 @@ export default {
     width: 90px;
     font-size: 10px;
   }
+
   .dropdown-year {
     position: absolute;
     background-color: #f5eded;
@@ -470,6 +490,7 @@ export default {
     margin-left: 110px;
     font-size: 10px;
   }
+
   .calendar-table th {
     border: 2px solid #493628;
     background-color: #f9f3ea;
@@ -480,6 +501,7 @@ export default {
     font-size: 10px;
     padding: 5px;
   }
+
   .calendar-table td {
     border: 2px solid #493628;
     background-color: #f9f3ea;
@@ -503,6 +525,7 @@ export default {
   .ms-kob {
     margin-top: -600px;
   }
+
   .calendar-header {
     margin-bottom: 30px;
     display: flex;
@@ -528,6 +551,7 @@ export default {
     width: 70px;
     font-size: 10px;
   }
+
   .dropdown-month {
     position: absolute;
     background-color: #f5eded;
@@ -540,6 +564,7 @@ export default {
     width: 90px;
     font-size: 10px;
   }
+
   .dropdown-year {
     position: absolute;
     background-color: #f5eded;
@@ -553,6 +578,7 @@ export default {
     margin-left: 110px;
     font-size: 10px;
   }
+
   .calendar-table th {
     border: 2px solid #493628;
     background-color: #f9f3ea;
@@ -563,6 +589,7 @@ export default {
     font-size: 10px;
     padding: 5px;
   }
+
   .calendar-table td {
     border: 2px solid #493628;
     background-color: #f9f3ea;
@@ -586,6 +613,7 @@ export default {
   .ms-kob {
     margin-top: -880px;
   }
+
   .calendar-header {
     margin-bottom: 30px;
     display: flex;
@@ -611,6 +639,7 @@ export default {
     width: 70px;
     font-size: 10px;
   }
+
   .dropdown-month {
     position: absolute;
     background-color: #f5eded;
@@ -623,6 +652,7 @@ export default {
     width: 100px;
     font-size: 10px;
   }
+
   .dropdown-year {
     position: absolute;
     background-color: #f5eded;
@@ -636,6 +666,7 @@ export default {
     margin-left: 120px;
     font-size: 10px;
   }
+
   .calendar-table th {
     border: 2px solid #493628;
     background-color: #f9f3ea;
@@ -646,6 +677,7 @@ export default {
     font-size: 10px;
     padding: 5px;
   }
+
   .calendar-table td {
     border: 2px solid #493628;
     background-color: #f9f3ea;

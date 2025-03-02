@@ -16,7 +16,7 @@
       <template #item="{ item, index }">
         <tr :class="index % 2 === 0 ? 'row-even' : 'row-odd'" class="table-font">
           <td>{{ index + 1 }}</td>
-          <td>-</td>
+          <td>{{ item.userBookings?.[0]?.user?.firstname }} {{ item.userBookings?.[0]?.user?.lastname }}</td>
           <td>{{ item.roomName }}</td>
           <td>{{ item.startDate }}</td>
           <td>{{ item.startTime }} - {{ item.endTime }}</td>
@@ -130,15 +130,25 @@
   </v-dialog>
 
   <!-- แจ้งเตือนยกเลิกการจองห้องสำเร็จ -->
-  <v-snackbar v-model="snackbar" timeout="3000" top class="snackbar-text" color="#b5cfb7">
+  <v-dialog v-model="successDialog" max-width="400px" class="success-dialog">
+    <v-card>
+      <v-card-text class="success-text mt-5 text-center">
+        <v-icon icon="mdi-check-circle" color="#b5cfb7" size="60" class="mb-3"></v-icon>
+        <div>ยกเลิกการจองห้องสำเร็จ !</div>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
+  <!-- <v-snackbar v-model="snackbar" timeout="3000" top class="snackbar-text" color="#b5cfb7">
     ยกเลิกการจองห้องสำเร็จ !
-  </v-snackbar>
+  </v-snackbar> -->
 </template>
 
 <script lang="ts" setup>
 import { ref, computed, onMounted } from "vue";
 import { useRoomStore } from "@/stores/roomStore";
 import { useNormalRoomBookStore } from "@/stores/nrbStore";
+import { useUserStore } from "@/stores/userStore";
 
 interface BookingDetail {
   numb: number;
@@ -152,11 +162,21 @@ interface BookingDetail {
   details: string;
   cancelReason: string;
   cancelTime?: string;
+  userBookings?: Array<{
+    userbooking_Id: number;
+    user: {
+      firstname: string;
+      lastname: string;
+      Username: string;
+      [key: string]: any;
+    };
+  }>;
 }
 
 // Store
 const roomStore = useRoomStore();
 const nrbStore = useNormalRoomBookStore();
+const userStore = useUserStore();
 
 // State
 const bookingDetails = ref<BookingDetail[]>([]);
@@ -167,6 +187,7 @@ const cancelReason = ref("");
 const snackbar = ref(false);
 const selectedFloor = ref(3);
 const availableFloors = ref<number[]>([3, 4, 5, 6]);
+const successDialog = ref(false);
 
 // ฟังก์ชันช่วย
 const cancelBooking = async (booking: BookingDetail | null) => {
@@ -187,8 +208,13 @@ const cancelBooking = async (booking: BookingDetail | null) => {
     booking.cancelReason = cancelReason.value || "ยกเลิกโดยผู้ใช้";
     booking.cancelTime = cancelTime;
 
-    // แสดงข้อความแจ้งเตือน
-    snackbar.value = true;
+    // แสดง Dialog สำเร็จ
+    successDialog.value = true;
+    
+    // ปิด Dialog หลังจาก 2 วินาที
+    setTimeout(() => {
+      successDialog.value = false;
+    }, 700);
 
     // ปิด Dialog
     dialog.value = false;
@@ -251,7 +277,7 @@ const formatThaiDate = (dateString: string | number | Date) => {
 
 // Data Table Headers
 const headers = [
-  { title: "ลำดับ", align: "start", key: "numb" },
+  { title: "ลำดับ", align: "start" as const, key: "numb" },
   { title: "ชื่อ", key: "details" },
   { title: "ห้อง", key: "roomName" },
   { title: "วันที่", key: "startDate" },
@@ -262,9 +288,13 @@ const headers = [
 
 // Computed Data
 const filteredData = computed(() => {
-  return bookingDetails.value.filter(
-    (item) => parseInt(item.floorNumber) === selectedFloor.value
-  );
+  return bookingDetails.value
+    .filter(item => 
+      // เช็คชั้นที่เลือก
+      parseInt(item.floorNumber) === selectedFloor.value &&
+      // เช็ค username ของผู้ใช้
+      item.userBookings?.[0]?.user?.Username === userStore.currentUser?.Username
+    );
 });
 
 // Lifecycle Hook
@@ -287,6 +317,7 @@ onMounted(async () => {
             status: booking.reseve_status,
             details: booking.details,
             cancelReason: booking.reason,
+            userBookings: booking.userBookings
           });
         }
       }
@@ -495,5 +526,15 @@ tr {
 .snackbar-text {
   font-weight: 400;
   font-size: 16px;
+}
+
+.success-dialog {
+  border-radius: 20px;
+}
+
+.success-text {
+  font-weight: 400;
+  font-size: 18px;
+  color: #493628;
 }
 </style>
