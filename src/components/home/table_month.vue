@@ -26,13 +26,13 @@
             @click="showYearDropdown = !showYearDropdown"
             class="year-button"
           >
-            {{ selectedYear }}
+            {{ selectedYear + 543 }}
           </button>
           <div v-if="showYearDropdown" class="dropdown-year">
             <div
               v-for="year in years"
               :key="year"
-              @click="changeYear(year)"
+              @click="changeYear(year - 543)"
               class="dropdown-item"
             >
               {{ year }}
@@ -82,7 +82,7 @@ export default {
       selectedMonth: new Date().getMonth() + 1,
       showMonthDropdown: false,
       showYearDropdown: false,
-      years: Array.from({ length: 11 }, (_, i) => currentYear - 5 + i),
+      years: [currentYear - 1, currentYear, currentYear + 1].map(year => year + 543), // Convert to Buddhist years
       months: [
         "มกราคม",
         "กุมภาพันธ์",

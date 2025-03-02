@@ -76,10 +76,7 @@
               @click="selectRoom(roomIndex, 3, time)"
             >
               {{ getCellClass(room.roomId, time)?.text }}
-              <a
-                :href="generateBookingLink(roomIndex, time, 3)"
-                class="table-link"
-              />
+              <a class="table-link" />
             </td>
           </tr>
         </tbody>
@@ -135,10 +132,7 @@
               @click="selectRoom(roomIndex, 4, time)"
             >
               {{ getCellClass(room.roomId, time)?.text }}
-              <a
-                :href="generateBookingLink(roomIndex, time, 4)"
-                class="table-link"
-              />
+              <a class="table-link" />
             </td>
           </tr>
         </tbody>
@@ -194,10 +188,7 @@
               @click="selectRoom(roomIndex, 5, time)"
             >
               {{ getCellClass(room.roomId, time)?.text }}
-              <a
-                :href="generateBookingLink(roomIndex, time, 5)"
-                class="table-link"
-              />
+              <a class="table-link" />
             </td>
           </tr>
         </tbody>
@@ -205,6 +196,9 @@
     </v-container>
   </v-container>
   <Footer_page />
+  
+  <!-- เพิ่ม Dialog สำหรับแจ้งเตือนการจองเกินจำนวน -->
+  <LimitReachedDialog v-model:showDialog="showLimitDialog" />
 </template>
 
 <script lang="ts" setup>
@@ -214,6 +208,8 @@ import Footer_page from "../footer/footer_page.vue";
 import { useRoomStore } from "@/stores/roomStore";
 import { useHolidayStore } from "@/stores/holidayStore";
 import { useNormalRoomBookStore } from "@/stores/nrbStore";
+import { useUserStore } from "@/stores/userStore";
+import LimitReachedDialog from "../dialog/limit_reached_dialog.vue";
 
 import VueFlatpickr from "vue-flatpickr-component";
 import "flatpickr/dist/flatpickr.css";
@@ -243,6 +239,9 @@ const typeroom = [
     link: "/table_meeting",
   },
 ];
+
+const showLimitDialog = ref(false);
+const userStore = useUserStore();
 
 // ฟังก์ชันเปลี่ยนหน้าเมื่อเลือกประเภทห้องใน Dropdown
 const onSelectChange = (value: string) => {
@@ -482,7 +481,53 @@ const rooms3 = computed(() => roomStore.studyFloor3);
 const rooms4 = computed(() => roomStore.studyFloor4);
 const rooms5 = computed(() => roomStore.studyFloor5);
 
-function selectRoom(roomIndex: number, floor: number, time: string) {
+async function checkUserBooking(roomId: number) {
+  const bookings = nrbStore.bookings;
+  const currentUser = userStore.currentUser;
+  
+  if (!currentUser) return false;
+
+  // กรองการจองที่มี username ตรงกับ user ปัจจุบัน และไม่ได้ถูกยกเลิก
+  const userBookingsToday = bookings.filter(booking => 
+    booking.user_name === currentUser.Username && 
+    booking.re_status !== "ยกเลิก"
+  );
+
+  return userBookingsToday.length > 0;
+}
+
+async function generateBookingLink(
+  roomIndex: number,
+  time: string,
+  floor: number
+): Promise<string> {
+  let roomName = "";
+
+  const rooms =
+    floor === 3
+      ? rooms3.value
+      : floor === 4
+      ? rooms4.value
+      : floor === 5
+      ? rooms5.value
+      : [];
+
+  if (Array.isArray(rooms) && rooms[roomIndex]?.roomName) {
+    roomName = rooms[roomIndex].roomName;
+  } else {
+    console.error(
+      `Room data is invalid for floor=${floor}, roomIndex=${roomIndex}`
+    );
+    roomName = "Unknown Room";
+  }
+
+  // สร้างลิงก์
+  return `/booking_study?floor=${floor}&room=${
+    roomIndex + 1
+  }&time=${time}&roomName=${encodeURIComponent(roomName)}`;
+}
+
+async function selectRoom(roomIndex: number, floor: number, time: string) {
   const rooms =
     floor === 3
       ? roomStore.studyFloor3
@@ -494,6 +539,16 @@ function selectRoom(roomIndex: number, floor: number, time: string) {
 
   const room = rooms[roomIndex];
   if (room) {
+    // เช็คว่า user ได้จองห้องไปแล้วหรือไม่
+    const hasBooking = await checkUserBooking(room.roomId);
+    
+    if (hasBooking) {
+      // ถ้ามีการจองแล้ว แสดง dialog และไม่ทำอะไรต่อ
+      showLimitDialog.value = true;
+      return;
+    }
+
+    // ถ้ายังไม่มีการจอง ดำเนินการต่อตามปกติ
     roomStore.setCurrentRoom({
       roomId: room.roomId,
       roomName: room.roomName,
@@ -505,7 +560,9 @@ function selectRoom(roomIndex: number, floor: number, time: string) {
       orderFood: room.orderFood,
       floorId: room.floorId,
     });
-    console.log("Selected Room:", roomStore.currentTypeRoom);
+    
+    // นำทางไปยังหน้า form_study
+    router.push(`/booking_study?floor=${floor}&room=${roomIndex + 1}&time=${time}&roomName=${encodeURIComponent(room.roomName)}`);
   } else {
     console.error(`Room not found: floor=${floor}, roomIndex=${roomIndex}`);
   }
@@ -540,37 +597,6 @@ onMounted(async () => {
     console.error("Error during onMounted:", error);
   }
 });
-
-const generateBookingLink = (
-  roomIndex: number,
-  time: string,
-  floor: number
-) => {
-  let roomName = "";
-
-  const rooms =
-    floor === 3
-      ? rooms3.value
-      : floor === 4
-      ? rooms4.value
-      : floor === 5
-      ? rooms5.value
-      : [];
-
-  if (Array.isArray(rooms) && rooms[roomIndex]?.roomName) {
-    roomName = rooms[roomIndex].roomName;
-  } else {
-    console.error(
-      `Room data is invalid for floor=${floor}, roomIndex=${roomIndex}`
-    );
-    roomName = "Unknown Room";
-  }
-
-  // สร้างลิงก์
-  return `/booking_study?floor=${floor}&room=${
-    roomIndex + 1
-  }&time=${time}&roomName=${encodeURIComponent(roomName)}`;
-};
 
 const timeSlots = [
   "08:00",

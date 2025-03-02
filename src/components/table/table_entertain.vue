@@ -69,13 +69,10 @@
               :class="getCellClass(room.roomId, time)?.class"
               :rowspan="getCellClass(room.roomId, time)?.rowspan"
               v-show="!getCellClass(room.roomId, time)?.isHidden"
-              @click="selectRoom(room.roomId)"
+              @click="selectRoom(room.roomId, time)"
             >
               {{ getCellClass(room.roomId, time)?.text }}
-              <a
-                :href="generateBookingLink(roomIndex, time, 6, 'stv')"
-                class="table-link"
-              ></a>
+              <a class="table-link" />
             </td>
           </tr>
         </tbody>
@@ -121,13 +118,10 @@
               :class="getCellClass(room.roomId, time)?.class"
               :rowspan="getCellClass(room.roomId, time)?.rowspan"
               v-show="!getCellClass(room.roomId, time)?.isHidden"
-              @click="selectRoom(room.roomId)"
+              @click="selectRoom(room.roomId, time)"
             >
               {{ getCellClass(room.roomId, time)?.text }}
-              <a
-                :href="generateBookingLink(roomIndex, time, 6, 'oke')"
-                class="table-link"
-              ></a>
+              <a class="table-link" />
             </td>
           </tr>
         </tbody>
@@ -178,13 +172,10 @@
               :class="getCellClass(room.roomId, time)?.class"
               :rowspan="getCellClass(room.roomId, time)?.rowspan"
               v-show="!getCellClass(room.roomId, time)?.isHidden"
-              @click="selectRoom(room.roomId)"
+              @click="selectRoom(room.roomId, time)"
             >
               {{ getCellClass(room.roomId, time)?.text }}
-              <a
-                :href="generateBookingLink(roomIndex, time, 6, 'minitheater')"
-                class="table-link"
-              ></a>
+              <a class="table-link" />
             </td>
           </tr>
         </tbody>
@@ -192,15 +183,19 @@
     </v-container>
   </v-container>
   <Footer_page />
+  
+  <!-- เพิ่ม Dialog สำหรับแจ้งเตือนการจองเกินจำนวน -->
+  <LimitReachedDialog v-model:showDialog="showLimitDialog" />
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted, computed, watch } from "vue";
 import { useRouter } from "vue-router";
-
+import Footer_page from "../footer/footer_page.vue";
 import { useRoomStore } from "@/stores/roomStore";
 import { useNormalRoomBookStore } from "@/stores/nrbStore";
-
+import { useUserStore } from "@/stores/userStore";
+import LimitReachedDialog from "../dialog/limit_reached_dialog.vue";
 import VueFlatpickr from "vue-flatpickr-component";
 import "flatpickr/dist/flatpickr.css";
 import { Thai } from "flatpickr/dist/l10n/th.js";
@@ -209,6 +204,7 @@ import { Thai } from "flatpickr/dist/l10n/th.js";
 const router = useRouter();
 const roomStore = useRoomStore();
 const nrbStore = useNormalRoomBookStore();
+const userStore = useUserStore();
 
 const selectedDate = ref<string | null>(null);
 const selectedPage = ref("Entertain Room");
@@ -216,6 +212,7 @@ const currentReserveDate = ref<string>();
 const holidays = ref<string[]>([]);
 const showDatePicker = ref(false);
 const currentDate = ref("");
+const showLimitDialog = ref(false);
 
 // Computed Properties
 const stv = computed(() => roomStore.stvRooms);
@@ -451,6 +448,29 @@ async function loadedReserveRoom(selectedDate: string) {
   nrbStore.bookings = loadedRoom;
 }
 
+async function checkUserBooking(roomId: number) {
+  const bookings = nrbStore.bookings;
+  const currentUser = userStore.currentUser;
+  const entertainRooms = roomStore.entertainRooms;
+  
+  if (!currentUser) return false;
+
+  // กรองการจองที่:
+  // 1. username ตรงกับ user ปัจจุบัน
+  // 2. สถานะเป็น "รอ" หรือ "อนุมัติ" (ไม่รวมสถานะ "ยกเลิก")
+  // 3. เป็นห้องประเภท Entertain
+  const userBookingsToday = bookings.filter(booking => {
+    // เช็คว่าห้องที่จองเป็นห้อง Entertain หรือไม่
+    const isEntertainRoom = entertainRooms.some(room => room.roomId === booking.room_id);
+    
+    return booking.user_name === currentUser.Username && 
+           (booking.re_status === "รอ" || booking.re_status === "อนุมัติ") && // เช็คเฉพาะสถานะ รอ และ อนุมัติ
+           isEntertainRoom;
+  });
+
+  return userBookingsToday.length > 0;
+}
+
 function getCellClass(roomId: number, time: string) {
   // 📌 ดึงข้อมูลรายการจองทั้งหมดจาก store
   const bookings = nrbStore.bookings;
@@ -541,7 +561,7 @@ const onSelectChange = (value: string) => {
   }
 };
 
-async function selectRoom(roomIndex: number) {
+async function selectRoom(roomId: number, time: string) {
   const rooms = roomStore.entertainRooms;
 
   // ตรวจสอบว่า rooms มีค่าและเป็นอาร์เรย์
@@ -550,9 +570,19 @@ async function selectRoom(roomIndex: number) {
     return;
   }
 
-  const selectedRoom = rooms.find((room) => room?.roomId === roomIndex);
+  const selectedRoom = rooms.find((room) => room?.roomId === roomId);
 
   if (selectedRoom) {
+    // เช็คว่า user ได้จองห้องไปแล้วหรือไม่
+    const hasBooking = await checkUserBooking(roomId);
+    
+    if (hasBooking) {
+      // ถ้ามีการจองแล้ว แสดง dialog และไม่ทำอะไรต่อ
+      showLimitDialog.value = true;
+      return;
+    }
+
+    // ถ้ายังไม่มีการจอง ดำเนินการต่อตามปกติ
     roomStore.setCurrentRoom({
       roomId: selectedRoom.roomId,
       roomName: selectedRoom.roomName,
@@ -564,9 +594,11 @@ async function selectRoom(roomIndex: number) {
       orderFood: selectedRoom.orderFood,
       floorId: selectedRoom.floorId,
     });
-    console.log("Selected Room:", roomStore.currentTypeRoom);
+    
+    // นำทางไปยังหน้า booking_study พร้อมส่งพารามิเตอร์
+    router.push(`/booking_study?floor=6&room=${selectedRoom.roomId}&time=${time}&roomName=${encodeURIComponent(selectedRoom.roomName)}&roomType=Entertain`);
   } else {
-    console.warn(`Room with ID ${roomIndex} not found!`);
+    console.warn(`Room with ID ${roomId} not found!`);
   }
 }
 
@@ -693,7 +725,6 @@ onMounted(async () => {
 //   router.push("/booking_study");
 // };
 </script>
--
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap");
