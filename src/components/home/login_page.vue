@@ -27,6 +27,10 @@
               type="password"
               prepend-inner-icon="mdi-lock-outline"
             />
+            <div v-if="errorMessage" class="error-message">
+              <v-icon color="#ff5252" class="error-icon">mdi-alert-circle</v-icon>
+              {{ errorMessage }}
+            </div>
           </v-form>
           <v-btn
             class="btn-form"
@@ -82,17 +86,24 @@ onUnmounted(() => {
 
 const username = ref<string>("");
 const password = ref<string>("");
+const errorMessage = ref<string>("");
 
 const submitForm = async () => {
   if (username.value && password.value) {
-    await userStore.checkLoignAndSaveDataUser(
-      username.value.toString(),
-      password.value.toString()
-    );
-    if (userStore.isLoign) {
-      userStore.getLocalStorageUser()
-      router.push("/home/home_page");
-      console.log("Login successful")
+    try {
+      await userStore.checkLoignAndSaveDataUser(
+        username.value.toString(),
+        password.value.toString()
+      );
+      if (userStore.isLoign) {
+        userStore.getLocalStorageUser()
+        router.push("/home/home_page");
+        console.log("Login successful")
+      } else {
+        errorMessage.value = "Incorrect username or password";
+      }
+    } catch (error) {
+      errorMessage.value = "Incorrect username or password";
     }
   }
 };
@@ -148,7 +159,6 @@ const submitForm = async () => {
 }
 
 .form-border .v-input__control {
-  width: 500px;
   margin-top: 10px;
   border-radius: 5px;
   border: 2px solid #493628;
@@ -189,6 +199,19 @@ const submitForm = async () => {
 .mg-formfont {
   margin-left: 30px;
   margin-top: 30px;
+}
+
+.error-message {
+  color: #ff5252;
+  margin-top: 10px;
+  font-size: 16px;
+  width: 500px;
+  display: flex;
+  align-items: center;
+}
+
+.error-icon {
+  margin-right: 8px;
 }
 
 /* ipad แนวตั้ง*/

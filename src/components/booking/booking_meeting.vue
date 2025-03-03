@@ -11,7 +11,7 @@
       :disabled="
         srbStore.newSRB.people_Count === 0 ||
         srbStore.newSRB.contract_Number.length !== 10 ||
-        srbStore.newSRB.document === null
+        !documentFileStore.currentDocument
       "
     >
       <v-icon left> mdi-content-save </v-icon>
